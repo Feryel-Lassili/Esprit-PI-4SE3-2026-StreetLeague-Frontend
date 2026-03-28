@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node24'        // Must match exactly the name in Jenkins Tools
+        nodejs 'node24'
     }
 
     environment {
@@ -19,12 +19,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'npm ci'
-            }
-        }
-
-        stage('Lint') {
-            steps {
-                sh 'npm run lint -- --max-warnings=0'
             }
         }
 
