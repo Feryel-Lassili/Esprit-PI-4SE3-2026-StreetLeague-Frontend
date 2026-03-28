@@ -24,9 +24,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo '⚠️ Tests skipped due to ChromeHeadless not available on Jenkins'
-                // You can uncomment later when Chrome is installed
-                // sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadless'
+                echo '⚠️ Tests skipped (Chrome not installed on Jenkins)'
             }
         }
 
@@ -39,7 +37,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'dist/**, coverage/**', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'dist/**', allowEmptyArchive: true
             echo 'Pipeline finished'
         }
         success {
