@@ -2,11 +2,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { BackofficeShopComponent } from './shop-management.component';
+import { BackofficeOrdersComponent } from './orders-management.component';
+import { BackofficeSponsorComponent } from './sponsor-management.component';
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-  imports: [CommonModule],
+    imports: [CommonModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -268,27 +271,12 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
 
           <!-- SHOP -->
-          <div *ngIf="currentScreen === 'shop'">
-            <div class="card">
-              <table class="table">
-                <thead>
-                  <tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let p of products">
-                    <td style="font-weight:500;">{{ p.name }}</td>
-                    <td><span class="pill pill-blue">{{ p.category }}</span></td>
-                    <td>{{ p.price }} TND</td>
-                    <td><span class="pill" [class.pill-green]="p.stock > 10" [class.pill-yellow]="p.stock <= 10 && p.stock > 0" [class.pill-red]="p.stock === 0">{{ p.stock }} left</span></td>
-                    <td>
-                      <button class="action-btn">Edit</button>
-                      <button class="action-btn">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <bo-shop *ngIf="currentScreen === 'shop'"></bo-shop>
+
+          <!-- ORDERS -->
+          <bo-orders *ngIf="currentScreen === 'orders'"></bo-orders>
+          <!-- SPONSORS -->
+          <bo-sponsors *ngIf="currentScreen === 'sponsors'"></bo-sponsors>
 
           <!-- HEALTH -->
           <div *ngIf="currentScreen === 'health'">
@@ -429,8 +417,10 @@ export class BackofficeComponent {
       items: [
         { id: 'users', label: 'Users & Teams', icon: '👥' },
         { id: 'venues', label: 'Venues', icon: '📍' },
+        { id: 'orders', label: 'Orders', icon: '📦' },
         { id: 'health', label: 'Health', icon: '🏥' },
         { id: 'shop', label: 'Shop', icon: '🛍️' },
+        { id: 'sponsors', label: 'Sponsors', icon: '💰' },
       ]
     },
     {

@@ -5,6 +5,7 @@ import { FrontofficeComponent } from './frontoffice.component';
 import { authGuard } from '../../core/guards/auth.guard';
 import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
+import { FrontofficeShopComponent } from './shop.component';
 
   
 
@@ -16,15 +17,17 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
-      
-      { path: 'profile', component: ProfileComponent }
+      { path: 'profile', component: ProfileComponent },
+      { path: 'shop', component: FrontofficeShopComponent },
+      { path: 'sponsors', loadComponent: () => import('./sponsors.component').then(m => m.FrontofficeSponsorsComponent) }
     ]
   }
 ];
 
 @NgModule({
   declarations: [
-    ProfileComponent
+    ProfileComponent,
+    FrontofficeShopComponent
   ],
   imports: [
     CommonModule,

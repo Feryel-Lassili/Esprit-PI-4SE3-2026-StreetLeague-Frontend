@@ -1,1 +1,51 @@
 
+/* Tailwind base layers (used when Tailwind is installed) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global StreetLeague Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f9fafb;
+  color: #111827;
+}
+
+/* Utility Classes */
+.card {
+  @apply bg-white rounded-2xl p-6 shadow-lg border border-gray-200;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-[#0D6EFD] to-[#FF6B00] hover:from-[#0D6EFD] hover:to-[#ff8c33] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg font-medium transition-all;
+}
+
+.badge {
+  @apply px-3 py-1 rounded-lg text-xs font-bold;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-700;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-700;
+}
+
+.badge-info {
+  @apply bg-blue-100 text-blue-700;
+}

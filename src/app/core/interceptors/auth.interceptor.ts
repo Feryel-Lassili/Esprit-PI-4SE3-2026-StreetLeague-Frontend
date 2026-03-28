@@ -9,26 +9,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
-  const isAuthRequest = req.url.includes('/auth/login') ||
-                        req.url.includes('/auth/register');
+  const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/register');
 
-  const skipLogout = isAuthRequest ||
-                     req.url.includes('/cart') ||
-                     req.url.includes('/posts') ||
-                     req.url.includes('/likes') ||
-                     req.url.includes('/comments') ||
-                     req.url.includes('/comment-reactions')||
-                     req.url.includes('/user/me');
-
- if (token) {
-  req = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
-}
+  if (token && !isAuthRequest) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  }
 
   return next(req).pipe(
     catchError(error => {
-      if ((error.status === 401 || error.status === 403) && !skipLogout) {
+      // Only logout on 401 (token invalid/expired), not 403 (forbidden - different issue)
+      if (error.status === 401 && !isAuthRequest) {
         authService.logout();
         router.navigate(['/login']);
       }
