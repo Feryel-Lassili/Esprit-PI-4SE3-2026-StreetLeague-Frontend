@@ -2,11 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { of, throwError, Observable } from 'rxjs';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 import { BackofficeSponsorComponent } from './sponsor-management.component';
-import { SponsorService } from '../services/sponsor.service';
-import { SponsorProfile, Sponsorship, SponsorshipStatus } from '../models/sponsor.model';
+import { SponsorService } from '../../core/services/sponsor.service';
+import { SponsorProfile, Sponsorship, SponsorshipStatus } from '../../core/models/sponsor.model';
 
 const mockSponsor: SponsorProfile = {
   id: 1, companyName: 'Acme', logo: '', contactEmail: 'acme@test.com', budget: 5000,
@@ -25,14 +24,14 @@ const active: Sponsorship = {
 
 function makeSvc() {
   return {
-    getAllSponsors: vi.fn((): Observable<SponsorProfile[]> => of([])),
-    getPendingSponsorships: vi.fn((): Observable<Sponsorship[]> => of([])),
-    getAdminStats: vi.fn(() => of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 })),
-    getActiveSponsorships: vi.fn((): Observable<Sponsorship[]> => of([])),
-    approveSponsorship: vi.fn((): Observable<any> => of({})),
-    rejectSponsorship: vi.fn((): Observable<any> => of({})),
-    deleteSponsor: vi.fn((): Observable<void> => of(undefined)),
-    deleteSponsorship: vi.fn((): Observable<void> => of(undefined)),
+    getAllSponsors: jasmine.createSpy().and.returnValue(of([])),
+    getPendingSponsorships: jasmine.createSpy().and.returnValue(of([])),
+    getAdminStats: jasmine.createSpy().and.returnValue(of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 })),
+    getActiveSponsorships: jasmine.createSpy().and.returnValue(of([])),
+    approveSponsorship: jasmine.createSpy().and.returnValue(of({})),
+    rejectSponsorship: jasmine.createSpy().and.returnValue(of({})),
+    deleteSponsor: jasmine.createSpy().and.returnValue(of(undefined)),
+    deleteSponsorship: jasmine.createSpy().and.returnValue(of(undefined)),
   };
 }
 
@@ -59,7 +58,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should load sponsors on init', async () => {
     svc = makeSvc();
-    svc.getAllSponsors.mockReturnValue(of([mockSponsor]));
+    svc.getAllSponsors.and.returnValue(of([mockSponsor]));
     await TestBed.configureTestingModule({
       imports: [BackofficeSponsorComponent, CommonModule, FormsModule],
       providers: [{ provide: SponsorService, useValue: svc }]
@@ -71,7 +70,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should load pending on init', async () => {
     svc = makeSvc();
-    svc.getPendingSponsorships.mockReturnValue(of([pending]));
+    svc.getPendingSponsorships.and.returnValue(of([pending]));
     await TestBed.configureTestingModule({
       imports: [BackofficeSponsorComponent, CommonModule, FormsModule],
       providers: [{ provide: SponsorService, useValue: svc }]
@@ -83,7 +82,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should load stats on init', async () => {
     svc = makeSvc();
-    svc.getAdminStats.mockReturnValue(of({ totalActive: 3, totalPending: 2, totalAmountThisMonth: 9000 }));
+    svc.getAdminStats.and.returnValue(of({ totalActive: 3, totalPending: 2, totalAmountThisMonth: 9000 }));
     await TestBed.configureTestingModule({
       imports: [BackofficeSponsorComponent, CommonModule, FormsModule],
       providers: [{ provide: SponsorService, useValue: svc }]
@@ -95,7 +94,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should handle stats error silently', async () => {
     svc = makeSvc();
-    svc.getAdminStats.mockReturnValue(throwError(() => new Error('403')));
+    svc.getAdminStats.and.returnValue(throwError(() => new Error('403')));
     await TestBed.configureTestingModule({
       imports: [BackofficeSponsorComponent, CommonModule, FormsModule],
       providers: [{ provide: SponsorService, useValue: svc }]
@@ -108,7 +107,7 @@ describe('BackofficeSponsorComponent', () => {
   // --- loadAllSponsorships ---
   it('should load active sponsorships', async () => {
     const comp = await setup();
-    svc.getActiveSponsorships.mockReturnValue(of([active]));
+    svc.getActiveSponsorships.and.returnValue(of([active]));
     comp.loadAllSponsorships();
     expect(comp.allSponsorships.length).toBe(1);
     expect(comp.filteredSponsorships.length).toBe(1);
@@ -116,7 +115,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should handle non-array response', async () => {
     const comp = await setup();
-    svc.getActiveSponsorships.mockReturnValue(of(null as any));
+    svc.getActiveSponsorships.and.returnValue(of(null as any));
     comp.loadAllSponsorships();
     expect(comp.allSponsorships).toEqual([]);
   });
@@ -142,9 +141,9 @@ describe('BackofficeSponsorComponent', () => {
   // --- approve / reject ---
   it('should approve and reload pending', async () => {
     const comp = await setup();
-    svc.approveSponsorship.mockReturnValue(of({} as any));
-    svc.getPendingSponsorships.mockReturnValue(of([]));
-    svc.getAdminStats.mockReturnValue(of({ totalActive: 1, totalPending: 0, totalAmountThisMonth: 0 }));
+    svc.approveSponsorship.and.returnValue(of({} as any));
+    svc.getPendingSponsorships.and.returnValue(of([]));
+    svc.getAdminStats.and.returnValue(of({ totalActive: 1, totalPending: 0, totalAmountThisMonth: 0 }));
     comp.approve(7);
     expect(svc.approveSponsorship).toHaveBeenCalledWith(7);
     expect(svc.getPendingSponsorships).toHaveBeenCalled();
@@ -152,23 +151,23 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should reject and reload pending', async () => {
     const comp = await setup();
-    svc.rejectSponsorship.mockReturnValue(of({} as any));
-    svc.getPendingSponsorships.mockReturnValue(of([]));
-    svc.getAdminStats.mockReturnValue(of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 }));
+    svc.rejectSponsorship.and.returnValue(of({} as any));
+    svc.getPendingSponsorships.and.returnValue(of([]));
+    svc.getAdminStats.and.returnValue(of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 }));
     comp.reject(7);
     expect(svc.rejectSponsorship).toHaveBeenCalledWith(7);
   });
 
   it('should set error on approve failure', async () => {
     const comp = await setup();
-    svc.approveSponsorship.mockReturnValue(throwError(() => new Error('fail')));
+    svc.approveSponsorship.and.returnValue(throwError(() => new Error('fail')));
     comp.approve(7);
     expect(comp.error).toBe('Failed to approve');
   });
 
   it('should set error on reject failure', async () => {
     const comp = await setup();
-    svc.rejectSponsorship.mockReturnValue(throwError(() => new Error('fail')));
+    svc.rejectSponsorship.and.returnValue(throwError(() => new Error('fail')));
     comp.reject(7);
     expect(comp.error).toBe('Failed to reject');
   });
@@ -176,10 +175,10 @@ describe('BackofficeSponsorComponent', () => {
   // --- approveFromTable ---
   it('approveFromTable should reload active and pending', async () => {
     const comp = await setup();
-    svc.approveSponsorship.mockReturnValue(of({} as any));
-    svc.getActiveSponsorships.mockReturnValue(of([]));
-    svc.getPendingSponsorships.mockReturnValue(of([]));
-    svc.getAdminStats.mockReturnValue(of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 }));
+    svc.approveSponsorship.and.returnValue(of({} as any));
+    svc.getActiveSponsorships.and.returnValue(of([]));
+    svc.getPendingSponsorships.and.returnValue(of([]));
+    svc.getAdminStats.and.returnValue(of({ totalActive: 0, totalPending: 0, totalAmountThisMonth: 0 }));
     comp.approveFromTable(7);
     expect(svc.getActiveSponsorships).toHaveBeenCalled();
     expect(svc.getPendingSponsorships).toHaveBeenCalled();
@@ -188,8 +187,8 @@ describe('BackofficeSponsorComponent', () => {
   // --- deleteSponsor ---
   it('should remove sponsor after confirmed delete', async () => {
     const comp = await setup();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    svc.deleteSponsor.mockReturnValue(of(undefined));
+    spyOn(window, 'confirm').and.returnValue(true);
+    svc.deleteSponsor.and.returnValue(of(undefined));
     comp.sponsors = [mockSponsor];
     comp.deleteSponsor(1);
     expect(comp.sponsors.length).toBe(0);
@@ -197,7 +196,7 @@ describe('BackofficeSponsorComponent', () => {
 
   it('should not delete if confirm cancelled', async () => {
     const comp = await setup();
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    spyOn(window, 'confirm').and.returnValue(false);
     comp.sponsors = [mockSponsor];
     comp.deleteSponsor(1);
     expect(svc.deleteSponsor).not.toHaveBeenCalled();
@@ -206,8 +205,8 @@ describe('BackofficeSponsorComponent', () => {
   // --- deleteSponsorship ---
   it('should remove sponsorship after confirmed delete', async () => {
     const comp = await setup();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    svc.deleteSponsorship.mockReturnValue(of(undefined));
+    spyOn(window, 'confirm').and.returnValue(true);
+    svc.deleteSponsorship.and.returnValue(of(undefined));
     comp.allSponsorships = [active];
     comp.filteredSponsorships = [active];
     comp.deleteSponsorship(8);

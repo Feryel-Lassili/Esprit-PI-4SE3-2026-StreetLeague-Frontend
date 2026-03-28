@@ -2,12 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { of, throwError, Observable } from 'rxjs';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 import { FrontofficeSponsorsComponent } from './sponsors.component';
-import { SponsorService } from '../services/sponsor.service';
-import { AuthService } from '../services/auth.service';
-import { SponsorProfile, Sponsorship, SponsorshipStatus } from '../models/sponsor.model';
+import { SponsorService } from '../../core/services/sponsor.service';
+import { AuthService } from '../../core/services/auth.service';
+import { SponsorProfile, Sponsorship, SponsorshipStatus } from '../../core/models/sponsor.model';
 
 const mockSponsor: SponsorProfile = {
   id: 1, companyName: 'Acme', logo: '', contactEmail: 'acme@test.com', budget: 10000,
@@ -21,20 +20,20 @@ const mockSponsorship: Sponsorship = {
 
 function makeSponsorSvc() {
   return {
-    getAllSponsors: vi.fn((): Observable<SponsorProfile[]> => of([])),
-    getMySponsorships: vi.fn((): Observable<Sponsorship[]> => of([])),
-    getPendingSponsorships: vi.fn((): Observable<Sponsorship[]> => of([])),
-    getAvailableTargets: vi.fn((): Observable<any> => of({ targets: [] })),
-    submitSponsorship: vi.fn((): Observable<any> => of({})),
-    uploadPaymentProofFile: vi.fn((): Observable<any> => of({})),
-    approveSponsorship: vi.fn((): Observable<any> => of({})),
-    rejectSponsorship: vi.fn((): Observable<any> => of({})),
-    cancelSponsorship: vi.fn((): Observable<void> => of(undefined)),
+    getAllSponsors: jasmine.createSpy().and.returnValue(of([])),
+    getMySponsorships: jasmine.createSpy().and.returnValue(of([])),
+    getPendingSponsorships: jasmine.createSpy().and.returnValue(of([])),
+    getAvailableTargets: jasmine.createSpy().and.returnValue(of({ targets: [] })),
+    submitSponsorship: jasmine.createSpy().and.returnValue(of({})),
+    uploadPaymentProofFile: jasmine.createSpy().and.returnValue(of({})),
+    approveSponsorship: jasmine.createSpy().and.returnValue(of({})),
+    rejectSponsorship: jasmine.createSpy().and.returnValue(of({})),
+    cancelSponsorship: jasmine.createSpy().and.returnValue(of(undefined)),
   };
 }
 
 function makeAuthSvc(isSponsor = false, isAdmin = false) {
-  return { hasRole: vi.fn((role: string) => (role === 'SPONSOR' && isSponsor) || (role === 'ADMIN' && isAdmin)) };
+  return { hasRole: jasmine.createSpy().and.callFake((role: string) => (role === 'SPONSOR' && isSponsor) || (role === 'ADMIN' && isAdmin)) };
 }
 
 describe('FrontofficeSponsorsComponent', () => {
@@ -65,7 +64,7 @@ describe('FrontofficeSponsorsComponent', () => {
 
   it('should load sponsors on init', async () => {
     sponsorSvc = makeSponsorSvc();
-    sponsorSvc.getAllSponsors.mockReturnValue(of([mockSponsor]));
+    sponsorSvc.getAllSponsors.and.returnValue(of([mockSponsor]));
     authSvc = makeAuthSvc();
     await TestBed.configureTestingModule({
       imports: [FrontofficeSponsorsComponent, ReactiveFormsModule, CommonModule],
@@ -81,7 +80,7 @@ describe('FrontofficeSponsorsComponent', () => {
 
   it('should load pending on init when admin', async () => {
     sponsorSvc = makeSponsorSvc();
-    sponsorSvc.getPendingSponsorships.mockReturnValue(of([mockSponsorship]));
+    sponsorSvc.getPendingSponsorships.and.returnValue(of([mockSponsorship]));
     authSvc = makeAuthSvc(false, true);
     await TestBed.configureTestingModule({
       imports: [FrontofficeSponsorsComponent, ReactiveFormsModule, CommonModule],
@@ -97,7 +96,7 @@ describe('FrontofficeSponsorsComponent', () => {
 
   it('should handle non-array available targets', async () => {
     sponsorSvc = makeSponsorSvc();
-    sponsorSvc.getAvailableTargets.mockReturnValue(of(null as any));
+    sponsorSvc.getAvailableTargets.and.returnValue(of(null as any));
     authSvc = makeAuthSvc(true, false);
     await TestBed.configureTestingModule({
       imports: [FrontofficeSponsorsComponent, ReactiveFormsModule, CommonModule],
@@ -204,11 +203,11 @@ describe('FrontofficeSponsorsComponent', () => {
 
   it('should submit with correct TEAM payload', async () => {
     const comp = await setup(true);
-    sponsorSvc.submitSponsorship.mockReturnValue(of({ ...mockSponsorship, id: 10 }));
-    sponsorSvc.getMySponsorships.mockReturnValue(of([]));
+    sponsorSvc.submitSponsorship.and.returnValue(of({ ...mockSponsorship, id: 10 }));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
     comp.sponsorForm.patchValue({ targetId: '1|TEAM', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
     comp.submitSponsorship();
-    const payload = (sponsorSvc.submitSponsorship.mock.calls as any)[0][0];
+    const payload = (sponsorSvc.submitSponsorship.calls.mostRecent().args as any)[0];
     expect(payload.team).toEqual({ id: 1 });
     expect(payload.amount).toBe(500);
   });
@@ -216,9 +215,9 @@ describe('FrontofficeSponsorsComponent', () => {
   it('should upload payment proof after submit', async () => {
     const comp = await setup(true);
     const created = { ...mockSponsorship, id: 10 };
-    sponsorSvc.submitSponsorship.mockReturnValue(of(created));
-    sponsorSvc.uploadPaymentProofFile.mockReturnValue(of(created));
-    sponsorSvc.getMySponsorships.mockReturnValue(of([]));
+    sponsorSvc.submitSponsorship.and.returnValue(of(created));
+    sponsorSvc.uploadPaymentProofFile.and.returnValue(of(created));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
     comp.sponsorForm.patchValue({ targetId: '1|TEAM', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
     const file = new File(['data'], 'proof.pdf');
     comp.paymentProofFile = file;
@@ -228,7 +227,7 @@ describe('FrontofficeSponsorsComponent', () => {
 
   it('should set formError on submit failure', async () => {
     const comp = await setup(true);
-    sponsorSvc.submitSponsorship.mockReturnValue(throwError(() => new Error('fail')));
+    sponsorSvc.submitSponsorship.and.returnValue(throwError(() => new Error('fail')));
     comp.sponsorForm.patchValue({ targetId: '1|TEAM', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
     comp.submitSponsorship();
     expect(comp.formError).toBe('Failed to submit sponsorship');
@@ -237,16 +236,16 @@ describe('FrontofficeSponsorsComponent', () => {
   // --- approve / reject ---
   it('should reload pending after approve', async () => {
     const comp = await setup(false, true);
-    sponsorSvc.approveSponsorship.mockReturnValue(of({} as any));
-    sponsorSvc.getPendingSponsorships.mockReturnValue(of([]));
+    sponsorSvc.approveSponsorship.and.returnValue(of({} as any));
+    sponsorSvc.getPendingSponsorships.and.returnValue(of([]));
     comp.approveSponsorship(7);
     expect(sponsorSvc.approveSponsorship).toHaveBeenCalledWith(7);
   });
 
   it('should reload pending after reject', async () => {
     const comp = await setup(false, true);
-    sponsorSvc.rejectSponsorship.mockReturnValue(of({} as any));
-    sponsorSvc.getPendingSponsorships.mockReturnValue(of([]));
+    sponsorSvc.rejectSponsorship.and.returnValue(of({} as any));
+    sponsorSvc.getPendingSponsorships.and.returnValue(of([]));
     comp.rejectSponsorship(7);
     expect(sponsorSvc.rejectSponsorship).toHaveBeenCalledWith(7);
   });
