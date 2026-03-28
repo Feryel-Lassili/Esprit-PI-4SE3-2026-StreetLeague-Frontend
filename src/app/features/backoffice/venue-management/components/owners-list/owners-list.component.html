@@ -1,0 +1,132 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Venue Owners</h1>
+      <p class="page-subtitle">Manage all registered venue owners and their venues</p>
+    </div>
+    <button class="btn-refresh" (click)="loadOwners()" id="refresh-owners-btn">🔄 Refresh</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="state-center">
+    <div class="spinner"></div>
+    <p>Loading owners...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert-error">
+    <span>⚠️</span> {{ error }}
+    <button (click)="loadOwners()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && !error && owners.length === 0" class="empty-state">
+    <div class="empty-icon">👤</div>
+    <h2>No Venue Owners</h2>
+    <p>There are no registered venue owners yet.</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error && owners.length > 0" class="table-card">
+    <table class="owners-table" id="owners-table">
+      <thead>
+        <tr>
+          <th>Owner</th>
+          <th>Company</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let owner of owners" [id]="'owner-row-' + owner.ownerId">
+          <td>
+            <div class="owner-cell">
+              <div class="owner-avatar">{{ owner.ownerUsername[0].toUpperCase() }}</div>
+              <div>
+                <div class="owner-username">{{ owner.ownerUsername }}</div>
+                <div class="owner-email">{{ owner.ownerEmail }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">{{ owner.companyName }}</td>
+          <td class="text-muted">{{ owner.ownerPhone }}</td>
+          <td>
+            <span class="status-pill" [class.pill-verified]="owner.verified" [class.pill-unverified]="!owner.verified">
+              {{ owner.verified ? '✓ Verified' : '✗ Unverified' }}
+            </span>
+          </td>
+          <td>
+            <div class="action-group">
+              <button class="action-btn btn-view-owner"
+                (click)="viewOwner(owner.ownerId)"
+                [id]="'view-owner-' + owner.ownerId"
+                title="View venues">
+                👁 View
+              </button>
+              <button class="action-btn btn-verify"
+                *ngIf="!owner.verified"
+                (click)="verifyOwner(owner.ownerId)"
+                [disabled]="actionLoading === owner.ownerId"
+                [id]="'verify-owner-' + owner.ownerId">
+                ✓ Verify
+              </button>
+              <button class="action-btn btn-unverify"
+                *ngIf="owner.verified"
+                (click)="unverifyOwner(owner.ownerId)"
+                [disabled]="actionLoading === owner.ownerId"
+                [id]="'unverify-owner-' + owner.ownerId">
+                ✗ Unverify
+              </button>
+              <button class="action-btn btn-delete-owner"
+                (click)="deleteOwner(owner.ownerId)"
+                [disabled]="actionLoading === owner.ownerId"
+                [id]="'delete-owner-' + owner.ownerId">
+                🗑 Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .page-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin: 0 0 4px; }
+  .page-subtitle { font-size: 14px; color: #6e6e73; margin: 0; }
+  .btn-refresh { background: none; border: 1px solid #d0d0d5; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #6e6e73; cursor: pointer; transition: background 0.15s; }
+  .btn-refresh:hover { background: #f5f5f7; }
+  .state-center { display: flex; flex-direction: column; align-items: center; padding: 60px; color: #6e6e73; gap: 14px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #e0e0e5; border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .btn-retry { margin-left: auto; background: #c62828; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .empty-state { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center; color: #6e6e73; }
+  .empty-icon { font-size: 48px; margin-bottom: 14px; }
+  .empty-state h2 { font-size: 18px; font-weight: 600; color: #1d1d1f; margin: 0 0 6px; }
+  .table-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 14px; overflow: hidden; }
+  .owners-table { width: 100%; border-collapse: collapse; }
+  .owners-table th { text-align: left; font-size: 11px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 16px; border-bottom: 1px solid #e0e0e5; background: #fafafa; }
+  .owners-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f7; font-size: 13px; color: #1d1d1f; vertical-align: middle; }
+  .owners-table tbody tr:last-child td { border-bottom: none; }
+  .owners-table tbody tr:hover { background: #fafafa; }
+  .owner-cell { display: flex; align-items: center; gap: 12px; }
+  .owner-avatar { width: 34px; height: 34px; border-radius: 50%; background: #e8f0fe; color: #185fa5; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .owner-username { font-weight: 600; color: #1d1d1f; font-size: 13px; }
+  .owner-email { font-size: 12px; color: #6e6e73; }
+  .text-muted { color: #6e6e73; }
+  .venue-count-badge { background: #f5f5f7; color: #1d1d1f; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+  .pill-verified { background: #f1f8e9; color: #2e7d32; }
+  .pill-unverified { background: #fff2f2; color: #c62828; }
+  .action-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .action-btn { padding: 5px 10px; border: 1px solid #e0e0e5; border-radius: 6px; font-size: 11px; cursor: pointer; background: #fff; transition: background 0.15s, border-color 0.15s; white-space: nowrap; }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-view-owner:hover { background: #e8f0fe; border-color: #185fa5; color: #185fa5; }
+  .btn-verify:hover { background: #f1f8e9; border-color: #2e7d32; color: #2e7d32; }
+  .btn-unverify:hover { background: #fffde7; border-color: #f57f17; color: #f57f17; }
+  .btn-delete-owner:hover { background: #fff2f2; border-color: #c62828; color: #c62828; }
+</style>

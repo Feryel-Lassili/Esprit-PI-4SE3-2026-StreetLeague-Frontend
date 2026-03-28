@@ -1,0 +1,92 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Venues</h1>
+      <p class="page-subtitle">Manage your sport venues</p>
+    </div>
+    <a routerLink="/venue/create" class="btn-primary" id="create-venue-btn">
+      <span>＋</span> Add Venue
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="state-container">
+    <div class="spinner"></div>
+    <p>Loading your venues...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert-error">
+    <span>⚠️</span> {{ error }}
+    <button (click)="loadVenues()" class="btn-retry">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && venues.length === 0" class="empty-state">
+    <div class="empty-icon">🏟️</div>
+    <h2>No Venues Yet</h2>
+    <p>You haven't added any venues. Start by creating your first sport venue.</p>
+    <a routerLink="/venue/create" class="btn-primary">Create your first venue</a>
+  </div>
+
+  <!-- Venues Grid -->
+  <div *ngIf="!loading && !error && venues.length > 0" class="venues-grid">
+    <div class="venue-card" *ngFor="let venue of venues" [id]="'venue-card-' + venue.id">
+      <div class="venue-card-header">
+        <div class="sport-badge">{{ venue.sportType }}</div>
+        <span class="capacity-badge">👥 {{ venue.capacity }}</span>
+      </div>
+      <div class="venue-card-body">
+        <h3 class="venue-name">{{ venue.name }}</h3>
+        <p class="venue-address">📍 {{ venue.address }}</p>
+        <div class="venue-price">
+          <span class="price-value">{{ venue.pricePerHour }} TND</span>
+          <span class="price-label">/hour</span>
+        </div>
+      </div>
+      <div class="venue-card-footer">
+        <button class="btn-action btn-edit" (click)="editVenue(venue.id)" [id]="'edit-btn-' + venue.id">
+          ✏️ Edit
+        </button>
+        <button class="btn-action btn-delete" (click)="deleteVenue(venue.id)" [id]="'delete-btn-' + venue.id">
+          🗑 Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin: 0 0 4px; }
+  .page-subtitle { font-size: 14px; color: #6e6e73; margin: 0; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 6px; background: #000; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.8; }
+  .state-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; color: #6e6e73; gap: 16px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #e0e0e5; border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .btn-retry { margin-left: auto; background: #c62828; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; text-align: center; color: #6e6e73; }
+  .empty-icon { font-size: 56px; margin-bottom: 16px; }
+  .empty-state h2 { font-size: 20px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px; }
+  .empty-state p { margin: 0 0 24px; }
+  .venues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .venue-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 14px; overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+  .venue-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .venue-card-header { padding: 16px 16px 0; display: flex; justify-content: space-between; align-items: center; }
+  .sport-badge { background: #e8f0fe; color: #185fa5; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .capacity-badge { font-size: 12px; color: #6e6e73; }
+  .venue-card-body { padding: 14px 16px; }
+  .venue-name { font-size: 16px; font-weight: 700; color: #1d1d1f; margin: 0 0 6px; }
+  .venue-address { font-size: 13px; color: #6e6e73; margin: 0 0 12px; }
+  .venue-price { display: flex; align-items: baseline; gap: 4px; }
+  .price-value { font-size: 20px; font-weight: 700; color: #1d1d1f; }
+  .price-label { font-size: 13px; color: #6e6e73; }
+  .venue-card-footer { padding: 12px 16px; border-top: 1px solid #f5f5f7; display: flex; gap: 8px; }
+  .btn-action { flex: 1; padding: 7px 0; border: 1px solid #e0e0e5; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; transition: background 0.15s; }
+  .btn-view:hover { background: #e8f0fe; border-color: #185fa5; color: #185fa5; }
+  .btn-edit:hover { background: #f1f8e9; border-color: #2e7d32; color: #2e7d32; }
+  .btn-delete:hover { background: #fff2f2; border-color: #c62828; color: #c62828; }
+</style>

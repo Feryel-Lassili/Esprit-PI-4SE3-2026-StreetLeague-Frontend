@@ -10,7 +10,28 @@ const routes: Routes = [
     path: '',
     component: BackofficeComponent,
     canActivate: [authGuard, roleGuard],
-    data: { role: 'ADMIN' }
+    data: { role: 'ADMIN' },
+    children: [
+      // Venue Management
+      {
+        path: 'venue-management',
+        children: [
+          {
+            path: 'owners',
+            loadComponent: () => import('./venue-management/components/owners-list/owners-list.component').then(m => m.OwnersListComponent)
+          },
+          {
+            path: 'owners/:ownerId',
+            loadComponent: () => import('./venue-management/components/owner-details/owner-details.component').then(m => m.OwnerDetailsComponent)
+          },
+          {
+            path: 'venues',
+            loadComponent: () => import('./venue-management/components/admin-venues/admin-venues.component').then(m => m.AdminVenuesComponent)
+          },
+          { path: '', redirectTo: 'owners', pathMatch: 'full' }
+        ]
+      }
+    ]
   }
 ];
 
@@ -21,4 +42,4 @@ const routes: Routes = [
     BackofficeComponent
   ]
 })
-export class BackofficeModule {}
+export class BackofficeModule {}

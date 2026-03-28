@@ -1,5 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
@@ -7,6 +8,8 @@ import { AuthService } from '../services/auth.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+  
   const token = authService.getToken();
 
   const isAuthRequest = req.url.includes('/auth/login') ||
@@ -20,19 +23,27 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                      req.url.includes('/comment-reactions')||
                      req.url.includes('/user/me');
 
- if (token) {
-  req = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
-}
+  if (token) {
+    console.log(`[authInterceptor] Found token for ${req.url}. Attaching Authorization header.`);
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  } else {
+    console.warn(`[authInterceptor] NO TOKEN FOUND for ${req.url}. Request will be sent unauthenticated!`);
+  }
 
   return next(req).pipe(
     catchError(error => {
-      if ((error.status === 401 || error.status === 403) && !skipLogout) {
-        authService.logout();
-        router.navigate(['/login']);
+      console.error(`[authInterceptor] Caught HTTP error on ${req.url}:`, error.status);
+      // Only redirect on 401 Unauthorized (invalid/expired token) - 403 is just access denied
+      if (error.status === 401 && !skipLogout) {
+        if (isPlatformBrowser(platformId)) {
+          console.warn('[authInterceptor] Forcing logout due to 401 error.');
+          authService.logout();
+          router.navigate(['/login']);
+        }
       }
       return throwError(() => error);
     })
   );
-};
+};

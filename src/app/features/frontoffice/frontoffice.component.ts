@@ -108,9 +108,9 @@ export class FrontofficeComponent {
     {
       section: 'Sports',
       items: [
-        { path: '/teams',   label: 'Teams',     icon: '👥' },
-        { path: '/venues',  label: 'Venues',    icon: '📍' },
-        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
+        { path: '/teams',          label: 'Teams',      icon: '👥' },
+        { path: '/venue/my-venues', label: 'My Venues',  icon: '🏟️' },
+        { path: '/fantasy',        label: 'Fantasy',    icon: '🎮' },
       ]
     },
     {
