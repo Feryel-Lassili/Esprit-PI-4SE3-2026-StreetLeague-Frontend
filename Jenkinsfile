@@ -1,14 +1,13 @@
 pipeline {
     agent any
 
-    // Must match EXACTLY the name you set in Manage Jenkins → Tools → NodeJS installations
     tools {
-        nodejs 'node24'        // ← Changed from 'NodeJS' to 'node24'
+        nodejs 'node24'          // Must match exactly what you configured in Jenkins Tools
     }
 
     environment {
         CI = 'true'
-        PROJECT_DIR = 'p_ifrontend2'   // If your frontend is in a subfolder
+        PROJECT_DIR = 'p_ifrontend2'     // Change only if your Angular app is in a different folder
     }
 
     stages {
@@ -21,7 +20,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir("${PROJECT_DIR}") {
-                    sh 'npm ci'                    // More reliable than npm install in CI
+                    sh 'npm ci'
                 }
             }
         }
@@ -29,7 +28,7 @@ pipeline {
         stage('Lint') {
             steps {
                 dir("${PROJECT_DIR}") {
-                    sh 'npm run lint -- --max-warnings=0'   // Fail build if there are lint errors
+                    sh 'npm run lint -- --max-warnings=0'
                 }
             }
         }
@@ -37,13 +36,17 @@ pipeline {
         stage('Test') {
             steps {
                 dir("${PROJECT_DIR}") {
-                    // Better command for Angular + Karma/Jasmine in CI
-                    sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadless'
+                    // Best command for Angular + Karma/Jasmine in CI
+                    sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessCI'
                 }
             }
             post {
                 always {
-                    junit '**/test-results/**/*.xml'      // Adjust if your reporter path is different
+                    // Publish test results for Angular Karma
+                    junit allowEmptyResults: true, 
+                          testResults: '**/test-results/**/*.xml, **/junit.xml'
+                    
+                    // Archive coverage report
                     archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
                 }
             }
@@ -60,8 +63,8 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline finished'
             archiveArtifacts artifacts: "${PROJECT_DIR}/dist/**", allowEmptyArchive: true
+            echo 'Pipeline finished'
         }
         success {
             echo '✅ Angular Frontend Pipeline Succeeded!'
