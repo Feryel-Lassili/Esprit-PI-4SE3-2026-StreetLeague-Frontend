@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS'
+        nodejs 'node24'
     }
 
     environment {
@@ -10,9 +10,27 @@ pipeline {
     }
 
     stages {
-        stage('Install') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
             steps {
                 sh 'npm ci'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessCI'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, 
+                          testResults: '**/junit.xml, **/test-results/**/*.xml'
+                }
             }
         }
 
@@ -21,23 +39,18 @@ pipeline {
                 sh 'npm run build -- --configuration production'
             }
         }
-
-        stage('Test') {
-            steps {
-                sh 'npm test -- --watch=false --browsers=ChromeHeadless'
-            }
-        }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: 'dist/**', allowEmptyArchive: true
-        }
-        failure {
-            echo 'Pipeline failed!'
+            archiveArtifacts artifacts: 'dist/**, coverage/**', allowEmptyArchive: true
+            echo 'Pipeline finished'
         }
         success {
-            echo 'Pipeline succeeded!'
+            echo '✅ Angular Frontend Pipeline Succeeded!'
+        }
+        failure {
+            echo '❌ Angular Frontend Pipeline Failed!'
         }
     }
 }
