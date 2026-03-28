@@ -18,6 +18,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                      req.url.includes('/likes') ||
                      req.url.includes('/comments') ||
                      req.url.includes('/comment-reactions')||
+                     req.url.includes('/virtual-teams')||
                      req.url.includes('/user/me');
 
  if (token) {

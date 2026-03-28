@@ -110,7 +110,7 @@ export class FrontofficeComponent {
       items: [
         { path: '/teams',   label: 'Teams',     icon: '👥' },
         { path: '/venues',  label: 'Venues',    icon: '📍' },
-        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
+        { path: 'fantasy',    label: 'Fantasy',   icon: '🎮' },
       ]
     },
     {
