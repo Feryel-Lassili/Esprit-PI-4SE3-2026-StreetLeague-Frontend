@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node24'          // Must match exactly what you configured in Jenkins Tools
+        nodejs 'node24'        // Must match exactly the name in Jenkins Tools
     }
 
     environment {
         CI = 'true'
-        PROJECT_DIR = 'p_ifrontend2'     // Change only if your Angular app is in a different folder
     }
 
     stages {
@@ -19,51 +18,38 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir("${PROJECT_DIR}") {
-                    sh 'npm ci'
-                }
+                sh 'npm ci'
             }
         }
 
         stage('Lint') {
             steps {
-                dir("${PROJECT_DIR}") {
-                    sh 'npm run lint -- --max-warnings=0'
-                }
+                sh 'npm run lint -- --max-warnings=0'
             }
         }
 
         stage('Test') {
             steps {
-                dir("${PROJECT_DIR}") {
-                    // Best command for Angular + Karma/Jasmine in CI
-                    sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessCI'
-                }
+                sh 'npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessCI'
             }
             post {
                 always {
-                    // Publish test results for Angular Karma
                     junit allowEmptyResults: true, 
-                          testResults: '**/test-results/**/*.xml, **/junit.xml'
-                    
-                    // Archive coverage report
-                    archiveArtifacts artifacts: '**/coverage/**', allowEmptyArchive: true
+                          testResults: '**/junit.xml, **/test-results/**/*.xml'
                 }
             }
         }
 
         stage('Build') {
             steps {
-                dir("${PROJECT_DIR}") {
-                    sh 'npm run build -- --configuration production'
-                }
+                sh 'npm run build -- --configuration production'
             }
         }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: "${PROJECT_DIR}/dist/**", allowEmptyArchive: true
+            archiveArtifacts artifacts: 'dist/**, coverage/**', allowEmptyArchive: true
             echo 'Pipeline finished'
         }
         success {
