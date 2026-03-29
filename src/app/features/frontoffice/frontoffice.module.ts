@@ -16,7 +16,7 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
-      
+      { path: 'teams', loadComponent: () => import('./teams/teams.component').then(m => m.FrontofficeTeamsComponent) },
       { path: 'profile', component: ProfileComponent }
     ]
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -31,7 +32,7 @@ export class ProfileComponent implements OnInit {
 
   // Charger les données utilisateur pour pré-remplir le formulaire
   loadUser() {
-    this.http.get('http://localhost:8089/SpringSecurity/user/me')
+    this.http.get(`${environment.baseUrl}/user/me`)
       .subscribe((res: any) => {
         this.user = res;
 
@@ -63,7 +64,7 @@ export class ProfileComponent implements OnInit {
       formData.append('file', this.selectedFile);
     }
 
-    this.http.put('http://localhost:8089/SpringSecurity/user/update', formData)
+    this.http.put(`${environment.baseUrl}/user/update`, formData)
       .subscribe({
         next: () => alert('✅ Profile updated'),
         error: () => alert('❌ Error updating profile')

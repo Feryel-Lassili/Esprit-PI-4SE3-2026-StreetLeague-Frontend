@@ -10,21 +10,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getToken();
 
   const isAuthRequest = req.url.includes('/auth/login') ||
-                        req.url.includes('/auth/register');
+    req.url.includes('/auth/register');
 
   const skipLogout = isAuthRequest ||
-                     req.url.includes('/cart') ||
-                     req.url.includes('/posts') ||
-                     req.url.includes('/likes') ||
-                     req.url.includes('/comments') ||
-                     req.url.includes('/comment-reactions')||
-                     req.url.includes('/user/me');
+    req.url.includes('/cart') ||
+    req.url.includes('/posts') ||
+    req.url.includes('/likes') ||
+    req.url.includes('/comments') ||
+    req.url.includes('/comment-reactions') ||
+    req.url.includes('/user/me') ||
+    req.url.includes('/teams') ||
+    req.url.includes('/players');
 
- if (token) {
-  req = req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` }
-  });
-}
+  if (token && !isAuthRequest) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  }
 
   return next(req).pipe(
     catchError(error => {

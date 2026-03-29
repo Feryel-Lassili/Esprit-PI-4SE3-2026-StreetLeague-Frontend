@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { TeamService } from '../../core/services/team.service';
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -81,6 +83,48 @@ import { AuthService } from '../../core/services/auth.service';
     .coming-soon h2 { font-size: 20px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px; }
     .switch-btn { background: none; border: 1px solid #e0e0e5; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: #6e6e73; cursor: pointer; display: flex; align-items: center; gap: 6px; }
     .switch-btn:hover { background: #f5f5f7; }
+    /* Teams admin */
+    .teams-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .teams-search { border:1px solid #e0e0e5; border-radius:8px; padding:8px 12px; font-size:13px; width:240px; outline:none; }
+    .btn-primary { background:#000; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:500; cursor:pointer; }
+    .btn-primary:hover { opacity:.85; }
+    .btn-danger { background:#c62828; color:#fff; border:none; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; }
+    .btn-danger:hover { opacity:.85; }
+    .team-logo-cell { width:36px; height:36px; border-radius:8px; background:#f5f5f7; display:flex; align-items:center; justify-content:center; font-size:18px; overflow:hidden; }
+    .team-logo-cell img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+    .players-avatars { display:flex; gap:4px; flex-wrap:wrap; }
+    .p-av { width:26px; height:26px; border-radius:50%; background:#e8f0fe; color:#185fa5; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+    .p-more { font-size:11px; color:#6e6e73; align-self:center; }
+    /* Modal */
+    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; display:flex; align-items:center; justify-content:center; }
+    .modal-box { background:#fff; border-radius:16px; padding:28px; width:520px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+    .modal-title { font-size:16px; font-weight:700; color:#1d1d1f; margin-bottom:20px; }
+    .form-row { margin-bottom:14px; }
+    .form-label { font-size:12px; font-weight:600; color:#6e6e73; text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:6px; }
+    .form-input { width:100%; border:1px solid #e0e0e5; border-radius:8px; padding:9px 12px; font-size:13px; outline:none; }
+    .form-input:focus { border-color:#000; }
+    .form-select { width:100%; border:1px solid #e0e0e5; border-radius:8px; padding:9px 12px; font-size:13px; outline:none; background:#fff; }
+    .logo-preview-box { width:72px; height:72px; border-radius:10px; background:#f5f5f7; display:flex; align-items:center; justify-content:center; font-size:30px; overflow:hidden; margin-bottom:8px; }
+    .logo-preview-box img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
+    .file-btn { border:1px dashed #e0e0e5; border-radius:8px; padding:8px 14px; font-size:12px; cursor:pointer; color:#6e6e73; background:#fafafa; display:inline-block; position:relative; overflow:hidden; }
+    .file-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .btn-cancel-modal { background:none; border:1px solid #e0e0e5; border-radius:8px; padding:8px 16px; font-size:13px; cursor:pointer; color:#1d1d1f; }
+    .player-pick { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; cursor:pointer; border:1px solid #e0e0e5; margin-bottom:6px; transition:all .15s; }
+    .player-pick:hover { border-color:#000; background:#f5f5f7; }
+    .player-pick.selected { border-color:#000; background:#000; color:#fff; }
+    .player-pick.selected .pp-email { color:#aeaeb2; }
+    .pp-name { font-size:13px; font-weight:500; }
+    .pp-email { font-size:11px; color:#6e6e73; }
+    .player-search { border:1px solid #e0e0e5; border-radius:8px; padding:8px 12px; font-size:13px; width:100%; outline:none; margin-bottom:10px; }
+    .players-list-box { max-height:200px; overflow-y:auto; }
+    .error-msg { color:#c62828; font-size:12px; margin-top:8px; }
+    .spinner-sm { width:16px; height:16px; border:2px solid #e0e0e5; border-top-color:#000; border-radius:50%; animation:spin .6s linear infinite; display:inline-block; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .detail-panel { background:#fff; border-radius:12px; border:1px solid #e0e0e5; padding:20px; margin-top:16px; }
+    .player-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f5f5f7; }
+    .player-row:last-child { border-bottom:none; }
+    .cap-tag { font-size:10px; font-weight:700; background:#fffde7; color:#f57f17; padding:2px 7px; border-radius:10px; }
   `],
   template: `
     <div class="layout">
@@ -368,6 +412,83 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
           </div>
 
+          <!-- ═══ TEAMS ADMIN ═══ -->
+          <div *ngIf="currentScreen === 'teams'">
+
+            <div class="teams-topbar">
+              <input class="teams-search" type="text" placeholder="Search teams..." [(ngModel)]="teamSearch"/>
+              <button class="btn-primary" (click)="openCreateTeam()">+ New team</button>
+            </div>
+
+            <div *ngIf="teamsLoading" style="text-align:center;padding:40px;color:#6e6e73;">
+              <span class="spinner-sm"></span> Loading…
+            </div>
+            <div *ngIf="teamsError" style="color:#c62828;padding:16px;">⚠️ {{ teamsError }}</div>
+
+            <div class="card" *ngIf="!teamsLoading && !teamsError">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Logo</th>
+                    <th>Name</th>
+                    <th>Sport</th>
+                    <th>Captain</th>
+                    <th>Players</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let t of filteredTeams">
+                    <td>
+                      <div class="team-logo-cell">
+                        <img *ngIf="t.logo" [src]="t.logo" [alt]="t.name" (error)="$any($event.target).style.display='none'"/>
+                        <span *ngIf="!t.logo">{{ sportEmoji(t.type) }}</span>
+                      </div>
+                    </td>
+                    <td style="font-weight:500;">{{ t.name }}</td>
+                    <td><span class="pill pill-blue">{{ t.type || '—' }}</span></td>
+                    <td style="font-size:12px;color:#6e6e73;">{{ getCaptainName(t) }}</td>
+                    <td>
+                      <div class="players-avatars">
+                        <div class="p-av" *ngFor="let p of (t.players||[]) | slice:0:4">{{ pInit(p) }}</div>
+                        <span class="p-more" *ngIf="(t.players?.length||0) > 4">+{{ (t.players?.length||0)-4 }}</span>
+                        <span style="font-size:11px;color:#aeaeb2;" *ngIf="!t.players?.length">—</span>
+                      </div>
+                    </td>
+                    <td>
+                      <button class="action-btn" (click)="viewTeam(t)">👁 View</button>
+                      <button class="action-btn" (click)="openEditTeam(t)">✏️ Edit</button>
+                      <button class="action-btn" style="color:#c62828;border-color:#fecaca;" (click)="deleteTeamAdmin(t)">🗑</button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="filteredTeams.length === 0">
+                    <td colspan="6" style="text-align:center;color:#aeaeb2;padding:32px;">No teams found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Detail panel -->
+            <div class="detail-panel" *ngIf="viewedTeam">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="font-size:15px;font-weight:700;">{{ viewedTeam.name }} — Players ({{ viewedTeam.players?.length || 0 }})</div>
+                <button class="action-btn" (click)="viewedTeam=null">✕ Close</button>
+              </div>
+              <div *ngIf="!viewedTeam.players?.length" style="color:#aeaeb2;font-size:13px;">No players yet.</div>
+              <div class="player-row" *ngFor="let p of viewedTeam.players">
+                <div class="p-av" style="width:34px;height:34px;font-size:13px;">{{ pInit(p) }}</div>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:500;">{{ p.fullName || p.username || p.email }}</div>
+                  <div style="font-size:11px;color:#6e6e73;">{{ p.email }}</div>
+                </div>
+                <span class="cap-tag" *ngIf="p.id === viewedTeam.captainId">👑 Captain</span>
+                <button class="action-btn" *ngIf="p.id !== viewedTeam.captainId" (click)="adminTransferCaptain(viewedTeam, p)">👑 Make captain</button>
+                <button class="action-btn" style="color:#c62828;" *ngIf="p.id !== viewedTeam.captainId" (click)="adminRemovePlayer(viewedTeam, p)">Remove</button>
+              </div>
+            </div>
+
+          </div>
+
           <!-- VENUE ALLOCATOR DASHBOARD -->
           <div *ngIf="userRole === 'venue-allocator' && currentScreen === 'allocator'">
             <div class="grid-3" style="margin-bottom:24px;">
@@ -410,12 +531,115 @@ import { AuthService } from '../../core/services/auth.service';
         </div>
       </main>
     </div>
+
+    <!-- ═══ TEAM CREATE / EDIT MODAL ═══ -->
+    <div class="modal-bg" *ngIf="showTeamModal" (click)="showTeamModal=false">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-title">{{ editingTeam ? '✏️ Edit Team' : '🏆 New Team' }}</div>
+
+        <!-- Logo -->
+        <div class="form-row">
+          <label class="form-label">Logo</label>
+          <div class="logo-preview-box">
+            <img *ngIf="tForm.logo" [src]="tForm.logo"/>
+            <span *ngIf="!tForm.logo">{{ sportEmoji(tForm.type) || '🏆' }}</span>
+          </div>
+          <label class="file-btn">
+            📁 Choose image
+            <input type="file" accept="image/*" (change)="onAdminLogo($event)"/>
+          </label>
+          <button *ngIf="tForm.logo" (click)="tForm.logo=''" style="background:none;border:none;color:#c62828;font-size:12px;cursor:pointer;margin-left:8px;">Remove</button>
+        </div>
+
+        <!-- Name -->
+        <div class="form-row">
+          <label class="form-label">Team name *</label>
+          <input class="form-input" type="text" placeholder="e.g. Thunder Hawks" [(ngModel)]="tForm.name"/>
+        </div>
+
+        <!-- Sport -->
+        <div class="form-row">
+          <label class="form-label">Sport *</label>
+          <select class="form-select" [(ngModel)]="tForm.type">
+            <option value="">— Choose sport —</option>
+            <option value="FOOTBALL">⚽ Football</option>
+            <option value="BASKETBALL">🏀 Basketball</option>
+            <option value="TENNIS">🎾 Tennis</option>
+            <option value="VOLLEYBALL">🏐 Volleyball</option>
+            <option value="HANDBALL">🤾 Handball</option>
+          </select>
+        </div>
+
+        <!-- Captain (only on create) -->
+        <div class="form-row" *ngIf="!editingTeam">
+          <label class="form-label">Captain / member *</label>
+          <input class="player-search" type="text" placeholder="Search player by name or email…" [(ngModel)]="captainSearch"/>
+          <div class="players-list-box">
+            <div *ngIf="playersLoading" style="padding:8px;color:#6e6e73;font-size:12px;"><span class="spinner-sm"></span> Loading…</div>
+            <div class="player-pick"
+              *ngFor="let p of filteredAvailablePlayers"
+              [class.selected]="tForm.captainId === p.id"
+              (click)="tForm.captainId = p.id">
+              <div class="p-av">{{ pInit(p) }}</div>
+              <div>
+                <div class="pp-name">{{ p.fullName || p.username || p.email }}</div>
+                <div class="pp-email">{{ p.email }}</div>
+              </div>
+              <span style="margin-left:auto;font-size:16px;" *ngIf="tForm.captainId === p.id">✓</span>
+            </div>
+            <div *ngIf="!playersLoading && filteredAvailablePlayers.length === 0" style="color:#aeaeb2;font-size:12px;padding:8px;">No players found</div>
+          </div>
+        </div>
+
+        <div class="error-msg" *ngIf="tError">⚠️ {{ tError }}</div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel-modal" (click)="showTeamModal=false">Cancel</button>
+          <button class="btn-primary" (click)="saveTeamAdmin()" [disabled]="tLoading">
+            <span class="spinner-sm" *ngIf="tLoading"></span>
+            {{ tLoading ? '' : (editingTeam ? 'Update' : 'Create team') }}
+          </button>
+        </div>
+      </div>
+    </div>
   `
 })
-export class BackofficeComponent {
+export class BackofficeComponent implements OnInit {
   sidebarOpen = true;
   userRole: 'admin' | 'venue-allocator' = 'admin';
   currentScreen = 'dashboard';
+
+  // ── Teams admin ────────────────────────────────────────────────────────────
+  allAdminTeams: any[] = [];
+  teamsLoading = false;
+  teamsError = '';
+  teamSearch = '';
+  viewedTeam: any = null;
+
+  get filteredTeams(): any[] {
+    const q = this.teamSearch.toLowerCase();
+    return this.allAdminTeams.filter(t => t.name?.toLowerCase().includes(q));
+  }
+
+  // Modal state
+  showTeamModal = false;
+  editingTeam: any = null;
+  tForm: any = { name: '', type: '', logo: '', captainId: null };
+  tError = '';
+  tLoading = false;
+
+  // Players for captain picker
+  allPlayers: any[] = [];
+  playersLoading = false;
+  captainSearch = '';
+
+  get filteredAvailablePlayers(): any[] {
+    const q = this.captainSearch.toLowerCase();
+    return this.allPlayers.filter(p =>
+      (p.fullName || '').toLowerCase().includes(q) ||
+      (p.email || '').toLowerCase().includes(q)
+    );
+  }
 
   adminMenu = [
     {
@@ -427,7 +651,8 @@ export class BackofficeComponent {
     {
       section: 'Management',
       items: [
-        { id: 'users', label: 'Users & Teams', icon: '👥' },
+        { id: 'users', label: 'Users', icon: '👤' },
+        { id: 'teams', label: 'Teams', icon: '🏆' },
         { id: 'venues', label: 'Venues', icon: '📍' },
         { id: 'health', label: 'Health', icon: '🏥' },
         { id: 'shop', label: 'Shop', icon: '🛍️' },
@@ -552,12 +777,162 @@ export class BackofficeComponent {
     { id: 'BK002', venueName: 'City Stadium', customerName: 'Jane Smith', date: '2026-02-16', totalPrice: 80, status: 'Pending' }
   ];
 
-  constructor(private route: ActivatedRoute, public authService: AuthService) {
+  constructor(
+    private route: ActivatedRoute,
+    public authService: AuthService,
+    private teamService: TeamService
+  ) {
     this.route.queryParams.subscribe(params => {
       if (params['role'] === 'venue-allocator') {
         this.userRole = 'venue-allocator';
         this.currentScreen = 'allocator';
       }
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadTeams();
+  }
+
+  // ── Teams: load ────────────────────────────────────────────────────────────
+
+  loadTeams(): void {
+    this.teamsLoading = true;
+    this.teamsError = '';
+    this.teamService.getAllTeams().subscribe({
+      next: data => { this.allAdminTeams = data; this.teamsLoading = false; },
+      error: () => { this.teamsError = 'Failed to load teams.'; this.teamsLoading = false; }
+    });
+  }
+
+  // ── Teams: helpers ─────────────────────────────────────────────────────────
+
+  sportEmoji(type?: string): string {
+    const m: Record<string, string> = { FOOTBALL: '⚽', BASKETBALL: '🏀', TENNIS: '🎾', VOLLEYBALL: '🏐', HANDBALL: '🤾' };
+    return m[type || ''] || '🏆';
+  }
+
+  pInit(p: any): string {
+    return (p.fullName || p.username || p.email || '?')[0].toUpperCase();
+  }
+
+  getCaptainName(team: any): string {
+    if (!team.captainId || !team.players?.length) return '—';
+    const cap = team.players.find((p: any) => p.id === team.captainId);
+    return cap ? (cap.fullName || cap.username || cap.email) : '—';
+  }
+
+  // ── Teams: view detail ────────────────────────────────────────────────────
+
+  viewTeam(team: any): void {
+    this.viewedTeam = this.viewedTeam?.id === team.id ? null : team;
+  }
+
+  // ── Teams: create ─────────────────────────────────────────────────────────
+
+  openCreateTeam(): void {
+    this.editingTeam = null;
+    this.tForm = { name: '', type: '', logo: '', captainId: null };
+    this.tError = '';
+    this.captainSearch = '';
+    this.showTeamModal = true;
+    this.loadPlayers();
+  }
+
+  loadPlayers(): void {
+    this.playersLoading = true;
+    this.teamService.getAllPlayers().subscribe({
+      next: data => { this.allPlayers = data; this.playersLoading = false; },
+      error: () => { this.playersLoading = false; }
+    });
+  }
+
+  onAdminLogo(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { this.tForm.logo = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Teams: edit ───────────────────────────────────────────────────────────
+
+  openEditTeam(team: any): void {
+    this.editingTeam = team;
+    this.tForm = { name: team.name, type: team.type || '', logo: team.logo || '', captainId: team.captainId };
+    this.tError = '';
+    this.showTeamModal = true;
+  }
+
+  // ── Teams: save (create or update) ────────────────────────────────────────
+
+  saveTeamAdmin(): void {
+    if (!this.tForm.name.trim()) { this.tError = 'Name is required.'; return; }
+    if (!this.tForm.type) { this.tError = 'Please select a sport.'; return; }
+    if (!this.editingTeam && !this.tForm.captainId) { this.tError = 'Please select a captain.'; return; }
+
+    this.tLoading = true;
+    this.tError = '';
+
+    const obs = this.editingTeam
+      ? this.teamService.updateTeam(this.editingTeam.id, { name: this.tForm.name, type: this.tForm.type, logo: this.tForm.logo })
+      : this.teamService.createTeam({ name: this.tForm.name, type: this.tForm.type, logo: this.tForm.logo, captainId: this.tForm.captainId });
+
+    obs.subscribe({
+      next: () => {
+        this.tLoading = false;
+        this.showTeamModal = false;
+        this.viewedTeam = null;
+        this.loadTeams();
+      },
+      error: err => {
+        this.tError = err?.error?.message || 'Operation failed.';
+        this.tLoading = false;
+      }
+    });
+  }
+
+  // ── Teams: delete ─────────────────────────────────────────────────────────
+
+  deleteTeamAdmin(team: any): void {
+    if (!confirm(`Delete team "${team.name}"? This cannot be undone.`)) return;
+    this.teamService.deleteTeam(team.id).subscribe({
+      next: () => {
+        if (this.viewedTeam?.id === team.id) this.viewedTeam = null;
+        this.loadTeams();
+      },
+      error: () => alert('Failed to delete team.')
+    });
+  }
+
+  // ── Teams: transfer captain ───────────────────────────────────────────────
+
+  adminTransferCaptain(team: any, player: any): void {
+    if (!confirm(`Make "${player.fullName || player.email}" the new captain?`)) return;
+    this.teamService.transferCaptain(team.id, player.id).subscribe({
+      next: updated => {
+        const idx = this.allAdminTeams.findIndex(t => t.id === team.id);
+        if (idx >= 0) this.allAdminTeams[idx] = updated;
+        this.viewedTeam = updated;
+      },
+      error: () => alert('Failed to transfer captain.')
+    });
+  }
+
+  // ── Teams: remove player ──────────────────────────────────────────────────
+
+  adminRemovePlayer(team: any, player: any): void {
+    if (!confirm(`Remove "${player.fullName || player.email}" from the team?`)) return;
+    this.teamService.removePlayer(team.id, player.id).subscribe({
+      next: () => {
+        this.viewedTeam = {
+          ...team,
+          players: team.players.filter((p: any) => p.id !== player.id)
+        };
+        const idx = this.allAdminTeams.findIndex(t => t.id === team.id);
+        if (idx >= 0) this.allAdminTeams[idx] = this.viewedTeam;
+      },
+      error: () => alert('Failed to remove player.')
     });
   }
 }
