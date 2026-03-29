@@ -343,7 +343,7 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
         <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
              (click)="$event.stopPropagation()">
              <div class="bg-red-500 text-white p-4 rounded-2xl text-center mb-6">
-  ✅ If you see this red box with rounded corners → Tailwind is working
+  
 </div>
           <div class="p-8">
             <div class="flex justify-between items-start mb-6">
