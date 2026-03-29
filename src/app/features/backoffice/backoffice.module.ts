@@ -30,6 +30,22 @@ const routes: Routes = [
           },
           { path: '', redirectTo: 'owners', pathMatch: 'full' }
         ]
+      },
+
+      // Carpooling Management
+      {
+        path: 'carpooling-management',
+        children: [
+          {
+            path: 'drivers',
+            loadComponent: () => import('./carpooling-management/components/admin-drivers-list/admin-drivers-list.component').then(m => m.AdminDriversListComponent)
+          },
+          {
+            path: 'drivers/:driverId',
+            loadComponent: () => import('./carpooling-management/components/admin-driver-details/admin-driver-details.component').then(m => m.AdminDriverDetailsComponent)
+          },
+          { path: '', redirectTo: 'drivers', pathMatch: 'full' }
+        ]
       }
     ]
   }

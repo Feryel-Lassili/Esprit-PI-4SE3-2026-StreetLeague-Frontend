@@ -169,7 +169,7 @@ export class LoginComponent {
         next: (response) => {
           this.loading = false;
           const role = response.role.replace('ROLE_', '');
-          if (role === 'ADMIN' || role === 'VENUE_OWNER') this.router.navigate(['/backoffice']);
+          if (role === 'ADMIN') this.router.navigate(['/backoffice']);
           else this.router.navigate(['/']);
         },
         error: (error) => {

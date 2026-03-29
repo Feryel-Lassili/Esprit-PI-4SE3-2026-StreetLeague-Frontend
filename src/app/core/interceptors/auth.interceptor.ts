@@ -34,7 +34,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError(error => {
-      console.error(`[authInterceptor] Caught HTTP error on ${req.url}:`, error.status);
+      console.error(`[authInterceptor] Caught HTTP error on ${req.url}:`, error.status, error);
       // Only redirect on 401 Unauthorized (invalid/expired token) - 403 is just access denied
       if (error.status === 401 && !skipLogout) {
         if (isPlatformBrowser(platformId)) {

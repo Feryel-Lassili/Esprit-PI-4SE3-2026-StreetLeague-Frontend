@@ -53,7 +53,8 @@ export class CreateVenueComponent {
       error: err => {
         console.error('API Error during venue creation:', err);
         if (err.status === 403) {
-          this.error = 'Accès refusé : vous devez être connecté en tant que propriétaire de salle pour créer un venue.';
+          const backendMsg = err?.error?.message || err?.message || '';
+          this.error = `Accès refusé : vous devez être connecté en tant que propriétaire de salle pour créer un venue. (Détails: ${backendMsg})`;
         } else {
           const detailedError = err?.error?.message || err?.message || JSON.stringify(err?.error) || 'Unknown backend error';
           this.error = `HTTP ${err.status}: ${detailedError}`;

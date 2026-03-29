@@ -1,0 +1,117 @@
+<div class="cp-page">
+  <div class="cp-header">
+    <div>
+      <h1 class="cp-title">My Cars</h1>
+      <p class="cp-sub">Manage the vehicles you use for carpooling</p>
+    </div>
+    <button class="cp-btn-primary" (click)="openAdd()" id="add-car-btn">＋ Add Car</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="cp-center"><div class="cp-spinner"></div><p>Loading…</p></div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="cp-error">⚠️ {{ error }} <button (click)="loadCars()" class="cp-retry">Retry</button></div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && !error && cars.length === 0" class="cp-empty">
+    <div class="cp-empty-icon">🚗</div>
+    <h2>No Cars Yet</h2>
+    <p>Add your first car to start creating carpooling trips.</p>
+  </div>
+
+  <!-- Grid -->
+  <div *ngIf="!loading && !error && cars.length > 0" class="cp-grid">
+    <div class="cp-card" *ngFor="let car of cars" [id]="'car-' + car.id">
+      <div class="cp-card-banner">
+        <span class="cp-card-emoji">🚗</span>
+        <span class="cp-card-pill">{{ car.seats }} seats</span>
+      </div>
+      <div class="cp-card-body">
+        <h3 class="cp-card-title">{{ car.model }}</h3>
+        <p class="cp-card-sub">🔢 {{ car.plateNumber }}</p>
+        <div class="cp-stats">
+          <div class="cp-stat"><span class="cp-stat-label">Total Seats</span><span class="cp-stat-val">{{ car.seats }}</span></div>
+          <div class="cp-stat"><span class="cp-stat-label">Available</span><span class="cp-stat-val">{{ car.availableSeats }}</span></div>
+        </div>
+      </div>
+      <div class="cp-card-footer">
+        <button class="cp-btn cp-btn-del" (click)="deleteCar(car.id)" [id]="'del-car-' + car.id">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <div class="cp-modal-overlay" *ngIf="showAddForm" (click)="closeAdd()">
+    <div class="cp-modal" (click)="$event.stopPropagation()" id="add-car-modal">
+      <div class="cp-modal-head"><h2>Add Car</h2><button class="cp-modal-close" (click)="closeAdd()">✕</button></div>
+      <div *ngIf="addError" class="cp-error" style="margin-bottom:14px;">⚠️ {{ addError }}</div>
+      <form [formGroup]="addForm" (ngSubmit)="submitAdd()">
+        <div class="cp-field">
+          <label>Model</label>
+          <input formControlName="model" placeholder="e.g. Toyota Corolla" [class.cp-input-err]="f['model'].touched && f['model'].invalid">
+          <span class="cp-ferr" *ngIf="f['model'].touched && f['model'].errors?.['required']">Required</span>
+        </div>
+        <div class="cp-field">
+          <label>Plate Number</label>
+          <input formControlName="plateNumber" placeholder="e.g. 123 TUN 456" [class.cp-input-err]="f['plateNumber'].touched && f['plateNumber'].invalid">
+          <span class="cp-ferr" *ngIf="f['plateNumber'].touched && f['plateNumber'].errors?.['required']">Required</span>
+        </div>
+        <div class="cp-row">
+          <div class="cp-field">
+            <label>Seats</label>
+            <input type="number" formControlName="seats" [class.cp-input-err]="f['seats'].touched && f['seats'].invalid">
+          </div>
+          <div class="cp-field">
+            <label>Available Seats</label>
+            <input type="number" formControlName="availableSeats" [class.cp-input-err]="f['availableSeats'].touched && f['availableSeats'].invalid">
+          </div>
+        </div>
+        <div class="cp-modal-foot">
+          <button type="button" class="cp-btn cp-btn-cancel" (click)="closeAdd()">Cancel</button>
+          <button type="submit" class="cp-btn-primary" [disabled]="addSaving">{{ addSaving ? 'Saving…' : 'Add Car' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .cp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .cp-title{font-size:22px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-sub{font-size:14px;color:#6e6e73;margin:0}
+  .cp-btn-primary{background:#000;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s}
+  .cp-btn-primary:hover{opacity:.8}.cp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .cp-center{display:flex;flex-direction:column;align-items:center;padding:80px 20px;color:#6e6e73;gap:14px}
+  .cp-spinner{width:32px;height:32px;border:3px solid #e0e0e5;border-top-color:#000;border-radius:50%;animation:cps .8s linear infinite}
+  @keyframes cps{to{transform:rotate(360deg)}}
+  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .cp-retry{margin-left:auto;background:#c62828;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px}
+  .cp-empty{display:flex;flex-direction:column;align-items:center;padding:80px 20px;text-align:center;color:#6e6e73}
+  .cp-empty-icon{font-size:56px;margin-bottom:14px}.cp-empty h2{font-size:20px;font-weight:600;color:#1d1d1f;margin:0 0 8px}
+  .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+  .cp-card{background:#fff;border:1px solid #e0e0e5;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
+  .cp-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.09);transform:translateY(-3px)}
+  .cp-card-banner{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);padding:20px;display:flex;justify-content:space-between;align-items:center}
+  .cp-card-emoji{font-size:36px}.cp-card-pill{background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;backdrop-filter:blur(4px)}
+  .cp-card-body{padding:16px 20px;flex:1}.cp-card-title{font-size:17px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-card-sub{font-size:13px;color:#6e6e73;margin:0 0 14px}
+  .cp-stats{display:flex;gap:10px}.cp-stat{background:#f5f5f7;border-radius:10px;padding:10px 14px;flex:1}
+  .cp-stat-label{display:block;font-size:10px;font-weight:600;color:#aeaeb2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .cp-stat-val{font-size:16px;font-weight:700;color:#1d1d1f}
+  .cp-card-footer{padding:12px 20px;border-top:1px solid #f0f0f5;display:flex;gap:8px}
+  .cp-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:background .15s}
+  .cp-btn-del{background:#fff2f2;color:#c62828;border:1px solid #ffcdd2}.cp-btn-del:hover{background:#ffcdd2}
+  .cp-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000}
+  .cp-modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+  .cp-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+  .cp-modal-head h2{font-size:18px;font-weight:700;color:#1d1d1f;margin:0}
+  .cp-modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:#6e6e73}
+  .cp-field{margin-bottom:14px}.cp-field label{display:block;font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:5px}
+  .cp-field input,.cp-field select{width:100%;padding:9px 12px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#1d1d1f;background:#fafafa;outline:none;box-sizing:border-box;transition:border-color .15s}
+  .cp-field input:focus,.cp-field select:focus{border-color:#000;background:#fff}
+  .cp-input-err{border-color:#c62828!important}.cp-ferr{display:block;font-size:11px;color:#c62828;margin-top:3px}
+  .cp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cp-modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+  .cp-btn-cancel{padding:9px 18px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#6e6e73;background:none;cursor:pointer}
+  .cp-btn-cancel:hover{background:#f5f5f7}
+</style>

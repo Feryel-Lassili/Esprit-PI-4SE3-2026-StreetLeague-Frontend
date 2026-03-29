@@ -1,0 +1,72 @@
+<div class="cp-page">
+  <div *ngIf="loading" class="cp-center"><div class="cp-spinner"></div><p>Loading…</p></div>
+  <div *ngIf="error && !loading" class="cp-error">⚠️ {{ error }} <button (click)="goBack()" class="cp-retry">← Back</button></div>
+
+  <div *ngIf="trip && !loading" class="cp-detail-card">
+    <button class="cp-back" (click)="goBack()">← Back to all trips</button>
+
+    <div class="cp-detail-banner">
+      <span style="font-size:48px;">🚗</span>
+      <div>
+        <h1 class="cp-detail-title">{{ trip.departureLocation }} → {{ trip.arrivalLocation }}</h1>
+        <p class="cp-detail-sub">📅 {{ trip.date }} · 🕐 {{ trip.departureTime }}</p>
+      </div>
+    </div>
+
+    <div class="cp-detail-grid">
+      <div class="cp-stat"><span class="cp-stat-label">Car</span><span class="cp-stat-val">{{ trip.carModel }}</span></div>
+      <div class="cp-stat"><span class="cp-stat-label">Plate</span><span class="cp-stat-val">{{ trip.plateNumber }}</span></div>
+      <div class="cp-stat"><span class="cp-stat-label">Seats Left</span><span class="cp-stat-val">{{ trip.availableSeats }}</span></div>
+      <div class="cp-stat"><span class="cp-stat-label">Participants</span><span class="cp-stat-val">{{ trip.participantCount }}</span></div>
+    </div>
+
+    <div class="cp-owner-strip">
+      <div class="cp-owner-avatar">{{ trip.driverUsername[0].toUpperCase() }}</div>
+      <div class="cp-owner-info">
+        <span class="cp-owner-name">Driver: {{ trip.driverUsername }}</span>
+        <span class="cp-owner-email">{{ trip.driverEmail }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="trip.participantUsernames && trip.participantUsernames.length > 0" style="margin-top:16px;">
+      <h3 style="font-size:15px;font-weight:700;color:#1d1d1f;margin:0 0 10px;">Participants</h3>
+      <div class="cp-participant" *ngFor="let p of trip.participantUsernames">
+        <span class="cp-p-avatar">{{ p[0].toUpperCase() }}</span>
+        <span class="cp-p-name">{{ p }}</span>
+      </div>
+    </div>
+
+    <div class="cp-detail-actions">
+      <button class="cp-btn-primary" (click)="join()" *ngIf="trip.availableSeats > 0" [disabled]="isJoined">
+        {{ isJoined ? 'Joined ✓' : '🚀 Join Trip' }}
+      </button>
+      <button class="cp-btn-leave" (click)="leave()">🚪 Leave Trip</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .cp-center{display:flex;flex-direction:column;align-items:center;padding:80px 20px;color:#6e6e73;gap:14px}
+  .cp-spinner{width:32px;height:32px;border:3px solid #e0e0e5;border-top-color:#000;border-radius:50%;animation:cps .8s linear infinite}@keyframes cps{to{transform:rotate(360deg)}}
+  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px}
+  .cp-retry{margin-left:auto;color:#c62828;background:none;border:none;cursor:pointer;font-size:13px}
+  .cp-back{background:none;border:none;color:#6e6e73;font-size:13px;cursor:pointer;padding:0;margin-bottom:16px}.cp-back:hover{color:#000}
+  .cp-detail-card{background:#fff;border:1px solid #e0e0e5;border-radius:16px;padding:28px;max-width:640px}
+  .cp-detail-banner{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .cp-detail-title{font-size:24px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-detail-sub{font-size:14px;color:#6e6e73;margin:0}
+  .cp-detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .cp-stat{background:#f5f5f7;border-radius:10px;padding:12px 16px}.cp-stat-label{display:block;font-size:10px;font-weight:600;color:#aeaeb2;text-transform:uppercase;margin-bottom:2px}.cp-stat-val{font-size:16px;font-weight:700;color:#1d1d1f}
+  .cp-owner-strip{display:flex;align-items:center;gap:10px;background:#e8f0fe;border-radius:10px;padding:10px 12px}
+  .cp-owner-avatar{width:32px;height:32px;border-radius:50%;background:#185fa5;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cp-owner-info{display:flex;flex-direction:column;overflow:hidden}.cp-owner-name{font-size:13px;font-weight:700;color:#1a3a6e}.cp-owner-email{font-size:11px;color:#5a7ab5}
+  .cp-participant{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f7}
+  .cp-p-avatar{width:28px;height:28px;border-radius:50%;background:#f5f5f7;font-size:12px;font-weight:700;color:#1d1d1f;display:flex;align-items:center;justify-content:center}
+  .cp-p-name{font-size:13px;color:#1d1d1f}
+  .cp-detail-actions{display:flex;gap:10px;margin-top:24px}
+  .cp-btn-primary{background:#000;color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .cp-btn-primary:not(:disabled):hover{background:#333}
+  .cp-btn-primary:disabled{opacity:0.5;cursor:not-allowed;background:#6e6e73;}
+  .cp-btn{padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none}
+  .cp-btn-leave{padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#fffde7;color:#f57f17;border:1px solid #fff9c4}.cp-btn-leave:hover{background:#fff9c4}
+</style>

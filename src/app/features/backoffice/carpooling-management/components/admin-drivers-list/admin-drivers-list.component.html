@@ -1,0 +1,58 @@
+<div class="cp-page">
+  <div class="cp-header">
+    <div><h1 class="cp-title">Drivers</h1><p class="cp-sub">All registered drivers with their cars and trips</p></div>
+    <div class="cp-controls">
+      <input class="cp-search" type="text" placeholder="🔍 Search driver…" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()">
+      <button class="cp-refresh" (click)="load()">🔄</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="cp-center"><div class="cp-spinner"></div><p>Loading…</p></div>
+  <div *ngIf="error && !loading" class="cp-error">⚠️ {{ error }} <button (click)="load()" class="cp-retry">Retry</button></div>
+  <div *ngIf="!loading && !error && filtered.length === 0" class="cp-empty"><div class="cp-empty-icon">🚗</div><h2>No Drivers</h2></div>
+
+  <div *ngIf="!loading && !error && filtered.length > 0" class="cp-table-card">
+    <table class="cp-table">
+      <thead><tr><th>Driver</th><th>Phone</th><th>Cars</th><th>Trips</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let d of filtered" [id]="'driver-' + d.driverId">
+          <td>
+            <div class="cp-user-cell">
+              <div class="cp-avatar">{{ d.driverUsername[0].toUpperCase() }}</div>
+              <div><div class="cp-uname">{{ d.driverUsername }}</div><div class="cp-uemail">{{ d.driverEmail }}</div></div>
+            </div>
+          </td>
+          <td class="cp-muted">{{ d.driverPhone || '—' }}</td>
+          <td><span class="cp-count-badge">{{ totalCars(d) }}</span></td>
+          <td><span class="cp-count-badge">{{ totalTrips(d) }}</span></td>
+          <td><button class="cp-action-btn cp-btn-view" (click)="viewDriver(d.driverId)">👁 View</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .cp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .cp-title{font-size:22px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-sub{font-size:14px;color:#6e6e73;margin:0}
+  .cp-controls{display:flex;gap:10px;align-items:center}
+  .cp-search{border:1px solid #d0d0d5;border-radius:10px;padding:9px 14px;font-size:13px;color:#1d1d1f;outline:none;width:240px;background:#fafafa}.cp-search:focus{border-color:#000;background:#fff}
+  .cp-refresh{background:none;border:1px solid #d0d0d5;border-radius:8px;padding:9px 12px;font-size:14px;cursor:pointer}.cp-refresh:hover{background:#f5f5f7}
+  .cp-center{display:flex;flex-direction:column;align-items:center;padding:80px 20px;color:#6e6e73;gap:14px}
+  .cp-spinner{width:32px;height:32px;border:3px solid #e0e0e5;border-top-color:#000;border-radius:50%;animation:cps .8s linear infinite}@keyframes cps{to{transform:rotate(360deg)}}
+  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .cp-retry{margin-left:auto;background:#c62828;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px}
+  .cp-empty{display:flex;flex-direction:column;align-items:center;padding:80px 20px;text-align:center;color:#6e6e73}.cp-empty-icon{font-size:56px;margin-bottom:14px}.cp-empty h2{font-size:20px;font-weight:600;color:#1d1d1f;margin:0 0 8px}
+  .cp-table-card{background:#fff;border:1px solid #e0e0e5;border-radius:14px;overflow:hidden}
+  .cp-table{width:100%;border-collapse:collapse}
+  .cp-table th{text-align:left;font-size:11px;font-weight:600;color:#6e6e73;text-transform:uppercase;letter-spacing:.05em;padding:12px 16px;border-bottom:1px solid #e0e0e5;background:#fafafa}
+  .cp-table td{padding:14px 16px;border-bottom:1px solid #f5f5f7;font-size:13px;color:#1d1d1f;vertical-align:middle}
+  .cp-table tbody tr:last-child td{border-bottom:none}.cp-table tbody tr:hover{background:#fafafa}
+  .cp-user-cell{display:flex;align-items:center;gap:12px}
+  .cp-avatar{width:34px;height:34px;border-radius:50%;background:#e8f0fe;color:#185fa5;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cp-uname{font-weight:600;color:#1d1d1f;font-size:13px}.cp-uemail{font-size:12px;color:#6e6e73}.cp-muted{color:#6e6e73}
+  .cp-count-badge{background:#f5f5f7;color:#1d1d1f;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
+  .cp-action-btn{padding:5px 10px;border:1px solid #e0e0e5;border-radius:6px;font-size:11px;cursor:pointer;background:#fff;transition:background .15s;white-space:nowrap}
+  .cp-btn-view:hover{background:#e8f0fe;border-color:#185fa5;color:#185fa5}
+</style>

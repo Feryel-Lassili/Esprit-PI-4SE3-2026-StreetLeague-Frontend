@@ -427,6 +427,7 @@ export class BackofficeComponent implements OnInit {
         { id: 'users',        label: 'Users & Teams',  icon: '👥', route: null },
         { id: 'owners',       label: 'Venue Owners',   icon: '🏟️', route: '/backoffice/venue-management/owners' },
         { id: 'venues',       label: 'Venues',         icon: '📍', route: '/backoffice/venue-management/venues' },
+        { id: 'drivers',      label: 'Driver List',    icon: '🚗', route: '/backoffice/carpooling-management/drivers' },
         { id: 'health',       label: 'Health',         icon: '🏥', route: null },
         { id: 'shop',         label: 'Shop',           icon: '🛍️', route: null },
       ]
