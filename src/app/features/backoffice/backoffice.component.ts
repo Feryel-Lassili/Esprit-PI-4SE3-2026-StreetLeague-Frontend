@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TeamService } from '../../core/services/team.service';
+import { AdminVenueService } from './venue-management/services/admin-venue.service';
+import { VenueDTO } from '../frontoffice/venue/models/venue.model';
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterOutlet, RouterLink],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -143,12 +145,23 @@ import { TeamService } from '../../core/services/team.service';
         <nav class="nav">
           <div *ngFor="let section of getCurrentMenu()">
             <div class="nav-section" *ngIf="sidebarOpen">{{ section.section }}</div>
-            <button class="nav-item" *ngFor="let item of section.items"
-              [class.active]="currentScreen === item.id"
-              (click)="currentScreen = item.id">
-              <span class="nav-icon">{{ item.icon }}</span>
-              <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
-            </button>
+            <ng-container *ngFor="let item of section.items">
+              <!-- Router-based nav items -->
+              <a *ngIf="item.route" class="nav-item" [routerLink]="item.route"
+                [class.active]="currentScreen === item.id"
+                style="text-decoration:none;"
+                (click)="currentScreen = item.id">
+                <span class="nav-icon">{{ item.icon }}</span>
+                <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+              </a>
+              <!-- Screen-based nav items -->
+              <button *ngIf="!item.route" class="nav-item"
+                [class.active]="currentScreen === item.id"
+                (click)="currentScreen = item.id">
+                <span class="nav-icon">{{ item.icon }}</span>
+                <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+              </button>
+            </ng-container>
           </div>
         </nav>
 
@@ -183,6 +196,9 @@ import { TeamService } from '../../core/services/team.service';
         </div>
 
         <div class="content">
+
+          <!-- Router outlet for child pages (venue-management etc.) -->
+          <router-outlet></router-outlet>
 
           <!-- DASHBOARD -->
           <div *ngIf="currentScreen === 'dashboard'">
@@ -237,26 +253,6 @@ import { TeamService } from '../../core/services/team.service';
 
           </div>
 
-          <!-- VENUES -->
-          <div *ngIf="currentScreen === 'venues'">
-            <div class="grid-3">
-              <div class="card" *ngFor="let v of venues">
-                <div style="font-size:15px; font-weight:600; color:#1d1d1f; margin-bottom:4px;">{{ v.name }}</div>
-                <div style="font-size:12px; color:#6e6e73; margin-bottom:12px;">📍 {{ v.location }}</div>
-                <div style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;">
-                  <span class="pill pill-blue" *ngFor="let s of v.sports">{{ s }}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                  <span style="font-size:13px; font-weight:600; color:#1d1d1f;">{{ v.pricePerHour }} TND/hr</span>
-                  <span class="pill pill-green">{{ v.status }}</span>
-                </div>
-                <div style="display:flex; gap:8px;">
-                  <button class="action-btn" style="flex:1;">Edit</button>
-                  <button class="action-btn" style="flex:1;">View</button>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- USERS & TEAMS -->
           <div *ngIf="currentScreen === 'users'">
@@ -645,25 +641,27 @@ export class BackofficeComponent implements OnInit {
     {
       section: 'Overview',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: '▣' },
+        { id: 'dashboard', label: 'Dashboard', icon: '▣', route: null },
       ]
     },
     {
       section: 'Management',
       items: [
-        { id: 'users', label: 'Users', icon: '👤' },
-        { id: 'teams', label: 'Teams', icon: '🏆' },
-        { id: 'venues', label: 'Venues', icon: '📍' },
-        { id: 'health', label: 'Health', icon: '🏥' },
-        { id: 'shop', label: 'Shop', icon: '🛍️' },
+        { id: 'users',    label: 'Users',        icon: '👤', route: null },
+        { id: 'teams',    label: 'Teams',        icon: '🏆', route: null },
+        { id: 'owners',   label: 'Venue Owners', icon: '🏟️', route: '/backoffice/venue-management/owners' },
+        { id: 'venues',   label: 'Venues',       icon: '📍', route: '/backoffice/venue-management/venues' },
+        { id: 'drivers',  label: 'Driver List',  icon: '🚗', route: '/backoffice/carpooling-management/drivers' },
+        { id: 'health',   label: 'Health',       icon: '🏥', route: null },
+        { id: 'shop',     label: 'Shop',         icon: '🛍️', route: null },
       ]
     },
     {
       section: 'Features',
       items: [
-        { id: 'fantasy', label: 'Fantasy Game', icon: '🎮' },
-        { id: 'community', label: 'Community (AI)', icon: '💬' },
-        { id: 'sponsorships', label: 'Sponsors', icon: '💰' },
+        { id: 'fantasy',       label: 'Fantasy Game',   icon: '🎮', route: null },
+        { id: 'community',     label: 'Community (AI)', icon: '💬', route: null },
+        { id: 'sponsorships',  label: 'Sponsors',        icon: '💰', route: null },
       ]
     }
   ];
@@ -672,8 +670,8 @@ export class BackofficeComponent implements OnInit {
     {
       section: 'Overview',
       items: [
-        { id: 'allocator', label: 'Dashboard', icon: '▣' },
-        { id: 'venues', label: 'My Venues', icon: '📍' },
+        { id: 'allocator', label: 'Dashboard', icon: '▣', route: null },
+        { id: 'venues', label: 'My Venues', icon: '📍', route: null },
       ]
     }
   ];
@@ -719,11 +717,7 @@ export class BackofficeComponent implements OnInit {
     { user: 'Emma Wilson', action: 'Joined tournament', time: '1 hour ago' }
   ];
 
-  venues = [
-    { name: 'Arena Sports Complex', location: 'Downtown, Tunis', sports: ['Football', 'Basketball'], pricePerHour: 50, status: 'Active', bookingsToday: 5 },
-    { name: 'City Stadium', location: 'North District', sports: ['Football'], pricePerHour: 40, status: 'Active', bookingsToday: 3 },
-    { name: 'Green Park', location: 'South Tunis', sports: ['Tennis', 'Volleyball'], pricePerHour: 30, status: 'Active', bookingsToday: 2 }
-  ];
+  venues: any[] = [];
 
   users = [
     { name: 'Alex Johnson', email: 'alex@mail.com', role: 'PLAYER', status: 'Active', joined: '2025-01-10' },
@@ -780,7 +774,8 @@ export class BackofficeComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     public authService: AuthService,
-    private teamService: TeamService
+    private teamService: TeamService,
+    private adminVenueService: AdminVenueService
   ) {
     this.route.queryParams.subscribe(params => {
       if (params['role'] === 'venue-allocator') {
@@ -792,6 +787,7 @@ export class BackofficeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTeams();
+    this.loadVenues();
   }
 
   // ── Teams: load ────────────────────────────────────────────────────────────
@@ -933,6 +929,23 @@ export class BackofficeComponent implements OnInit {
         if (idx >= 0) this.allAdminTeams[idx] = this.viewedTeam;
       },
       error: () => alert('Failed to remove player.')
+    });
+  }
+
+  loadVenues(): void {
+    this.adminVenueService.getAllVenues().subscribe({
+      next: (data: VenueDTO[]) => {
+        this.venues = data.map(v => ({
+          id: v.id,
+          name: v.name,
+          location: v.address,
+          sports: [v.sportType],
+          pricePerHour: v.pricePerHour,
+          status: 'Active',
+          bookingsToday: v.capacity
+        }));
+      },
+      error: (err) => console.error('Error fetching venues', err)
     });
   }
 }

@@ -97,38 +97,54 @@ export class FrontofficeComponent {
   sidebarOpen = true;
   currentPath = '/home';
 
-  menu = [
-    {
-      section: 'Main',
-      items: [
-        { path: '/home',    label: 'Home',      icon: '🏠' },
-        { path: '/explore', label: 'Explore',   icon: '🔍' },
-      ]
-    },
-    {
-      section: 'Sports',
-      items: [
-        { path: '/teams',   label: 'Teams',     icon: '👥' },
-        { path: '/venues',  label: 'Venues',    icon: '📍' },
-        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
-      ]
-    },
-    {
-      section: 'Social',
-      items: [
-        { path: '/community', label: 'Community', icon: '💬' },
-        { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
-      ]
-    },
-    {
-      section: 'More',
-      items: [
-        { path: '/shop',    label: 'Shop',      icon: '🛍️' },
-        { path: '/wallet',  label: 'Wallet',    icon: '💳' },
-        { path: '/profile', label: 'Profile',   icon: '👤' },
-      ]
+  get menu() {
+    const role = this.authService.getUserRole()?.replace('ROLE_', '') || '';
+    const isVenueOwner = role === 'VENUE_OWNER';
+
+    const sections: { section: string; items: { path: string; label: string; icon: string }[] }[] = [
+      {
+        section: 'Main',
+        items: [
+          { path: '/home',    label: 'Home',    icon: '🏠' },
+          { path: '/explore', label: 'Explore', icon: '🔍' },
+        ]
+      }
+    ];
+
+    // Venue section — only for VENUE_OWNER
+    if (isVenueOwner) {
+      sections.push({
+        section: 'My Venue',
+        items: [
+          { path: '/venue/my-venues', label: 'My Venues',    icon: '🏟️' },
+          { path: '/venue/create',    label: 'Create Venue', icon: '➕' },
+        ]
+      });
     }
-  ];
+
+    sections.push(
+      {
+        section: 'Carpooling',
+        items: [
+          { path: '/carpooling',           label: 'Browse Trips', icon: '🛣️' },
+          { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕' },
+          { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗' },
+          { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒' },
+          { path: '/cars',                 label: 'My Cars',      icon: '🔧' },
+        ]
+      },
+      {
+        section: 'More',
+        items: [
+          { path: '/shop',    label: 'Shop',    icon: '🛍️' },
+          { path: '/wallet',  label: 'Wallet',  icon: '💳' },
+          { path: '/profile', label: 'Profile', icon: '👤' },
+        ]
+      }
+    );
+
+    return sections;
+  }
 
   get userEmail(): string {
     return this.authService.getCurrentUser()?.email || 'user@street.com';
@@ -152,4 +168,4 @@ export class FrontofficeComponent {
   }
 
   logout() { this.authService.logout(); }
-}
+}

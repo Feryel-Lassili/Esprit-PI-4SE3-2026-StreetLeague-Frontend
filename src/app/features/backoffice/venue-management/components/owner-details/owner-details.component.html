@@ -1,0 +1,208 @@
+<div class="page-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="state-center">
+    <div class="spinner"></div>
+    <p>Loading owner details...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert-error">
+    <span>⚠️</span> {{ error }}
+    <button (click)="goBack()" class="btn-back-err">← Back</button>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="owner && !loading">
+    <div class="page-header">
+      <button class="back-btn" (click)="goBack()" id="back-to-owners">← Back to Owners</button>
+    </div>
+
+    <!-- Owner Info Card -->
+    <div class="owner-info-card">
+      <div class="owner-avatar-lg">{{ owner.ownerUsername[0].toUpperCase() }}</div>
+      <div class="owner-info-body">
+        <div class="owner-name-row">
+          <h1 class="owner-username">{{ owner.ownerUsername }}</h1>
+          <span class="status-pill" [class.pill-verified]="owner.verified" [class.pill-unverified]="!owner.verified">
+            {{ owner.verified ? '✓ Verified' : '✗ Unverified' }}
+          </span>
+        </div>
+        <p class="owner-email">{{ owner.ownerEmail }}</p>
+        <div class="owner-meta">
+          <span>📞 {{ owner.ownerPhone }}</span>
+          <span>🏢 {{ owner.companyName }}</span>
+          <span>🏟️ {{ owner.venues.length }} venue(s)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Venues Section -->
+    <div class="venues-section">
+      <div class="section-top-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+        <h2 class="section-title" style="margin:0;">Venues</h2>
+        <button class="btn-create-venue" (click)="openAddVenue()" style="background:#000; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;" id="add-venue-for-owner">＋ Add Venue</button>
+      </div>
+
+      <div *ngIf="owner.venues.length === 0" class="empty-venues">
+        <p>This owner has no venues yet.</p>
+      </div>
+
+      <div *ngIf="owner.venues.length > 0" class="table-card">
+        <table class="venues-table" id="owner-venues-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Sport</th>
+              <th>Price/Hr</th>
+              <th>Capacity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let venue of owner.venues" [id]="'venue-row-' + venue.id">
+              <td class="venue-name-cell">{{ venue.name }}</td>
+              <td class="text-muted">{{ venue.address }}</td>
+              <td><span class="sport-pill">{{ venue.sportType }}</span></td>
+              <td class="text-bold">{{ venue.pricePerHour }} TND</td>
+              <td class="text-muted">{{ venue.capacity }}</td>
+              <td>
+                <div class="action-group">
+                  <button class="action-btn btn-edit-venue"
+                    (click)="openEditVenue(venue)"
+                    [id]="'edit-venue-' + venue.id">
+                    ✏️ Edit
+                  </button>
+                  <button class="action-btn btn-delete-venue"
+                    (click)="deleteVenue(venue.id)"
+                    [disabled]="actionLoading === venue.id"
+                    [id]="'delete-venue-' + venue.id">
+                    🗑 Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal Overlay -->
+  <div class="modal-overlay" *ngIf="editingVenue || isAdding" (click)="closeEdit()">
+    <div class="modal-card" (click)="$event.stopPropagation()" id="edit-venue-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ isAdding ? 'Create Venue' : 'Edit Venue' }}</h2>
+        <button class="modal-close" (click)="closeEdit()" id="close-edit-modal">✕</button>
+      </div>
+
+      <div *ngIf="editError" class="alert-error" style="margin-bottom:16px;">⚠️ {{ editError }}</div>
+
+      <form [formGroup]="editForm" (ngSubmit)="saveVenueEdit()" id="admin-edit-venue-form">
+        <div class="form-group">
+          <label for="admin-edit-name">Name</label>
+          <input id="admin-edit-name" formControlName="name" type="text"
+            [class.input-error]="ef['name'].touched && ef['name'].invalid">
+          <span class="field-error" *ngIf="ef['name'].touched && ef['name'].errors?.['required']">Required.</span>
+        </div>
+        <div class="form-group">
+          <label for="admin-edit-address">Address</label>
+          <input id="admin-edit-address" formControlName="address" type="text"
+            [class.input-error]="ef['address'].touched && ef['address'].invalid">
+          <span class="field-error" *ngIf="ef['address'].touched && ef['address'].errors?.['required']">Required.</span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="admin-edit-price">Price/Hr (TND)</label>
+            <input id="admin-edit-price" formControlName="pricePerHour" type="number"
+              [class.input-error]="ef['pricePerHour'].touched && ef['pricePerHour'].invalid">
+            <span class="field-error" *ngIf="ef['pricePerHour'].touched && ef['pricePerHour'].errors?.['required']">Required.</span>
+          </div>
+          <div class="form-group">
+            <label for="admin-edit-capacity">Capacity</label>
+            <input id="admin-edit-capacity" formControlName="capacity" type="number"
+              [class.input-error]="ef['capacity'].touched && ef['capacity'].invalid">
+            <span class="field-error" *ngIf="ef['capacity'].touched && ef['capacity'].errors?.['required']">Required.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="admin-edit-sport">Sport Type</label>
+          <select id="admin-edit-sport" formControlName="sportType"
+            [class.input-error]="ef['sportType'].touched && ef['sportType'].invalid">
+            <option value="">-- Select sport --</option>
+            <option *ngFor="let sport of sportTypes" [value]="sport.value">{{ sport.label }}</option>
+          </select>
+          <span class="field-error" *ngIf="ef['sportType'].touched && ef['sportType'].errors?.['required']">Required.</span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeEdit()" id="cancel-edit-venue">Cancel</button>
+          <button type="submit" class="btn-save" [disabled]="editSaving" id="save-edit-venue">
+            <span *ngIf="editSaving" class="spinner-sm"></span>
+            {{ editSaving ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .page-container { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .state-center { display: flex; flex-direction: column; align-items: center; padding: 60px; color: #6e6e73; gap: 14px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #e0e0e5; border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+  .btn-back-err { margin-left: auto; color: #c62828; background: none; border: none; cursor: pointer; font-size: 13px; }
+  .page-header { margin-bottom: 20px; }
+  .back-btn { background: none; border: none; color: #6e6e73; font-size: 13px; cursor: pointer; padding: 0; }
+  .back-btn:hover { color: #000; }
+  .owner-info-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+  .owner-avatar-lg { width: 56px; height: 56px; border-radius: 50%; background: #e8f0fe; color: #185fa5; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .owner-info-body { flex: 1; }
+  .owner-name-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .owner-username { font-size: 20px; font-weight: 700; color: #1d1d1f; margin: 0; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+  .pill-verified { background: #f1f8e9; color: #2e7d32; }
+  .pill-unverified { background: #fff2f2; color: #c62828; }
+  .owner-email { font-size: 14px; color: #6e6e73; margin: 0 0 10px; }
+  .owner-meta { display: flex; gap: 20px; font-size: 13px; color: #6e6e73; flex-wrap: wrap; }
+  .venues-section { margin-top: 0; }
+  .section-title { font-size: 16px; font-weight: 700; color: #1d1d1f; margin: 0 0 16px; }
+  .empty-venues { background: #fff; border: 1px solid #e0e0e5; border-radius: 14px; padding: 40px; text-align: center; color: #6e6e73; }
+  .table-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 14px; overflow: hidden; }
+  .venues-table { width: 100%; border-collapse: collapse; }
+  .venues-table th { text-align: left; font-size: 11px; font-weight: 600; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 16px; border-bottom: 1px solid #e0e0e5; background: #fafafa; }
+  .venues-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f7; font-size: 13px; color: #1d1d1f; vertical-align: middle; }
+  .venues-table tbody tr:last-child td { border-bottom: none; }
+  .venues-table tbody tr:hover { background: #fafafa; }
+  .venue-name-cell { font-weight: 600; }
+  .text-muted { color: #6e6e73; }
+  .text-bold { font-weight: 600; }
+  .sport-pill { background: #e8f0fe; color: #185fa5; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+  .action-group { display: flex; gap: 6px; }
+  .action-btn { padding: 5px 10px; border: 1px solid #e0e0e5; border-radius: 6px; font-size: 11px; cursor: pointer; background: #fff; transition: background 0.15s; white-space: nowrap; }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-edit-venue:hover { background: #f1f8e9; border-color: #2e7d32; color: #2e7d32; }
+  .btn-delete-venue:hover { background: #fff2f2; border-color: #c62828; color: #c62828; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .modal-card { background: #fff; border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: #1d1d1f; margin: 0; }
+  .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #6e6e73; padding: 4px; }
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 5px; }
+  input, select { width: 100%; padding: 9px 12px; border: 1px solid #d0d0d5; border-radius: 8px; font-size: 13px; color: #1d1d1f; background: #fafafa; outline: none; box-sizing: border-box; transition: border-color 0.15s; }
+  input:focus, select:focus { border-color: #000; background: #fff; }
+  .input-error { border-color: #c62828 !important; }
+  .field-error { display: block; font-size: 11px; color: #c62828; margin-top: 3px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel { padding: 9px 18px; border: 1px solid #d0d0d5; border-radius: 8px; font-size: 13px; color: #6e6e73; background: none; cursor: pointer; }
+  .btn-cancel:hover { background: #f5f5f7; }
+  .btn-save { padding: 9px 20px; background: #000; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-save:hover:not(:disabled) { opacity: 0.8; }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+  .spinner-sm { width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+</style>

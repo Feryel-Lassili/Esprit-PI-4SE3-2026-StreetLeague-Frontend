@@ -1,0 +1,60 @@
+<div class="cp-page">
+  <h1 class="cp-title">Create a Trip</h1>
+  <p class="cp-sub" style="margin-bottom:24px;">Set up a new carpooling ride for others to join</p>
+
+  <div *ngIf="error" class="cp-error" style="margin-bottom:16px;">⚠️ {{ error }}</div>
+
+  <div class="cp-form-card">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="cp-row">
+        <div class="cp-field">
+          <label>Lieu de départ</label>
+          <input formControlName="departureLocation" placeholder="e.g. Tunis" [class.cp-input-err]="f['departureLocation'].touched && f['departureLocation'].invalid">
+          <span class="cp-ferr" *ngIf="f['departureLocation'].touched && f['departureLocation'].errors?.['required']">Required</span>
+        </div>
+        <div class="cp-field">
+          <label>Lieu d'arrivée</label>
+          <input formControlName="arrivalLocation" placeholder="e.g. Sousse" [class.cp-input-err]="f['arrivalLocation'].touched && f['arrivalLocation'].invalid">
+          <span class="cp-ferr" *ngIf="f['arrivalLocation'].touched && f['arrivalLocation'].errors?.['required']">Required</span>
+        </div>
+      </div>
+      <div class="cp-row">
+        <div class="cp-field">
+          <label>Date</label>
+          <input type="date" formControlName="date" [class.cp-input-err]="f['date'].touched && f['date'].invalid">
+        </div>
+        <div class="cp-field">
+          <label>Departure Time</label>
+          <input type="time" formControlName="departureTime" [class.cp-input-err]="f['departureTime'].touched && f['departureTime'].invalid">
+        </div>
+      </div>
+      <div class="cp-field">
+        <label>Car</label>
+        <div *ngIf="loadingCars" style="font-size:13px;color:#6e6e73;">Loading your cars…</div>
+        <select *ngIf="!loadingCars" formControlName="carId" [class.cp-input-err]="f['carId'].touched && f['carId'].invalid">
+          <option [ngValue]="null">-- Select a car --</option>
+          <option *ngFor="let car of cars" [ngValue]="car.id">{{ car.model }} ({{ car.plateNumber }}) – {{ car.availableSeats }} seats</option>
+        </select>
+        <span class="cp-ferr" *ngIf="f['carId'].touched && f['carId'].errors?.['required']">Please select a car</span>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+        <button type="button" class="cp-btn cp-btn-cancel" (click)="router.navigate(['/carpooling'])">Cancel</button>
+        <button type="submit" class="cp-btn-primary" [disabled]="saving">{{ saving ? 'Creating…' : 'Create Trip' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .cp-title{font-size:22px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-sub{font-size:14px;color:#6e6e73;margin:0}
+  .cp-form-card{background:#fff;border:1px solid #e0e0e5;border-radius:16px;padding:28px;max-width:560px}
+  .cp-field{margin-bottom:14px}.cp-field label{display:block;font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:5px}
+  .cp-field input,.cp-field select{width:100%;padding:9px 12px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#1d1d1f;background:#fafafa;outline:none;box-sizing:border-box}
+  .cp-field input:focus,.cp-field select:focus{border-color:#000;background:#fff}
+  .cp-input-err{border-color:#c62828!important}.cp-ferr{display:block;font-size:11px;color:#c62828;margin-top:3px}
+  .cp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px}
+  .cp-btn-primary{background:#000;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}.cp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .cp-btn-cancel{padding:9px 18px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#6e6e73;background:none;cursor:pointer}.cp-btn-cancel:hover{background:#f5f5f7}
+</style>

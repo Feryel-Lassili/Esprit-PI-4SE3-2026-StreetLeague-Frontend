@@ -1,0 +1,158 @@
+<div class="av-page">
+
+  <!-- Header -->
+  <div class="av-header">
+    <div>
+      <h1 class="av-title">All Venues</h1>
+      <p class="av-subtitle">All registered sport venues across all owners</p>
+    </div>
+    <div class="av-controls">
+      <input
+        class="av-search"
+        type="text"
+        placeholder="🔍 Search by venue, owner, sport…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        id="admin-venues-search"
+      />
+      <button class="av-refresh-btn" (click)="loadVenues()" id="refresh-venues-btn">🔄 Refresh</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="av-state-center">
+    <div class="av-spinner"></div>
+    <p>Loading venues…</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="av-alert-error">
+    <span>⚠️</span> {{ error }}
+    <button (click)="loadVenues()" class="av-retry-btn">Retry</button>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && !error && filtered.length === 0" class="av-empty">
+    <div class="av-empty-icon">🏟️</div>
+    <h2>No Venues Found</h2>
+    <p *ngIf="searchQuery">No venues match "{{ searchQuery }}".</p>
+    <p *ngIf="!searchQuery">No venues have been created yet.</p>
+  </div>
+
+  <!-- Card Grid -->
+  <div *ngIf="!loading && !error && filtered.length > 0" class="av-grid">
+    <div class="av-card" *ngFor="let c of filtered" [id]="'venue-card-' + c.venue.id">
+
+      <!-- Sport banner -->
+      <div class="av-card-banner">
+        <span class="av-sport-emoji">{{ sportEmoji(c.venue.sportType) }}</span>
+        <span class="av-sport-pill">{{ c.venue.sportType }}</span>
+      </div>
+
+      <!-- Body -->
+      <div class="av-card-body">
+        <h3 class="av-venue-name">{{ c.venue.name }}</h3>
+        <p class="av-venue-address">📍 {{ c.venue.address }}</p>
+
+        <div class="av-stats-row">
+          <div class="av-stat">
+            <span class="av-stat-label">Price / hr</span>
+            <span class="av-stat-value">{{ c.venue.pricePerHour }} TND</span>
+          </div>
+          <div class="av-stat">
+            <span class="av-stat-label">Capacity</span>
+            <span class="av-stat-value">{{ c.venue.capacity }} 👥</span>
+          </div>
+        </div>
+
+        <!-- Owner info strip -->
+        <div class="av-owner-strip">
+          <div class="av-owner-avatar">{{ c.ownerUsername[0].toUpperCase() }}</div>
+          <div class="av-owner-info">
+            <span class="av-owner-name">{{ c.ownerUsername }}</span>
+            <span class="av-owner-email">{{ c.ownerEmail }}</span>
+          </div>
+        </div>
+
+        <div class="av-company">🏢 {{ c.companyName }}</div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="av-card-footer">
+        <button
+          class="av-btn av-btn-edit"
+          (click)="editVenue(c.ownerId)"
+          [id]="'edit-venue-' + c.venue.id">
+          ✏️ Edit
+        </button>
+        <button
+          class="av-btn av-btn-delete"
+          (click)="deleteVenue(c.venue.id, c.ownerId)"
+          [id]="'delete-venue-' + c.venue.id">
+          🗑 Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .av-page { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 0; }
+  .av-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+  .av-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin: 0 0 4px; }
+  .av-subtitle { font-size: 14px; color: #6e6e73; margin: 0; }
+  .av-controls { display: flex; gap: 10px; align-items: center; }
+  .av-search { border: 1px solid #d0d0d5; border-radius: 10px; padding: 9px 14px; font-size: 13px; color: #1d1d1f; outline: none; width: 260px; background: #fafafa; transition: border-color 0.15s; }
+  .av-search:focus { border-color: #000; background: #fff; }
+  .av-refresh-btn { background: none; border: 1px solid #d0d0d5; border-radius: 8px; padding: 9px 14px; font-size: 13px; color: #6e6e73; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .av-refresh-btn:hover { background: #f5f5f7; }
+
+  .av-state-center { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; color: #6e6e73; gap: 16px; }
+  .av-spinner { width: 36px; height: 36px; border: 3px solid #e0e0e5; border-top-color: #000; border-radius: 50%; animation: av-spin 0.8s linear infinite; }
+  @keyframes av-spin { to { transform: rotate(360deg); } }
+  .av-alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .av-retry-btn { margin-left: auto; background: #c62828; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .av-empty { display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center; color: #6e6e73; }
+  .av-empty-icon { font-size: 56px; margin-bottom: 16px; }
+  .av-empty h2 { font-size: 20px; font-weight: 600; color: #1d1d1f; margin: 0 0 8px; }
+
+  /* Card Grid */
+  .av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+  .av-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.2s, transform 0.2s; }
+  .av-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.09); transform: translateY(-3px); }
+
+  /* Banner */
+  .av-card-banner { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px 20px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .av-sport-emoji { font-size: 36px; }
+  .av-sport-pill { background: rgba(255,255,255,0.15); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; backdrop-filter: blur(4px); }
+
+  /* Body */
+  .av-card-body { padding: 18px 20px; flex: 1; }
+  .av-venue-name { font-size: 17px; font-weight: 700; color: #1d1d1f; margin: 0 0 5px; }
+  .av-venue-address { font-size: 13px; color: #6e6e73; margin: 0 0 16px; }
+
+  .av-stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .av-stat { background: #f5f5f7; border-radius: 10px; padding: 10px 14px; flex: 1; }
+  .av-stat-label { display: block; font-size: 10px; font-weight: 600; color: #aeaeb2; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .av-stat-value { font-size: 16px; font-weight: 700; color: #1d1d1f; }
+
+  /* Owner strip */
+  .av-owner-strip { display: flex; align-items: center; gap: 10px; background: #e8f0fe; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+  .av-owner-avatar { width: 32px; height: 32px; border-radius: 50%; background: #185fa5; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .av-owner-info { display: flex; flex-direction: column; overflow: hidden; }
+  .av-owner-name { font-size: 13px; font-weight: 700; color: #1a3a6e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .av-owner-email { font-size: 11px; color: #5a7ab5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .av-company { font-size: 12px; color: #6e6e73; }
+
+  /* Footer */
+  .av-card-footer { padding: 12px 20px; border-top: 1px solid #f0f0f5; display: flex; gap: 8px; }
+  .av-btn { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, transform 0.1s; }
+  .av-btn:active { transform: scale(0.97); }
+  .av-btn-edit { background: #f1f8e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+  .av-btn-edit:hover { background: #c8e6c9; }
+  .av-btn-delete { background: #fff2f2; color: #c62828; border: 1px solid #ffcdd2; }
+  .av-btn-delete:hover { background: #ffcdd2; }
+</style>
