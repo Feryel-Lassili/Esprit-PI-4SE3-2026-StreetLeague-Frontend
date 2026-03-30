@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         CI = 'true'
+        DOCKER_IMAGE = 'fadisaidi02/pi-frontend'   // Your username + image name
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -28,24 +30,32 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Angular') {
             steps {
-                // Disable budget checks for CI to allow the combined code to build
-                sh 'npm run build -- --configuration production --delete-output-path'
+                sh 'npm run build -- --configuration production'
+            }
+        }
+
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}")
+                    
+                    docker.withRegistry('', 'docker-hub-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${IMAGE_TAG}").push()
+                        docker.image("${DOCKER_IMAGE}:${IMAGE_TAG}").push('latest')
+                    }
+                }
             }
         }
     }
 
     post {
-        always {
-            archiveArtifacts artifacts: 'dist/**', allowEmptyArchive: true
-            echo 'Pipeline finished'
-        }
         success {
-            echo '✅ Angular Frontend Pipeline Succeeded!'
+            echo "✅ Frontend Docker Image Pushed Successfully → ${DOCKER_IMAGE}:${IMAGE_TAG}"
         }
         failure {
-            echo '❌ Angular Frontend Pipeline Failed!'
+            echo '❌ Frontend Pipeline Failed!'
         }
     }
 }

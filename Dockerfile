@@ -5,16 +5,14 @@ FROM node:24-alpine AS build
 
 WORKDIR /app
 
-# Copy package files first (better layer caching)
+# Copy package files first for better caching
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci --ignore-scripts
 
 # Copy source code
 COPY . .
 
-# Build Angular app for production
+# Build the Angular app for production
 RUN npm run build -- --configuration production
 
 # ========================
@@ -22,14 +20,12 @@ RUN npm run build -- --configuration production
 # ========================
 FROM nginx:stable-alpine
 
-# Copy built Angular app from build stage
+# Copy the built Angular files (IMPORTANT: your output path)
 COPY --from=build /app/dist/frontend2test/browser /usr/share/nginx/html
 
-# Copy custom nginx configuration
+# Copy custom nginx config for Angular routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
