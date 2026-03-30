@@ -128,6 +128,7 @@ export class FrontofficeComponent implements OnInit {
         { path: '/shop',    label: 'Shop',      icon: '🛍️' },
         { path: '/wallet',  label: 'Wallet',    icon: '💳' },
         { path: '/profile', label: 'Profile',   icon: '👤' },
+        { path: '/health', label: 'Health', icon: '🏥' },
       ]
     }
   ];

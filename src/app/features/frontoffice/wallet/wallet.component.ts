@@ -1,0 +1,208 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { WalletService, Wallet, TransactionResponse } from '../../../core/services/wallet.service';
+import { AuthService } from '../../../core/services/auth.service';
+
+@Component({
+  selector: 'fo-wallet',
+  templateUrl: './wallet.component.html',
+  styleUrls: ['./wallet.component.scss']
+})
+export class WalletComponent implements OnInit {
+
+  wallet: Wallet | null = null;
+  transactions: TransactionResponse[] = [];
+  loading = true;
+  actionLoading = false;
+  error = '';
+  success = '';
+
+  activeTab: 'deposit' | 'withdraw' | 'transfer' = 'withdraw';
+  txFilter = 'ALL';
+  txFilters = ['ALL', 'DEPOSIT', 'WITHDRAWAL', 'TRANSFER'];
+
+  depositAmount: number | null = null;
+  withdrawAmount: number | null = null;
+  transferAmount: number | null = null;
+  transferUserId: number | null = null;
+
+  presets = [100, 250, 500];
+
+  insights = [
+    { label: 'Venue Bookings',       pct: 45, color: 'black' },
+    { label: 'Shop Purchases',       pct: 30, color: 'gray'  },
+    { label: 'Events & Tournaments', pct: 25, color: 'light' },
+  ];
+
+  constructor(
+    private walletService: WalletService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  // ── Role helpers ──────────────────────────────────────────
+  isPlayer():     boolean { return this.authService.hasRole('PLAYER'); }
+  isCoach():      boolean { return this.authService.hasRole('COACH'); }
+  isReferee():    boolean { return this.authService.hasRole('REFEREE'); }
+  isHealthPro():  boolean { return this.authService.hasRole('HEALTH_PROFESSIONAL'); }
+  isSponsor():    boolean { return this.authService.hasRole('SPONSOR'); }
+  isVenueOwner(): boolean { return this.authService.hasRole('VENUE_OWNER'); }
+
+  get userRole(): string {
+    return this.authService.getUserRole()?.replace('ROLE_', '') || '';
+  }
+
+  get roleLabel(): string {
+    const map: { [key: string]: string } = {
+      'PLAYER': 'Player', 'COACH': 'Coach', 'REFEREE': 'Referee',
+      'HEALTH_PROFESSIONAL': 'Health Professional',
+      'SPONSOR': 'Sponsor', 'VENUE_OWNER': 'Venue Owner'
+    };
+    return map[this.userRole] || this.userRole;
+  }
+
+  get incomeIcon(): string {
+    const map: { [key: string]: string } = {
+      'COACH': '🏋️', 'REFEREE': '🟡', 'HEALTH_PROFESSIONAL': '🩺',
+      'VENUE_OWNER': '🏟️', 'SPONSOR': '💰'
+    };
+    return map[this.userRole] || '💳';
+  }
+
+  get roleDescription(): string {
+    const map: { [key: string]: string } = {
+      'COACH':               'Receive training fees from your players and pay tournament registrations for your team.',
+      'REFEREE':             'Your match honoraires are credited automatically after each match you referee.',
+      'HEALTH_PROFESSIONAL': 'You are rewarded by the platform for each validated recommendation. Consultations are free for players.',
+      'VENUE_OWNER':         'Points are credited automatically when players book your venues.',
+      'SPONSOR':             'Inject your budget to sponsor tournaments, teams and events on StreetLeague.',
+    };
+    return map[this.userRole] || '';
+  }
+
+  get incomeStats() {
+    const received = this.transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+    const count    = this.transactions.filter(t => t.amount > 0).length;
+    return { received, count };
+  }
+
+  // ── Init ──────────────────────────────────────────────────
+  ngOnInit() {
+    this.loadWallet();
+    this.loadHistory();
+  }
+
+  // ── Computed ──────────────────────────────────────────────
+  get filteredTx(): TransactionResponse[] {
+    if (this.txFilter === 'ALL') return this.transactions;
+    return this.transactions.filter(t => t.transactionType === this.txFilter);
+  }
+
+  get monthDeposits(): string {
+    const v = this.transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+    return `+${v}`;
+  }
+
+  get monthExpenses(): string {
+    const v = this.transactions
+      .filter(t => t.amount < 0 && t.transactionType !== 'TRANSFER')
+      .reduce((s, t) => s + t.amount, 0);
+    return `${v}`;
+  }
+
+  get monthTransfers(): string {
+    const v = this.transactions
+      .filter(t => t.transactionType === 'TRANSFER')
+      .reduce((s, t) => s + Math.abs(t.amount), 0);
+    return `${v}`;
+  }
+
+  txColor(tx: TransactionResponse): string {
+    const map: { [key: string]: string } = {
+      'DEPOSIT': 'green', 'WITHDRAWAL': 'red', 'TRANSFER': 'blue'
+    };
+    return map[tx.transactionType] || 'gray';
+  }
+
+  txEmoji(tx: TransactionResponse): string {
+    const map: { [key: string]: string } = {
+      'DEPOSIT': '⬆️', 'WITHDRAWAL': '⬇️', 'TRANSFER': '🔄'
+    };
+    return map[tx.transactionType] || '💳';
+  }
+
+  txLabel(tx: TransactionResponse): string {
+    const map: { [key: string]: string } = {
+      'DEPOSIT': 'Wallet Recharge', 'WITHDRAWAL': 'Withdrawal', 'TRANSFER': 'Transfer'
+    };
+    return map[tx.transactionType] || tx.transactionType;
+  }
+
+  // ── Actions ───────────────────────────────────────────────
+  loadWallet() {
+    this.walletService.getMyWallet().subscribe({
+      next:  w  => { this.wallet = w; this.loading = false; this.cdr.detectChanges(); },
+      error: () => { this.error = 'Failed to load wallet'; this.loading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  loadHistory() {
+    this.walletService.getHistory().subscribe({
+      next:  t  => { this.transactions = t; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  deposit() {
+    if (!this.depositAmount) return;
+    this.actionLoading = true;
+    this.clearMessages();
+    this.walletService.deposit(this.depositAmount).subscribe({
+      next: w => {
+        this.wallet = w;
+        this.success = `+${Math.floor(this.depositAmount! / 10)} points added!`;
+        this.depositAmount = null;
+        this.actionLoading = false;
+        this.cdr.detectChanges();
+        this.loadHistory();
+      },
+      error: () => { this.error = 'Deposit failed'; this.actionLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  withdraw() {
+    if (!this.withdrawAmount) return;
+    this.actionLoading = true;
+    this.clearMessages();
+    this.walletService.withdraw(this.withdrawAmount).subscribe({
+      next: w => {
+        this.wallet = w;
+        this.success = 'Withdrawal successful!';
+        this.withdrawAmount = null;
+        this.actionLoading = false;
+        this.cdr.detectChanges();
+        this.loadHistory();
+      },
+      error: () => { this.error = 'Insufficient points or withdrawal failed'; this.actionLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  transfer() {
+    if (!this.transferAmount || !this.transferUserId) return;
+    this.actionLoading = true;
+    this.clearMessages();
+    this.walletService.transfer(this.transferUserId, this.transferAmount).subscribe({
+      next: () => {
+        this.success = 'Transfer successful!';
+        this.transferAmount = null;
+        this.transferUserId = null;
+        this.actionLoading = false;
+        this.cdr.detectChanges();
+        this.loadWallet();
+        this.loadHistory();
+      },
+      error: () => { this.error = 'Transfer failed'; this.actionLoading = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  clearMessages() { this.error = ''; this.success = ''; }
+}

@@ -16,10 +16,17 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
+<<<<<<< HEAD
       { path: 'profile', component: ProfileComponent },
       { path: 'shop', component: FrontofficeShopComponent },
       { path: 'my-merchandise', component: PlayerMerchandiseComponent },
       { path: 'sponsors', loadComponent: () => import('./sponsors.component').then(m => m.FrontofficeSponsorsComponent) }
+=======
+      
+      { path: 'profile', component: ProfileComponent },
+      { path: 'health', loadChildren: () => import('./health/health.module').then(m => m.HealthModule) },
+      { path: 'wallet', loadChildren: () => import('./wallet/wallet.module').then(m => m.WalletModule) }
+>>>>>>> origin/feature_yossra
     ]
   }
 ];

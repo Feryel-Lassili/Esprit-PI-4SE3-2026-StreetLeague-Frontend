@@ -163,12 +163,22 @@ export class AuthService {
     return userRole === `ROLE_${role}` || userRole === role;
   }
 
+  // ✅ Retourne le profileId du user connecté (utilisé par le module Health)
+  getProfileId(): number | null {
+    const user = this.getCurrentUser();
+    return user ? (user as any).profileId ?? null : null;
+  }
+
   private setSession(response: LoginResponse): void {
     if (isPlatformBrowser(this.platformId)) {
       const user: any = {
         email: response.email,
         role: response.role,
+<<<<<<< HEAD
         username: response.username ?? response.email
+=======
+        profileId: (response as any).profileId ?? null  // ✅ stocke le profileId
+>>>>>>> origin/feature_yossra
       };
       localStorage.setItem(this.TOKEN_KEY, response.token);
       localStorage.setItem(this.USER_KEY, JSON.stringify(user));
