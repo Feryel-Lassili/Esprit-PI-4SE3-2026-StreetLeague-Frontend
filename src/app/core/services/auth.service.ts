@@ -174,11 +174,8 @@ export class AuthService {
       const user: any = {
         email: response.email,
         role: response.role,
-<<<<<<< HEAD
-        username: response.username ?? response.email
-=======
+        username: response.username ?? response.email,
         profileId: (response as any).profileId ?? null  // ✅ stocke le profileId
->>>>>>> origin/feature_yossra
       };
       localStorage.setItem(this.TOKEN_KEY, response.token);
       localStorage.setItem(this.USER_KEY, JSON.stringify(user));

@@ -252,10 +252,13 @@
         <h3 class="card-title">💡 How Points Work</h3>
         <ul class="points-rules">
           <li><span class="rule-icon">➕</span><span>Earn <strong>1 pt</strong> per 10 units deposited</span></li>
+          <li><span class="rule-icon">🛒</span><span>Earn <strong>1% loyalty points</strong> on every shop purchase</span></li>
           <li><span class="rule-icon">🏟️</span><span>Use points to book <strong>venues</strong></span></li>
           <li><span class="rule-icon">🛍️</span><span>Spend in the <strong>shop</strong></span></li>
           <li><span class="rule-icon">🏆</span><span>Pay <strong>events &amp; tournaments</strong></span></li>
           <li><span class="rule-icon">🔄</span><span><strong>Transfer</strong> points to teammates</span></li>
+          <li><span class="rule-icon">↩️</span><span>Cancelled orders are <strong>refunded</strong> automatically</span></li>
+          <li *ngIf="isPlayer()">    <span class="rule-icon">🏅</span><span>Earn <strong>90% revenue</strong> when your merch sells</span></li>
           <li *ngIf="isCoach()">      <span class="rule-icon">🏋️</span><span>Receive <strong>training fees</strong> from players</span></li>
           <li *ngIf="isReferee()">    <span class="rule-icon">🟡</span><span>Receive <strong>honoraires</strong> per match</span></li>
           <li *ngIf="isHealthPro()">  <span class="rule-icon">🩺</span><span>Earn <strong>platform rewards</strong> per recommendation</span></li>

@@ -38,11 +38,8 @@ export interface LoginResponse {
   token: string;
   email: string;
   role: string;
-<<<<<<< HEAD
   username?: string;
-=======
   profileId?: number;
->>>>>>> origin/feature_yossra
 }
 
 export interface User {

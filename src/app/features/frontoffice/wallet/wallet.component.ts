@@ -18,7 +18,7 @@ export class WalletComponent implements OnInit {
 
   activeTab: 'deposit' | 'withdraw' | 'transfer' = 'withdraw';
   txFilter = 'ALL';
-  txFilters = ['ALL', 'DEPOSIT', 'WITHDRAWAL', 'TRANSFER'];
+  txFilters = ['ALL', 'PAYMENT', 'DEPOSIT', 'WITHDRAWAL', 'REFUND', 'TRANSFER'];
 
   depositAmount: number | null = null;
   withdrawAmount: number | null = null;
@@ -90,8 +90,6 @@ export class WalletComponent implements OnInit {
     this.loadWallet();
     this.loadHistory();
   }
-
-  // ── Computed ──────────────────────────────────────────────
   get filteredTx(): TransactionResponse[] {
     if (this.txFilter === 'ALL') return this.transactions;
     return this.transactions.filter(t => t.transactionType === this.txFilter);
@@ -118,21 +116,34 @@ export class WalletComponent implements OnInit {
 
   txColor(tx: TransactionResponse): string {
     const map: { [key: string]: string } = {
-      'DEPOSIT': 'green', 'WITHDRAWAL': 'red', 'TRANSFER': 'blue'
+      'DEPOSIT':    'green',
+      'REFUND':     'green',
+      'WITHDRAWAL': 'red',
+      'PAYMENT':    'red',
+      'TRANSFER':   'blue'
     };
     return map[tx.transactionType] || 'gray';
   }
 
   txEmoji(tx: TransactionResponse): string {
     const map: { [key: string]: string } = {
-      'DEPOSIT': '⬆️', 'WITHDRAWAL': '⬇️', 'TRANSFER': '🔄'
+      'DEPOSIT':    '⬆️',
+      'REFUND':     '↩️',
+      'WITHDRAWAL': '⬇️',
+      'PAYMENT':    '🛒',
+      'TRANSFER':   '🔄'
     };
     return map[tx.transactionType] || '💳';
   }
 
   txLabel(tx: TransactionResponse): string {
+    if (tx.description) return tx.description;
     const map: { [key: string]: string } = {
-      'DEPOSIT': 'Wallet Recharge', 'WITHDRAWAL': 'Withdrawal', 'TRANSFER': 'Transfer'
+      'DEPOSIT':    'Wallet Recharge',
+      'REFUND':     'Order Refund',
+      'WITHDRAWAL': 'Withdrawal',
+      'PAYMENT':    'Order Payment',
+      'TRANSFER':   'Transfer'
     };
     return map[tx.transactionType] || tx.transactionType;
   }
@@ -140,15 +151,25 @@ export class WalletComponent implements OnInit {
   // ── Actions ───────────────────────────────────────────────
   loadWallet() {
     this.walletService.getMyWallet().subscribe({
-      next:  w  => { this.wallet = w; this.loading = false; this.cdr.detectChanges(); },
+      next:  w  => {
+        console.log('Wallet response:', w);
+        this.wallet = w;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
       error: () => { this.error = 'Failed to load wallet'; this.loading = false; this.cdr.detectChanges(); }
     });
   }
 
   loadHistory() {
-    this.walletService.getHistory().subscribe({
+    this.walletService.getTransactions().subscribe({
       next:  t  => { this.transactions = t; this.cdr.detectChanges(); },
-      error: () => {}
+      error: () => {
+        this.walletService.getHistory().subscribe({
+          next:  t  => { this.transactions = t; this.cdr.detectChanges(); },
+          error: () => {}
+        });
+      }
     });
   }
 

@@ -4,12 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
-<<<<<<< HEAD
 import { BackofficeShopComponent } from './shop-management.component';
 import { BackofficeOrdersComponent } from './orders-management.component';
 import { BackofficeSponsorComponent } from './sponsor-management.component';
 import { MerchandiseAdminComponent } from './merchandise-admin.component';
-=======
 import { environment } from '../../../environments/environment';
 
 interface WalletAdmin {
@@ -21,16 +19,11 @@ interface WalletAdmin {
   role: string;
   phone: string;
 }
->>>>>>> origin/feature_yossra
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-<<<<<<< HEAD
     imports: [CommonModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
-=======
-  imports: [CommonModule, FormsModule],
->>>>>>> origin/feature_yossra
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -723,7 +716,6 @@ export class BackofficeComponent implements OnInit {
 
   // ── Menus ─────────────────────────────────────────────────
   adminMenu = [
-<<<<<<< HEAD
     {
       section: 'Overview',
       items: [
@@ -749,21 +741,7 @@ export class BackofficeComponent implements OnInit {
         { id: 'community', label: 'Community (AI)', icon: '💬' },
       ]
     }
-=======
-    { section: 'Overview',    items: [{ id: 'dashboard', label: 'Dashboard', icon: '▣' }] },
-    { section: 'Management',  items: [
-        { id: 'users',    label: 'Users & Teams', icon: '👥' },
-        { id: 'venues',   label: 'Venues',        icon: '📍' },
-        { id: 'health',   label: 'Health',        icon: '🏥' },
-        { id: 'shop',     label: 'Shop',          icon: '🛍️' },
-        { id: 'wallet',   label: 'Wallet',        icon: '💳' },
-    ]},
-    { section: 'Features', items: [
-        { id: 'fantasy',      label: 'Fantasy Game', icon: '🎮' },
-        { id: 'community',    label: 'Community (AI)', icon: '💬' },
-        { id: 'sponsorships', label: 'Sponsors',     icon: '💰' },
-    ]}
->>>>>>> origin/feature_yossra
+    
   ];
 
   allocatorMenu = [
