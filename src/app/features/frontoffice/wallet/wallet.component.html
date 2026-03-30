@@ -122,7 +122,7 @@
         <div class="tx-filters">
           <button *ngFor="let f of txFilters" class="filter-btn"
             [class.active]="txFilter === f"
-            (click)="txFilter = f">{{ f }}</button>
+            (click)="setFilter(f)">{{ f }}</button>
         </div>
       </div>
 
@@ -167,6 +167,9 @@
           <label class="action-label">Amount to withdraw</label>
           <input type="number" [(ngModel)]="withdrawAmount" name="withdrawAmount"
             placeholder="Enter amount" class="action-input" min="1" />
+          <label class="action-label" style="margin-top:8px;">Description (optional)</label>
+          <input type="text" [(ngModel)]="withdrawDescription" name="withdrawDescription"
+            placeholder="e.g. ATM withdrawal" class="action-input" />
           <button class="action-btn action-btn--black" (click)="withdraw()"
             [disabled]="actionLoading || !withdrawAmount">
             {{ actionLoading ? 'Processing…' : 'Withdraw Points' }}
@@ -181,6 +184,9 @@
           <label class="action-label" style="margin-top:8px;">Amount</label>
           <input type="number" [(ngModel)]="transferAmount" name="transferAmount"
             placeholder="Amount" class="action-input" min="1" />
+          <label class="action-label" style="margin-top:8px;">Description (optional)</label>
+          <input type="text" [(ngModel)]="transferDescription" name="transferDescription"
+            placeholder="e.g. Payment for services" class="action-input" />
           <button class="action-btn action-btn--gray" (click)="transfer()"
             [disabled]="actionLoading || !transferAmount || !transferUserId">
             {{ actionLoading ? 'Processing…' : 'Send Points' }}

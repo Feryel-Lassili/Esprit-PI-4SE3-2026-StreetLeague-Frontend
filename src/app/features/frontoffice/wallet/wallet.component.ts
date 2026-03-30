@@ -22,9 +22,12 @@ export class WalletComponent implements OnInit {
 
   depositAmount: number | null = null;
   withdrawAmount: number | null = null;
+  withdrawDescription = '';
   transferAmount: number | null = null;
   transferUserId: number | null = null;
+  transferDescription = '';
 
+  filteredTx: TransactionResponse[] = [];
   presets = [100, 250, 500];
 
   insights = [
@@ -90,10 +93,7 @@ export class WalletComponent implements OnInit {
     this.loadWallet();
     this.loadHistory();
   }
-  get filteredTx(): TransactionResponse[] {
-    if (this.txFilter === 'ALL') return this.transactions;
-    return this.transactions.filter(t => t.transactionType === this.txFilter);
-  }
+  get filteredTxCount(): number { return this.filteredTx.length; }
 
   get monthDeposits(): string {
     const v = this.transactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
@@ -115,61 +115,55 @@ export class WalletComponent implements OnInit {
   }
 
   txColor(tx: TransactionResponse): string {
+    const type = tx.transactionType ?? tx.type ?? '';
     const map: { [key: string]: string } = {
-      'DEPOSIT':    'green',
-      'REFUND':     'green',
-      'WITHDRAWAL': 'red',
-      'PAYMENT':    'red',
-      'TRANSFER':   'blue'
+      'DEPOSIT': 'green', 'REFUND': 'green',
+      'WITHDRAWAL': 'red', 'PAYMENT': 'red',
+      'TRANSFER': 'blue'
     };
-    return map[tx.transactionType] || 'gray';
+    return map[type] || 'gray';
   }
 
   txEmoji(tx: TransactionResponse): string {
+    const type = tx.transactionType ?? tx.type ?? '';
     const map: { [key: string]: string } = {
-      'DEPOSIT':    '⬆️',
-      'REFUND':     '↩️',
-      'WITHDRAWAL': '⬇️',
-      'PAYMENT':    '🛒',
-      'TRANSFER':   '🔄'
+      'DEPOSIT': '⬆️', 'REFUND': '↩️',
+      'WITHDRAWAL': '⬇️', 'PAYMENT': '🛒',
+      'TRANSFER': '🔄'
     };
-    return map[tx.transactionType] || '💳';
+    return map[type] || '💳';
   }
 
   txLabel(tx: TransactionResponse): string {
     if (tx.description) return tx.description;
+    const type = tx.transactionType ?? tx.type ?? '';
     const map: { [key: string]: string } = {
-      'DEPOSIT':    'Wallet Recharge',
-      'REFUND':     'Order Refund',
-      'WITHDRAWAL': 'Withdrawal',
-      'PAYMENT':    'Order Payment',
-      'TRANSFER':   'Transfer'
+      'DEPOSIT': 'Wallet Recharge', 'REFUND': 'Order Refund',
+      'WITHDRAWAL': 'Withdrawal', 'PAYMENT': 'Order Payment',
+      'TRANSFER': 'Transfer'
     };
-    return map[tx.transactionType] || tx.transactionType;
+    return map[type] || type;
   }
 
   // ── Actions ───────────────────────────────────────────────
   loadWallet() {
     this.walletService.getMyWallet().subscribe({
-      next:  w  => {
-        console.log('Wallet response:', w);
-        this.wallet = w;
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
+      next: w => { this.wallet = w; this.loading = false; this.cdr.detectChanges(); },
       error: () => { this.error = 'Failed to load wallet'; this.loading = false; this.cdr.detectChanges(); }
     });
   }
 
   loadHistory() {
     this.walletService.getTransactions().subscribe({
-      next:  t  => { this.transactions = t; this.cdr.detectChanges(); },
-      error: () => {
-        this.walletService.getHistory().subscribe({
-          next:  t  => { this.transactions = t; this.cdr.detectChanges(); },
-          error: () => {}
-        });
-      }
+      next: t => {
+        this.transactions = t.map(tx => ({
+          ...tx,
+          transactionType: (tx.type || tx.transactionType || '').toUpperCase()
+        }));
+        this.applyFilter();
+        this.cdr.detectChanges();
+      },
+      error: (err) => { console.error('getTransactions error:', err); }
     });
   }
 
@@ -194,11 +188,12 @@ export class WalletComponent implements OnInit {
     if (!this.withdrawAmount) return;
     this.actionLoading = true;
     this.clearMessages();
-    this.walletService.withdraw(this.withdrawAmount).subscribe({
-      next: w => {
-        this.wallet = w;
-        this.success = 'Withdrawal successful!';
+    this.walletService.withdraw(this.withdrawAmount, this.withdrawDescription).subscribe({
+      next: res => {
+        if (this.wallet) this.wallet.points = res.newBalance;
+        this.success = `Withdrawal successful! New balance: ${res.newBalance} pts`;
         this.withdrawAmount = null;
+        this.withdrawDescription = '';
         this.actionLoading = false;
         this.cdr.detectChanges();
         this.loadHistory();
@@ -211,11 +206,12 @@ export class WalletComponent implements OnInit {
     if (!this.transferAmount || !this.transferUserId) return;
     this.actionLoading = true;
     this.clearMessages();
-    this.walletService.transfer(this.transferUserId, this.transferAmount).subscribe({
+    this.walletService.transfer(this.transferUserId, this.transferAmount, this.transferDescription).subscribe({
       next: () => {
         this.success = 'Transfer successful!';
         this.transferAmount = null;
         this.transferUserId = null;
+        this.transferDescription = '';
         this.actionLoading = false;
         this.cdr.detectChanges();
         this.loadWallet();
@@ -223,6 +219,18 @@ export class WalletComponent implements OnInit {
       },
       error: () => { this.error = 'Transfer failed'; this.actionLoading = false; this.cdr.detectChanges(); }
     });
+  }
+
+  setFilter(f: string) {
+    this.txFilter = f;
+    this.applyFilter();
+    this.cdr.detectChanges();
+  }
+
+  applyFilter() {
+    this.filteredTx = this.txFilter === 'ALL'
+      ? [...this.transactions]
+      : this.transactions.filter(t => t.transactionType === this.txFilter);
   }
 
   clearMessages() { this.error = ''; this.success = ''; }

@@ -20,12 +20,9 @@ export interface TransactionResponse {
   amount: number;
   earnedPoints: number;
   date: string;
-  transactionType: string;
+  type: string;
+  transactionType?: string;
   description?: string;
-  userId: number;
-  username: string;
-  email: string;
-  currentPoints: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,22 +44,27 @@ export class WalletService {
   }
 
   getTransactions(): Observable<TransactionResponse[]> {
-    return this.http.get<TransactionResponse[]>(`${this.base}/transactions`);
+    return this.http.get<any>(`${this.base}/transactions`).pipe(
+      map(res => {
+        if (Array.isArray(res)) return res;
+        if (Array.isArray(res?.transactions)) return res.transactions;
+        if (Array.isArray(res?.content)) return res.content;
+        if (Array.isArray(res?.data)) return res.data;
+        return [];
+      })
+    );
   }
 
   deposit(amount: number): Observable<Wallet> {
     return this.http.post<Wallet>(`${this.base}/deposit`, { amount });
   }
 
-  withdraw(amount: number): Observable<Wallet> {
-    return this.http.post<Wallet>(`${this.base}/withdraw`, { amount });
+  withdraw(amount: number, description: string = ''): Observable<any> {
+    return this.http.post<any>(`${this.base}/withdraw`, { amount, description });
   }
 
-  transfer(toUserId: number, amount: number): Observable<string> {
-    return this.http.post(`${this.base}/transfer`, { toUserId, amount }, { responseType: 'text' });
+  transfer(recipientId: number, amount: number, description: string = ''): Observable<string> {
+    return this.http.post(`${this.base}/transfer`, { recipientId, amount, description }, { responseType: 'text' });
   }
 
-  getHistory(): Observable<TransactionResponse[]> {
-    return this.http.get<TransactionResponse[]>(`${this.base}/history`);
-  }
 }

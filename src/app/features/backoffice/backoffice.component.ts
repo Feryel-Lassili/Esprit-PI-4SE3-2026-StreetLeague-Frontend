@@ -356,34 +356,13 @@ interface WalletAdmin {
           <bo-merchandise-admin *ngIf="currentScreen === 'merchandise'"></bo-merchandise-admin>
 
           <!-- SHOP -->
-<<<<<<< HEAD
           <bo-shop *ngIf="currentScreen === 'shop'"></bo-shop>
 
           <!-- ORDERS -->
           <bo-orders *ngIf="currentScreen === 'orders'"></bo-orders>
+
           <!-- SPONSORS -->
           <bo-sponsors *ngIf="currentScreen === 'sponsors'"></bo-sponsors>
-=======
-          <div *ngIf="currentScreen === 'shop'">
-            <div class="card">
-              <table class="table">
-                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
-                <tbody>
-                  <tr *ngFor="let p of products">
-                    <td style="font-weight:500;">{{ p.name }}</td>
-                    <td><span class="pill pill-blue">{{ p.category }}</span></td>
-                    <td>{{ p.price }} TND</td>
-                    <td><span class="pill" [class.pill-green]="p.stock > 10" [class.pill-yellow]="p.stock <= 10 && p.stock > 0" [class.pill-red]="p.stock === 0">{{ p.stock }} left</span></td>
-                    <td>
-                      <button class="action-btn">Edit</button>
-                      <button class="action-btn">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
->>>>>>> origin/feature_yossra
 
           <!-- HEALTH -->
           <div *ngIf="currentScreen === 'health'">
@@ -732,6 +711,7 @@ export class BackofficeComponent implements OnInit {
         { id: 'health', label: 'Health', icon: '🏥' },
         { id: 'shop', label: 'Shop', icon: '🛍️' },
         { id: 'sponsors', label: 'Sponsors', icon: '💰' },
+        { id: 'wallet', label: 'Wallet', icon: '💳' },
       ]
     },
     {
@@ -876,9 +856,9 @@ export class BackofficeComponent implements OnInit {
   deleteWallet(id: number) {
     if (!confirm('Delete this wallet?')) return;
     const headers = new HttpHeaders({ 'Authorization': `Bearer ${this.authService.getToken()}` });
-    this.http.delete(`${this.walletBase}/${id}`, { headers }).subscribe({
+    this.http.delete(`${this.walletBase}/${id}`, { headers, responseType: 'text' }).subscribe({
       next:  () => { this.wallets = this.wallets.filter(w => w.id !== id); this.walletSuccess = 'Wallet deleted!'; },
-      error: () => { this.walletError = 'Failed to delete wallet'; }
+      error: (err) => { console.error('Delete wallet error:', err); this.walletError = 'Failed to delete wallet'; }
     });
   }
 
