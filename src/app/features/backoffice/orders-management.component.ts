@@ -104,10 +104,10 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
                   class="border-t border-gray-100 hover:bg-gray-50 transition-all">
                 <td class="px-6 py-4 font-bold text-gray-900">#{{ order.id }}</td>
                 <td class="px-6 py-4 text-gray-700">
-                  <div>{{ order.user?.username || '—' }}</div>
-                  <div class="text-xs text-gray-400">{{ order.user?.email }}</div>
+                  <div>{{ order.username || order.user?.username || '—' }}</div>
+                  <div class="text-xs text-gray-400">{{ order.userEmail || order.user?.email }}</div>
                 </td>
-                <td class="px-6 py-4 text-gray-600 text-sm">{{ order.createdAt | date:'MMM d, y, h:mm a' }}</td>
+                <td class="px-6 py-4 text-gray-600 text-sm">{{ (order.orderDate || order.createdAt) ? ((order.orderDate || order.createdAt) | date:'MMM d, y, h:mm a') : '—' }}</td>
                 <td class="px-6 py-4 text-right font-black text-[#0D6EFD]">\${{ order.totalAmount.toFixed(2) }}</td>
                 <td class="px-6 py-4 text-center">
                   <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="getStatusStyle(order.status)">
@@ -161,11 +161,11 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Customer</span>
-                <span class="font-medium">{{ selectedOrder.user?.username || '—' }}</span>
+                <span class="font-medium">{{ selectedOrder.username || selectedOrder.user?.username || '—' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Email</span>
-                <span class="font-medium">{{ selectedOrder.user?.email || '—' }}</span>
+                <span class="font-medium">{{ selectedOrder.userEmail || selectedOrder.user?.email || '—' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Shipping Address</span>
@@ -177,7 +177,7 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">Date</span>
-                <span class="font-medium">{{ selectedOrder.createdAt | date:'medium' }}</span>
+                <span class="font-medium">{{ (selectedOrder.orderDate || selectedOrder.createdAt) | date:'medium' }}</span>
               </div>
             </div>
 

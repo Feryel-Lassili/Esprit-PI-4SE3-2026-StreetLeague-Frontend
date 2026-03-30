@@ -1,15 +1,14 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil, forkJoin } from 'rxjs';
 import { ShopService } from '../../core/services/shop.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../shared/services/toast.service';
-import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../../core/models/shop.model';
+import { Product, Cart, SportType, ProductReview, PaginatedResponse, Order, OrderItem, MerchandiseSubmission } from '../../core/models/shop.model';
 
 @Component({
   selector: 'fo-shop',
+  standalone: false,
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
       <!-- Modern Header -->
@@ -44,26 +43,36 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
       <!-- Modern Category Tabs -->
       <div class="bg-white/50 backdrop-blur-sm border-b border-gray-200/50 overflow-x-auto">
         <div class="max-w-7xl mx-auto px-6 py-3 flex gap-2">
-          <button (click)="searchSportType = ''; onSearchChange()"
-                  [class.bg-gradient-to-r]="searchSportType === ''"
-                  [class.from-blue-600]="searchSportType === ''"
-                  [class.to-purple-600]="searchSportType === ''"
-                  [class.text-white]="searchSportType === ''"
-                  [class.bg-gray-100]="searchSportType !== ''"
-                  [class.text-gray-700]="searchSportType !== ''"
+          <button (click)="searchSportType = ''; showPlayerMerch = false; onSearchChange()"
+                  [class.bg-gradient-to-r]="searchSportType === '' && !showPlayerMerch"
+                  [class.from-blue-600]="searchSportType === '' && !showPlayerMerch"
+                  [class.to-purple-600]="searchSportType === '' && !showPlayerMerch"
+                  [class.text-white]="searchSportType === '' && !showPlayerMerch"
+                  [class.bg-gray-100]="searchSportType !== '' || showPlayerMerch"
+                  [class.text-gray-700]="searchSportType !== '' || showPlayerMerch"
                   class="px-5 py-2.5 rounded-full font-semibold whitespace-nowrap transition-all hover:shadow-md">
             All Sports
           </button>
           <button *ngFor="let sport of ['FOOTBALL', 'BASKETBALL', 'TENNIS', 'VOLLEYBALL']"
                   (click)="selectSport(sport)"
-                  [class.bg-gradient-to-r]="searchSportType === sport"
-                  [class.from-blue-600]="searchSportType === sport"
-                  [class.to-purple-600]="searchSportType === sport"
-                  [class.text-white]="searchSportType === sport"
-                  [class.bg-gray-100]="searchSportType !== sport"
-                  [class.text-gray-700]="searchSportType !== sport"
+                  [class.bg-gradient-to-r]="searchSportType === sport && !showPlayerMerch"
+                  [class.from-blue-600]="searchSportType === sport && !showPlayerMerch"
+                  [class.to-purple-600]="searchSportType === sport && !showPlayerMerch"
+                  [class.text-white]="searchSportType === sport && !showPlayerMerch"
+                  [class.bg-gray-100]="searchSportType !== sport || showPlayerMerch"
+                  [class.text-gray-700]="searchSportType !== sport || showPlayerMerch"
                   class="px-5 py-2.5 rounded-full font-semibold whitespace-nowrap transition-all hover:shadow-md">
             {{ sport }}
+          </button>
+          <button (click)="togglePlayerMerch()"
+                  [class.bg-gradient-to-r]="showPlayerMerch"
+                  [class.from-purple-600]="showPlayerMerch"
+                  [class.to-pink-600]="showPlayerMerch"
+                  [class.text-white]="showPlayerMerch"
+                  [class.bg-gray-100]="!showPlayerMerch"
+                  [class.text-gray-700]="!showPlayerMerch"
+                  class="px-5 py-2.5 rounded-full font-semibold whitespace-nowrap transition-all hover:shadow-md flex items-center gap-1.5">
+            🏅 Player Merch
           </button>
         </div>
       </div>
@@ -213,9 +222,15 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
                     
                     <!-- Top Badges -->
                     <div class="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-                      <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-white/95 backdrop-blur-sm text-gray-900 shadow-sm">
-                        {{ product.sportType }}
-                      </span>
+                      <div class="flex flex-col gap-1">
+                        <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-white/95 backdrop-blur-sm text-gray-900 shadow-sm">
+                          {{ product.sportType }}
+                        </span>
+                        <span *ngIf="isPlayerMerch(product)"
+                              class="px-2 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm">
+                          🏅 Player Merch
+                        </span>
+                      </div>
                       <button (click)="toggleWishlist(product); $event.stopPropagation()"
                               class="text-2xl hover:scale-125 transition-transform drop-shadow-lg"
                               [title]="isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'">
@@ -234,7 +249,8 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
                   <!-- Product Info -->
                   <div class="p-5 flex flex-col">
                     <h3 class="font-bold text-base text-gray-900 line-clamp-2 mb-1.5 group-hover:text-blue-600 transition-colors">{{ product.name }}</h3>
-                    <p class="text-gray-500 text-xs font-medium mb-3 uppercase tracking-wide">{{ product.category }}</p>
+                    <p class="text-gray-500 text-xs font-medium mb-1 uppercase tracking-wide">{{ product.category }}</p>
+                    <p *ngIf="getSellerName(product)" class="text-purple-600 text-xs font-semibold mb-2">🏅 by {{ getSellerName(product) }}</p>
 
                     <!-- Price & Stock -->
                     <div class="flex items-center justify-between mb-3">
@@ -299,7 +315,7 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
             </div>
 
             <!-- Wishlist Section -->
-            <div *ngIf="showCart && showWishlist && isAuthenticated && wishlist.length > 0" class="mb-8">
+            <div *ngIf="showCart && showWishlist && !showOrders && isAuthenticated && wishlist.length > 0" class="mb-8">
               <div class="bg-white rounded-3xl shadow p-8">
                 <h2 class="text-3xl font-black mb-6">❤️ My Wishlist</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -456,26 +472,101 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
       <div *ngIf="showCart && cart" class="bg-white rounded-3xl shadow-xl p-8">
         <div class="flex justify-between items-center mb-8">
                 <div class="flex gap-4">
-                  <button (click)="showWishlist = false"
-                          [class.border-b-4]="!showWishlist"
-                          [class.border-[#0D6EFD]]="!showWishlist"
+                  <button (click)="showWishlist = false; showOrders = false"
+                          [class.border-b-4]="!showWishlist && !showOrders"
+                          [class.border-[#0D6EFD]]="!showWishlist && !showOrders"
                           class="text-2xl font-bold pb-2 transition-all">
                     🛒 Cart
                   </button>
-                  <button *ngIf="isAuthenticated" (click)="showWishlist = true"
-                          [class.border-b-4]="showWishlist"
-                          [class.border-[#0D6EFD]]="showWishlist"
+                  <button *ngIf="isAuthenticated" (click)="showWishlist = true; showOrders = false"
+                          [class.border-b-4]="showWishlist && !showOrders"
+                          [class.border-[#0D6EFD]]="showWishlist && !showOrders"
                           class="text-2xl font-bold pb-2 transition-all relative">
                     ❤️ Wishlist
                     <span *ngIf="wishlist.length > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                       {{ wishlist.length }}
                     </span>
                   </button>
+                  <button *ngIf="isAuthenticated" (click)="showOrders = true; showWishlist = false; loadOrders()"
+                          [class.border-b-4]="showOrders"
+                          [class.border-[#0D6EFD]]="showOrders"
+                          class="text-2xl font-bold pb-2 transition-all">
+                    📦 Orders
+                  </button>
                 </div>
                 <button (click)="toggleCart()" class="text-3xl text-gray-400 hover:text-gray-600">✕</button>
               </div>
 
-        <div *ngIf="cart.cartItems.length === 0" class="text-center py-20">
+        <!-- Orders View -->
+        <div *ngIf="showOrders">
+          <div *ngIf="loadingOrders" class="text-center py-10 text-gray-500">Loading orders...</div>
+          <div *ngIf="!loadingOrders && orders.length === 0" class="text-center py-20">
+            <div class="text-6xl mb-4">📭</div>
+            <p class="text-gray-500 text-lg">No orders yet</p>
+          </div>
+          <div *ngFor="let order of orders" class="mb-4 border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer" (click)="openOrderDetail(order)">
+            <div class="flex items-center justify-between p-4 bg-gray-50">
+              <div>
+                <p class="font-bold text-gray-900">Order #{{ order.id }}</p>
+                <p class="text-xs text-gray-500">{{ order.createdAt | date:'mediumDate' }}</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-black text-[#0D6EFD]">\${{ order.totalAmount }}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold"
+                      [ngClass]="getStatusClass(order.status)">
+                  {{ order.status }}
+                </span>
+              </div>
+            </div>
+            <div class="px-4 py-2 text-xs text-gray-500">
+              <span *ngIf="order.shippingAddress">📍 {{ order.shippingAddress }}</span>
+              <span *ngIf="order.orderItems"> · {{ order.orderItems.length }} item(s)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Detail Modal -->
+        <div *ngIf="selectedOrder"
+             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+             (click)="selectedOrder = null">
+          <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-8"
+               (click)="$event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+              <div>
+                <h2 class="text-2xl font-black">Order #{{ selectedOrder.id }}</h2>
+                <p class="text-gray-500 text-sm">{{ selectedOrder.createdAt | date:'medium' }}</p>
+              </div>
+              <button (click)="selectedOrder = null" class="text-3xl text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+              <span class="px-4 py-1.5 rounded-full text-sm font-bold" [ngClass]="getStatusClass(selectedOrder.status)">{{ selectedOrder.status }}</span>
+              <span *ngIf="selectedOrder.phoneNumber" class="text-gray-500 text-sm">📞 {{ selectedOrder.phoneNumber }}</span>
+            </div>
+            <div *ngIf="selectedOrder.shippingAddress" class="bg-gray-50 rounded-xl p-4 mb-6">
+              <p class="text-xs font-bold text-gray-500 uppercase mb-1">Shipping Address</p>
+              <p class="text-gray-800">{{ selectedOrder.shippingAddress }}</p>
+            </div>
+            <div *ngIf="selectedOrder.orderItems && selectedOrder.orderItems.length > 0">
+              <p class="font-bold text-gray-700 mb-3">Items</p>
+              <div *ngFor="let item of selectedOrder.orderItems" class="flex items-center gap-4 py-3 border-b last:border-0">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">
+                  {{ getProductImage(item.product) }}
+                </div>
+                <div class="flex-1">
+                  <p class="font-semibold text-sm">{{ item.product.name }}</p>
+                  <p class="text-gray-500 text-xs">{{ item.quantity }} × \${{ item.price }}</p>
+                </div>
+                <p class="font-bold text-[#0D6EFD]">\${{ (item.quantity * item.price).toFixed(2) }}</p>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t-2 flex justify-between items-center">
+              <span class="text-lg font-bold">Total</span>
+              <span class="text-3xl font-black text-[#0D6EFD]">\${{ selectedOrder.totalAmount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!showOrders && cart.cartItems.length === 0" class="text-center py-20">
           <div class="text-7xl mb-6">🛒</div>
           <p class="text-2xl text-gray-400">Your cart is empty</p>
           <button (click)="toggleCart()" class="mt-4 px-6 py-2 bg-[#0D6EFD] text-white rounded-xl font-bold">
@@ -483,7 +574,7 @@ import { Product, Cart, SportType, ProductReview, PaginatedResponse } from '../.
           </button>
         </div>
 
-        <div *ngIf="cart.cartItems.length > 0">
+        <div *ngIf="!showOrders && cart.cartItems.length > 0">
           <div *ngFor="let item of cart.cartItems; trackBy: trackByCartItem" class="flex gap-4 py-6 border-b last:border-0">
             <div class="w-20 h-20 bg-gradient-to-br from-[#0D6EFD] to-[#9D4EDD] rounded-2xl flex-shrink-0 flex items-center justify-center">
               <img *ngIf="hasImage(item.product)"
@@ -606,6 +697,10 @@ export class FrontofficeShopComponent implements OnInit, OnDestroy {
   cart: Cart | null = null;
   showCart = false;
   showWishlist = false;
+  showOrders = false;
+  orders: Order[] = [];
+  loadingOrders = false;
+  selectedOrder: Order | null = null;
   showFilters = true;
   showProductDetail = false;
   showCheckout = false;
@@ -642,6 +737,9 @@ export class FrontofficeShopComponent implements OnInit, OnDestroy {
   checkoutErrors = { shippingAddress: '', phoneNumber: '' };
 
   isAuthenticated = false;
+  showPlayerMerch = false;
+  playerMerchProducts: Product[] = [];
+  private playerMerchSellerMap = new Map<number, string>();
 
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<void>();
@@ -847,8 +945,71 @@ export class FrontofficeShopComponent implements OnInit, OnDestroy {
   }
 
   selectSport(sport: string) {
+    this.showPlayerMerch = false;
     this.searchSportType = sport as SportType;
     this.onSearchChange();
+  }
+
+  togglePlayerMerch() {
+    this.showPlayerMerch = !this.showPlayerMerch;
+    if (this.showPlayerMerch) {
+      this.searchSportType = '';
+      this.loadPlayerMerch();
+    } else {
+      this.loadProducts();
+    }
+  }
+
+  loadPlayerMerch() {
+    this.loading = true;
+    this.shopService.getApprovedPlayerMerchandise().subscribe({
+      next: (data) => {
+        this.ngZone.run(() => {
+          // Build seller map and product list from submissions
+          this.playerMerchSellerMap.clear();
+          const mapped: Product[] = [];
+          for (const submission of data.content) {
+            // Backend sets merch.product when approved — use submission fields as Product shape
+            const product: Product = {
+              id: submission.id,
+              name: submission.name,
+              price: submission.price,
+              stock: submission.stock,
+              category: submission.category,
+              image: submission.image,
+              sportType: submission.sportType
+            };
+            mapped.push(product);
+            if (submission.id != null && submission.sellerName) {
+              this.playerMerchSellerMap.set(submission.id, submission.sellerName);
+            }
+          }
+          this.playerMerchProducts = mapped;
+          this.products = mapped;
+          this.totalPages = data.totalPages || 1;
+          this.totalElements = data.totalElements || 0;
+          this.loading = false;
+          this.hasLoaded = true;
+          this.cdr.markForCheck();
+        });
+      },
+      error: () => {
+        this.ngZone.run(() => {
+          this.loading = false;
+          this.hasLoaded = true;
+          this.toastService.error('Failed to load player merchandise');
+          this.cdr.markForCheck();
+        });
+      }
+    });
+  }
+
+  isPlayerMerch(product: Product): boolean {
+    return this.playerMerchSellerMap.has(product.id!);
+  }
+
+  getSellerName(product: Product): string | null {
+    return this.playerMerchSellerMap.get(product.id!) ?? null;
   }
 
   onSortChange() {
@@ -1115,6 +1276,32 @@ export class FrontofficeShopComponent implements OnInit, OnDestroy {
 
   closeCheckout() {
     this.showCheckout = false;
+  }
+
+  loadOrders() {
+    this.loadingOrders = true;
+    this.shopService.getMyOrders().subscribe({
+      next: (data) => { this.orders = data; this.loadingOrders = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingOrders = false; this.toastService.error('Failed to load orders'); }
+    });
+  }
+
+  openOrderDetail(order: Order) {
+    if (order.orderItems) { this.selectedOrder = order; return; }
+    this.shopService.getOrder(order.id).subscribe({
+      next: (data) => { this.selectedOrder = data; this.cdr.markForCheck(); },
+      error: () => this.toastService.error('Failed to load order details')
+    });
+  }
+
+  getStatusClass(status: string): { [key: string]: boolean } {
+    return {
+      'bg-yellow-100 text-yellow-800': status === 'PENDING',
+      'bg-blue-100 text-blue-800': status === 'CONFIRMED' || status === 'PROCESSING',
+      'bg-purple-100 text-purple-800': status === 'SHIPPED',
+      'bg-green-100 text-green-800': status === 'DELIVERED',
+      'bg-red-100 text-red-800': status === 'CANCELLED'
+    };
   }
 
   confirmCheckout() {

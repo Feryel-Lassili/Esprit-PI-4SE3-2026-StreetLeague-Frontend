@@ -6,8 +6,7 @@ import { authGuard } from '../../core/guards/auth.guard';
 import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
 import { FrontofficeShopComponent } from './shop.component';
-
-  
+import { PlayerMerchandiseComponent } from './player-merchandise.component';
 
 const routes: Routes = [
   {
@@ -19,6 +18,7 @@ const routes: Routes = [
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
       { path: 'profile', component: ProfileComponent },
       { path: 'shop', component: FrontofficeShopComponent },
+      { path: 'my-merchandise', component: PlayerMerchandiseComponent },
       { path: 'sponsors', loadComponent: () => import('./sponsors.component').then(m => m.FrontofficeSponsorsComponent) }
     ]
   }
@@ -27,11 +27,12 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ProfileComponent,
-    FrontofficeShopComponent
+    FrontofficeShopComponent,
+    PlayerMerchandiseComponent
   ],
   imports: [
     CommonModule,
-     FormsModule,
+    FormsModule,
     RouterModule.forChild(routes),
     FrontofficeComponent
   ]

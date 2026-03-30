@@ -46,9 +46,13 @@ export interface Order {
   id: number;
   totalAmount: number;
   status: OrderStatus;
-  createdAt: Date;
+  orderDate?: string;
+  createdAt?: Date;
   shippingAddress?: string;
   phoneNumber?: string;
+  userId?: number;
+  username?: string;
+  userEmail?: string;
   user?: User;
   orderItems?: OrderItem[];
 }
@@ -78,6 +82,31 @@ export interface User {
   id: number;
   username: string;
   email: string;
+}
+
+export type MerchandiseStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface MerchandiseSubmission {
+  id?: number;
+  name: string;
+  description?: string;
+  price: number;
+  stock: number;
+  category: string;
+  image: string;
+  sportType: SportType;
+  status?: MerchandiseStatus;
+  rejectionReason?: string;
+  sellerName?: string;
+  sellerId?: number;
+  submittedAt?: string;
+  approvedAt?: string;
+}
+
+export interface MerchandiseStats {
+  pending: number;
+  approved: number;
+  rejected: number;
 }
 
 export interface ProductReview {

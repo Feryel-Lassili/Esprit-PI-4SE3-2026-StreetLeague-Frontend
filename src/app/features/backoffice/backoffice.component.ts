@@ -5,11 +5,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { BackofficeShopComponent } from './shop-management.component';
 import { BackofficeOrdersComponent } from './orders-management.component';
 import { BackofficeSponsorComponent } from './sponsor-management.component';
+import { MerchandiseAdminComponent } from './merchandise-admin.component';
 
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-    imports: [CommonModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent],
+    imports: [CommonModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -92,7 +93,7 @@ import { BackofficeSponsorComponent } from './sponsor-management.component';
       <aside class="sidebar" [class.collapsed]="!sidebarOpen">
 
         <div class="sidebar-header">
-          <div class="logo-box"><span>S</span></div>
+          <div class="logo-box"><img src="logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>
           <span class="logo-text" *ngIf="sidebarOpen">
             {{ userRole === 'admin' ? 'Admin Panel' : 'Venue Allocator' }}
           </span>
@@ -270,6 +271,9 @@ import { BackofficeSponsorComponent } from './sponsor-management.component';
             </div>
           </div>
 
+          <!-- MERCHANDISE ADMIN -->
+          <bo-merchandise-admin *ngIf="currentScreen === 'merchandise'"></bo-merchandise-admin>
+
           <!-- SHOP -->
           <bo-shop *ngIf="currentScreen === 'shop'"></bo-shop>
 
@@ -418,6 +422,7 @@ export class BackofficeComponent {
         { id: 'users', label: 'Users & Teams', icon: '👥' },
         { id: 'venues', label: 'Venues', icon: '📍' },
         { id: 'orders', label: 'Orders', icon: '📦' },
+        { id: 'merchandise', label: 'Player Merch', icon: '🏅' },
         { id: 'health', label: 'Health', icon: '🏥' },
         { id: 'shop', label: 'Shop', icon: '🛍️' },
         { id: 'sponsors', label: 'Sponsors', icon: '💰' },
@@ -428,7 +433,6 @@ export class BackofficeComponent {
       items: [
         { id: 'fantasy', label: 'Fantasy Game', icon: '🎮' },
         { id: 'community', label: 'Community (AI)', icon: '💬' },
-        { id: 'sponsorships', label: 'Sponsors', icon: '💰' },
       ]
     }
   ];

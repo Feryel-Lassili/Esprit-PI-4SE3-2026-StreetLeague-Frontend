@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -45,7 +45,7 @@ import { AuthService } from '../../core/services/auth.service';
       <aside class="sidebar" [class.collapsed]="!sidebarOpen">
 
         <div class="sidebar-header">
-          <div class="logo-box"><span>S</span></div>
+          <div class="logo-box"><img src="logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>
           <span class="logo-text" *ngIf="sidebarOpen">StreetLeague</span>
           <button class="toggle-btn" (click)="sidebarOpen = !sidebarOpen">☰</button>
         </div>
@@ -93,9 +93,10 @@ import { AuthService } from '../../core/services/auth.service';
     </div>
   `
 })
-export class FrontofficeComponent {
+export class FrontofficeComponent implements OnInit {
   sidebarOpen = true;
   currentPath = '/home';
+  isPlayer = false;
 
   menu = [
     {
@@ -150,6 +151,16 @@ export class FrontofficeComponent {
 
   constructor(private authService: AuthService, private router: Router) {
     this.currentPath = this.router.url || '/home';
+  }
+
+  ngOnInit() {
+    this.isPlayer = this.authService.hasRole('PLAYER');
+    if (this.isPlayer) {
+      const moreSection = this.menu.find(s => s.section === 'More');
+      if (moreSection) {
+        moreSection.items.push({ path: '/my-merchandise', label: 'My Merch', icon: '🏅' });
+      }
+    }
   }
 
   logout() { this.authService.logout(); }
