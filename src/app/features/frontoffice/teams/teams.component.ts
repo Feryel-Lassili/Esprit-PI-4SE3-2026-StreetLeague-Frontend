@@ -55,6 +55,7 @@ export class FrontofficeTeamsComponent implements OnInit {
   modalLoading = false;
   modalError = '';
   form = { name: '', type: '', logo: '' };
+  formTouched = false;
   logoPreview = '';
   isDragOver = false;
 
@@ -230,6 +231,7 @@ export class FrontofficeTeamsComponent implements OnInit {
   openCreateModal(): void {
     this.editingTeam = null;
     this.form = { name: '', type: '', logo: '' };
+    this.formTouched = false;
     this.logoPreview = '';
     this.modalError = '';
     this.showModal = true;
@@ -239,6 +241,7 @@ export class FrontofficeTeamsComponent implements OnInit {
     event?.stopPropagation();
     this.editingTeam = team;
     this.form = { name: team.name, type: team.type || '', logo: team.logo || '' };
+    this.formTouched = false;
     this.logoPreview = team.logo || '';
     this.modalError = '';
     this.showModal = true;
@@ -247,6 +250,7 @@ export class FrontofficeTeamsComponent implements OnInit {
   closeModal(): void {
     this.showModal = false;
     this.editingTeam = null;
+    this.formTouched = false;
     this.logoPreview = '';
     this.modalError = '';
   }
@@ -279,8 +283,11 @@ export class FrontofficeTeamsComponent implements OnInit {
   }
 
   saveTeam(): void {
-    if (!this.form.name.trim()) { this.modalError = 'Name is required.'; return; }
-    if (!this.form.type)        { this.modalError = 'Please select a sport.'; return; }
+    this.formTouched = true;
+    if (!this.form.name.trim())              { this.modalError = 'Team name is required.'; return; }
+    if (this.form.name.trim().length < 2)    { this.modalError = 'Name must be at least 2 characters.'; return; }
+    if (this.form.name.trim().length > 80)   { this.modalError = 'Name cannot exceed 80 characters.'; return; }
+    if (!this.form.type)                     { this.modalError = 'Please select a sport.'; return; }
     this.modalLoading = true;
     this.modalError = '';
     const isEditing = !!this.editingTeam;
@@ -415,6 +422,22 @@ export class FrontofficeTeamsComponent implements OnInit {
         this.loadAllTeams();
         this.showToast('👑 Captain transferred!');
         this.closeDetail();
+      },
+      error: err => this.showToast('❌ ' + (err?.error?.message || 'Error'), '#ef4444')
+    });
+  }
+
+  // ── Leave team (player himself) ────────────────────────────────────────────
+
+  leaveTeam(team: Team, event?: Event): void {
+    event?.stopPropagation();
+    if (!this.currentUserId) return;
+    if (!confirm(`Leave "${team.name}"?`)) return;
+    this.teamService.leaveTeam(team.id, this.currentUserId).subscribe({
+      next: () => {
+        if (this.selectedTeam?.id === team.id) this.closeDetail();
+        this.loadAllTeams();
+        this.showToast('👋 You left the team', '#6b7280');
       },
       error: err => this.showToast('❌ ' + (err?.error?.message || 'Error'), '#ef4444')
     });

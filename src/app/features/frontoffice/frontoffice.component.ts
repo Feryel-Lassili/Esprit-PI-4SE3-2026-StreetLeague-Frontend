@@ -56,8 +56,7 @@ import { AuthService } from '../../core/services/auth.service';
             <a class="nav-item"
               *ngFor="let item of section.items"
               [routerLink]="item.path"
-              [class.active]="currentPath === item.path"
-              (click)="currentPath = item.path">
+              [class.active]="isActive(item.path, item.exact)">
               <span class="nav-icon">{{ item.icon }}</span>
               <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
             </a>
@@ -95,53 +94,45 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class FrontofficeComponent {
   sidebarOpen = true;
-  currentPath = '/home';
 
   get menu() {
     const role = this.authService.getUserRole()?.replace('ROLE_', '') || '';
     const isVenueOwner = role === 'VENUE_OWNER';
 
-    const sections: { section: string; items: { path: string; label: string; icon: string }[] }[] = [
+    type MenuItem = { path: string; label: string; icon: string; exact: boolean };
+    const sections: { section: string; items: MenuItem[] }[] = [
       {
         section: 'Main',
         items: [
-          { path: '/home',    label: 'Home',    icon: '🏠' },
-          { path: '/explore', label: 'Explore', icon: '🔍' },
+          { path: '/home',   label: 'Home',    icon: '🏠', exact: true },
+          { path: '/teams',  label: 'Teams',   icon: '🏆', exact: false },
+          { path: '/venues', label: 'Venues',  icon: '🏟️', exact: false },
+          { path: '/profile', label: 'Profile', icon: '👤', exact: false },
         ]
       }
     ];
 
-    // Venue section — only for VENUE_OWNER
     if (isVenueOwner) {
       sections.push({
         section: 'My Venue',
         items: [
-          { path: '/venue/my-venues', label: 'My Venues',    icon: '🏟️' },
-          { path: '/venue/create',    label: 'Create Venue', icon: '➕' },
+          { path: '/venue/my-venues',       label: 'My Venues',        icon: '🏟️', exact: false },
+          { path: '/venue/reservations',    label: 'My Reservations',  icon: '📅', exact: false },
+          { path: '/venue/create',          label: 'Create Venue',     icon: '➕', exact: true },
         ]
       });
     }
 
-    sections.push(
-      {
-        section: 'Carpooling',
-        items: [
-          { path: '/carpooling',           label: 'Browse Trips', icon: '🛣️' },
-          { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕' },
-          { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗' },
-          { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒' },
-          { path: '/cars',                 label: 'My Cars',      icon: '🔧' },
-        ]
-      },
-      {
-        section: 'More',
-        items: [
-          { path: '/shop',    label: 'Shop',    icon: '🛍️' },
-          { path: '/wallet',  label: 'Wallet',  icon: '💳' },
-          { path: '/profile', label: 'Profile', icon: '👤' },
-        ]
-      }
-    );
+    sections.push({
+      section: 'Carpooling',
+      items: [
+        { path: '/carpooling',           label: 'Browse Trips', icon: '🛣️', exact: true },
+        { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕', exact: true },
+        { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗', exact: false },
+        { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒', exact: false },
+        { path: '/cars',                 label: 'My Cars',      icon: '🔧', exact: false },
+      ]
+    });
 
     return sections;
   }
@@ -159,13 +150,18 @@ export class FrontofficeComponent {
   }
 
   getTitle(): string {
+    const url = this.router.url.split('?')[0];
     const all = this.menu.flatMap(s => s.items);
-    return all.find(i => i.path === this.currentPath)?.label || 'Home';
+    const match = all.filter(i => url.startsWith(i.path)).sort((a, b) => b.path.length - a.path.length)[0];
+    return match?.label || 'Home';
   }
 
-  constructor(private authService: AuthService, private router: Router) {
-    this.currentPath = this.router.url || '/home';
+  isActive(path: string, exact: boolean): boolean {
+    const url = this.router.url.split('?')[0];
+    return exact ? url === path : url.startsWith(path);
   }
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   logout() { this.authService.logout(); }
 }

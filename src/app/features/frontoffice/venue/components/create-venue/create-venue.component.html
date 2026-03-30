@@ -1,98 +1,98 @@
-<div class="form-page">
-  <div class="form-card">
-    <div class="form-card-header">
-      <a routerLink="/venue/my-venues" class="back-link" id="back-to-venues">← Back to Venues</a>
-      <h1 class="form-title">Add New Venue</h1>
-      <p class="form-subtitle">Fill in the details below to add a new sport venue.</p>
-    </div>
+<div class="page">
+  <div class="page-title">Create a Venue</div>
+  <div class="page-sub">Add your sports venue to StreetLeague</div>
 
-    <!-- Success -->
-    <div *ngIf="success" class="alert-success">
-      ✅ Venue created successfully! Redirecting...
-    </div>
+  <div class="success-box" *ngIf="success">✅ Venue created! Redirecting…</div>
+  <div class="error-box"   *ngIf="error">⚠️ {{ error }}</div>
 
-    <!-- Error -->
-    <div *ngIf="error" class="alert-error">⚠️ {{ error }}</div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!success" id="create-venue-form">
-      <div class="form-group">
-        <label for="venue-name">Venue Name <span class="required">*</span></label>
-        <input id="venue-name" formControlName="name" type="text" placeholder="e.g. Arena Sports Complex"
-          [class.input-error]="f['name'].touched && f['name'].invalid">
-        <span class="field-error" *ngIf="f['name'].touched && f['name'].errors?.['required']">Name is required.</span>
-        <span class="field-error" *ngIf="f['name'].touched && f['name'].errors?.['minlength']">At least 3 characters.</span>
-      </div>
-
-      <div class="form-group">
-        <label for="venue-address">Address <span class="required">*</span></label>
-        <input id="venue-address" formControlName="address" type="text" placeholder="e.g. 12 Main Street, Tunis"
-          [class.input-error]="f['address'].touched && f['address'].invalid">
-        <span class="field-error" *ngIf="f['address'].touched && f['address'].errors?.['required']">Address is required.</span>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="venue-price">Price per Hour (TND) <span class="required">*</span></label>
-          <input id="venue-price" formControlName="pricePerHour" type="number" placeholder="e.g. 50"
-            [class.input-error]="f['pricePerHour'].touched && f['pricePerHour'].invalid">
-          <span class="field-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['required']">Price is required.</span>
-          <span class="field-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['min']">Must be at least 1.</span>
+    <!-- Basic Info -->
+    <div class="card">
+      <div class="card-title">📋 Basic Information</div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">Venue Name *</label>
+          <input class="form-input" formControlName="name" placeholder="e.g. Arena Nord"
+            [class.invalid]="f['name'].touched && f['name'].invalid"/>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['required']">Name is required</span>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['minlength']">Name must be at least 3 characters</span>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['maxlength']">Name cannot exceed 100 characters</span>
         </div>
-
-        <div class="form-group">
-          <label for="venue-capacity">Capacity (persons) <span class="required">*</span></label>
-          <input id="venue-capacity" formControlName="capacity" type="number" placeholder="e.g. 22"
-            [class.input-error]="f['capacity'].touched && f['capacity'].invalid">
-          <span class="field-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['required']">Capacity is required.</span>
-          <span class="field-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['min']">Must be at least 1.</span>
+        <div class="form-row">
+          <label class="form-label">Sport Type *</label>
+          <select class="form-select" formControlName="sportType"
+            [class.invalid]="f['sportType'].touched && f['sportType'].invalid">
+            <option value="">— Choose sport —</option>
+            <option *ngFor="let s of sportTypes" [value]="s.value">{{ s.label }}</option>
+          </select>
+          <span class="form-error" *ngIf="f['sportType'].touched && f['sportType'].errors?.['required']">Sport type is required</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Price per Hour (TND) *</label>
+          <input class="form-input" type="number" formControlName="pricePerHour" placeholder="50" min="1"
+            [class.invalid]="f['pricePerHour'].touched && f['pricePerHour'].invalid"/>
+          <span class="form-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['required']">Price is required</span>
+          <span class="form-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['min']">Price must be greater than 0</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Capacity (players) *</label>
+          <input class="form-input" type="number" formControlName="capacity" placeholder="22" min="1"
+            [class.invalid]="f['capacity'].touched && f['capacity'].invalid"/>
+          <span class="form-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['required']">Capacity is required</span>
+          <span class="form-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['min']">Capacity must be at least 1</span>
         </div>
       </div>
+    </div>
 
-      <div class="form-group">
-        <label for="venue-sport">Sport Type <span class="required">*</span></label>
-        <select id="venue-sport" formControlName="sportType"
-          [class.input-error]="f['sportType'].touched && f['sportType'].invalid">
-          <option value="">-- Select a sport --</option>
-          <option *ngFor="let sport of sportTypes" [value]="sport.value">{{ sport.label }}</option>
-        </select>
-        <span class="field-error" *ngIf="f['sportType'].touched && f['sportType'].errors?.['required']">Sport type is required.</span>
+    <!-- Address + Map -->
+    <div class="card">
+      <div class="card-title">📍 Location</div>
+      <div class="form-row full-width" style="margin-bottom:12px;">
+        <label class="form-label">Search Address</label>
+        <div class="map-search-row">
+          <input class="map-search-input" type="text" [(ngModel)]="mapSearch" [ngModelOptions]="{standalone:true}"
+            placeholder="Type a place and press Search…" (keydown.enter)="searchAddress($event)"/>
+          <button type="button" class="btn-search" (click)="searchAddress()">🔍 Search</button>
+        </div>
+        <div class="map-results" *ngIf="mapResults.length">
+          <div class="map-result-item" *ngFor="let r of mapResults" (click)="pickAddress(r)">
+            {{ r.display_name }}
+          </div>
+        </div>
       </div>
+      <div class="form-row full-width" style="margin-bottom:12px;">
+        <label class="form-label">Address *</label>
+        <input class="form-input" formControlName="address" placeholder="Filled when you pick from map"
+          [class.invalid]="f['address'].touched && f['address'].invalid"/>
+        <span class="form-error" *ngIf="f['address'].touched && f['address'].errors?.['required']">Address is required — pick a location from the map</span>
+      </div>
+      <div class="map-container" id="create-venue-map"></div>
+    </div>
 
-      <div class="form-actions">
-        <a routerLink="/venue/my-venues" class="btn-cancel" id="cancel-create">Cancel</a>
-        <button type="submit" class="btn-submit" [disabled]="loading" id="submit-create-venue">
-          <span *ngIf="loading" class="spinner-sm"></span>
-          {{ loading ? 'Creating...' : 'Create Venue' }}
-        </button>
+    <!-- Photo -->
+    <div class="card">
+      <div class="card-title">📸 Photo</div>
+      <div *ngIf="!photoPreview" class="photo-upload-area" (click)="photoInput.click()">
+        <input #photoInput type="file" accept="image/*" (change)="onPhotoSelected($event)"/>
+        <div style="font-size:40px;margin-bottom:8px;">📷</div>
+        <div style="font-size:13px;font-weight:600;color:#1d1d1f;">Click to upload a photo</div>
+        <div style="font-size:12px;color:#6e6e73;margin-top:4px;">JPG, PNG — max 10 MB</div>
       </div>
-    </form>
-  </div>
+      <div *ngIf="photoPreview" class="photo-preview-wrap">
+        <img [src]="photoPreview" class="photo-preview" alt="preview"/>
+        <button type="button" class="photo-remove" (click)="removePhoto()">✕</button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a class="btn-back" routerLink="/venue/my-venues">← Back</a>
+      <button class="btn-submit" type="submit" [disabled]="loading">
+        <span class="spinner" *ngIf="loading"></span>
+        {{ loading ? 'Creating…' : '✓ Create Venue' }}
+      </button>
+    </div>
+
+  </form>
 </div>
-
-<style>
-  .form-page { display: flex; justify-content: center; padding: 24px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  .form-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 16px; padding: 36px; width: 100%; max-width: 600px; }
-  .form-card-header { margin-bottom: 28px; }
-  .back-link { font-size: 13px; color: #6e6e73; text-decoration: none; display: inline-block; margin-bottom: 14px; }
-  .back-link:hover { color: #000; }
-  .form-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin: 0 0 6px; }
-  .form-subtitle { font-size: 14px; color: #6e6e73; margin: 0; }
-  .alert-success { background: #f1f8e9; border: 1px solid #c5e1a5; color: #2e7d32; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
-  .alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; }
-  .form-group { margin-bottom: 20px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  label { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
-  .required { color: #c62828; }
-  input, select { width: 100%; padding: 10px 14px; border: 1px solid #d0d0d5; border-radius: 10px; font-size: 14px; color: #1d1d1f; background: #fafafa; transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; outline: none; }
-  input:focus, select:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); background: #fff; }
-  .input-error { border-color: #c62828 !important; }
-  .field-error { display: block; font-size: 12px; color: #c62828; margin-top: 4px; }
-  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; }
-  .btn-cancel { padding: 10px 20px; border: 1px solid #d0d0d5; border-radius: 10px; font-size: 14px; color: #6e6e73; text-decoration: none; display: inline-flex; align-items: center; transition: background 0.15s; }
-  .btn-cancel:hover { background: #f5f5f7; }
-  .btn-submit { padding: 10px 24px; background: #000; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-  .btn-submit:hover:not(:disabled) { opacity: 0.8; }
-  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .spinner-sm { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-</style>

@@ -75,6 +75,10 @@ export class TeamService {
     return this.http.delete(`${this.apiUrl}/${teamId}/players/${userId}`);
   }
 
+  leaveTeam(teamId: number, userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${teamId}/players/${userId}`);
+  }
+
   // ── Players list ──────────────────────────────────────────────────────────
 
   getAllPlayers(): Observable<any[]> {

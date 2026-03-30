@@ -1,60 +1,137 @@
-<div class="cp-page">
-  <h1 class="cp-title">Create a Trip</h1>
-  <p class="cp-sub" style="margin-bottom:24px;">Set up a new carpooling ride for others to join</p>
+<div class="page">
+  <div class="page-title">🚗 Create a Trip</div>
+  <div class="page-sub">Set up a new carpooling ride for others to join</div>
 
-  <div *ngIf="error" class="cp-error" style="margin-bottom:16px;">⚠️ {{ error }}</div>
+  <div class="error-box" *ngIf="error">⚠️ {{ error }}</div>
 
-  <div class="cp-form-card">
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="cp-row">
-        <div class="cp-field">
-          <label>Lieu de départ</label>
-          <input formControlName="departureLocation" placeholder="e.g. Tunis" [class.cp-input-err]="f['departureLocation'].touched && f['departureLocation'].invalid">
-          <span class="cp-ferr" *ngIf="f['departureLocation'].touched && f['departureLocation'].errors?.['required']">Required</span>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Locations + Map -->
+    <div class="card">
+      <div class="card-title">📍 Route</div>
+
+      <!-- Departure -->
+      <div class="map-section">
+        <div class="map-label">Departure Location *</div>
+        <div class="map-search-row">
+          <input class="map-search-input" type="text" [(ngModel)]="depSearch" [ngModelOptions]="{standalone:true}"
+            placeholder="Search departure city or address…" (keydown.enter)="searchDep($event)"/>
+          <button type="button" class="btn-search" (click)="searchDep()">🔍</button>
         </div>
-        <div class="cp-field">
-          <label>Lieu d'arrivée</label>
-          <input formControlName="arrivalLocation" placeholder="e.g. Sousse" [class.cp-input-err]="f['arrivalLocation'].touched && f['arrivalLocation'].invalid">
-          <span class="cp-ferr" *ngIf="f['arrivalLocation'].touched && f['arrivalLocation'].errors?.['required']">Required</span>
+        <div class="map-results" *ngIf="depResults.length">
+          <div class="map-result-item" *ngFor="let r of depResults" (click)="pickDep(r)">{{ r.display_name }}</div>
+        </div>
+        <input class="form-input" formControlName="departureLocation" placeholder="Filled when you pick from map"
+          [class.invalid]="f['departureLocation'].touched && f['departureLocation'].invalid" style="margin-bottom:8px;"/>
+        <span class="form-error" *ngIf="f['departureLocation'].touched && f['departureLocation'].errors?.['required']">Required</span>
+      </div>
+
+      <!-- Arrival -->
+      <div class="map-section" style="margin-top:16px;">
+        <div class="map-label">Arrival Location *</div>
+        <div class="map-search-row">
+          <input class="map-search-input" type="text" [(ngModel)]="arrSearch" [ngModelOptions]="{standalone:true}"
+            placeholder="Search arrival city or address…" (keydown.enter)="searchArr($event)"/>
+          <button type="button" class="btn-search" (click)="searchArr()">🔍</button>
+        </div>
+        <div class="map-results" *ngIf="arrResults.length">
+          <div class="map-result-item" *ngFor="let r of arrResults" (click)="pickArr(r)">{{ r.display_name }}</div>
+        </div>
+        <input class="form-input" formControlName="arrivalLocation" placeholder="Filled when you pick from map"
+          [class.invalid]="f['arrivalLocation'].touched && f['arrivalLocation'].invalid" style="margin-bottom:8px;"/>
+        <span class="form-error" *ngIf="f['arrivalLocation'].touched && f['arrivalLocation'].errors?.['required']">Required</span>
+      </div>
+
+      <!-- Map -->
+      <div class="map-container" id="create-trip-map"></div>
+      <div class="map-legend" *ngIf="depLatLng || arrLatLng">
+        <span *ngIf="depLatLng" class="leg dep">🟢 Departure</span>
+        <span *ngIf="arrLatLng" class="leg arr">🔴 Arrival</span>
+      </div>
+    </div>
+
+    <!-- Date / Time / Car -->
+    <div class="card">
+      <div class="card-title">🗓️ Schedule & Vehicle</div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">Date *</label>
+          <input class="form-input" type="date" formControlName="date" [min]="todayStr"
+            [class.invalid]="f['date'].touched && f['date'].invalid"/>
+          <span class="form-error" *ngIf="f['date'].touched && f['date'].errors?.['required']">Date is required</span>
+          <span class="form-error" *ngIf="f['date'].touched && f['date'].errors?.['pastDate']">Date cannot be in the past</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Departure Time *</label>
+          <input class="form-input" type="time" formControlName="departureTime"
+            [class.invalid]="f['departureTime'].touched && f['departureTime'].invalid"/>
+          <span class="form-error" *ngIf="f['departureTime'].touched && f['departureTime'].errors?.['required']">Required</span>
+        </div>
+        <div class="form-row full-width">
+          <label class="form-label">Car *</label>
+          <div *ngIf="loadingCars" style="font-size:13px;color:#6e6e73;padding:8px 0;">Loading your cars…</div>
+          <select *ngIf="!loadingCars" class="form-select" formControlName="carId"
+            [class.invalid]="f['carId'].touched && f['carId'].invalid">
+            <option [ngValue]="null">— Select a car —</option>
+            <option *ngFor="let car of cars" [ngValue]="car.id">
+              {{ car.model }} · {{ car.plateNumber }} · {{ car.availableSeats }} seats
+            </option>
+          </select>
+          <div *ngIf="!loadingCars && cars.length===0" style="font-size:12px;color:#c62828;margin-top:6px;">
+            No cars found. <a routerLink="/cars" style="color:#000;font-weight:700;">Add a car first →</a>
+          </div>
+          <span class="form-error" *ngIf="f['carId'].touched && f['carId'].errors?.['required']">Please select a car</span>
         </div>
       </div>
-      <div class="cp-row">
-        <div class="cp-field">
-          <label>Date</label>
-          <input type="date" formControlName="date" [class.cp-input-err]="f['date'].touched && f['date'].invalid">
-        </div>
-        <div class="cp-field">
-          <label>Departure Time</label>
-          <input type="time" formControlName="departureTime" [class.cp-input-err]="f['departureTime'].touched && f['departureTime'].invalid">
-        </div>
-      </div>
-      <div class="cp-field">
-        <label>Car</label>
-        <div *ngIf="loadingCars" style="font-size:13px;color:#6e6e73;">Loading your cars…</div>
-        <select *ngIf="!loadingCars" formControlName="carId" [class.cp-input-err]="f['carId'].touched && f['carId'].invalid">
-          <option [ngValue]="null">-- Select a car --</option>
-          <option *ngFor="let car of cars" [ngValue]="car.id">{{ car.model }} ({{ car.plateNumber }}) – {{ car.availableSeats }} seats</option>
-        </select>
-        <span class="cp-ferr" *ngIf="f['carId'].touched && f['carId'].errors?.['required']">Please select a car</span>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
-        <button type="button" class="cp-btn cp-btn-cancel" (click)="router.navigate(['/carpooling'])">Cancel</button>
-        <button type="submit" class="cp-btn-primary" [disabled]="saving">{{ saving ? 'Creating…' : 'Create Trip' }}</button>
-      </div>
-    </form>
-  </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-back" (click)="router.navigate(['/carpooling'])">← Cancel</button>
+      <button type="submit" class="btn-submit" [disabled]="saving">
+        <span class="spinner" *ngIf="saving"></span>
+        {{ saving ? 'Creating…' : '✓ Create Trip' }}
+      </button>
+    </div>
+
+  </form>
 </div>
 
 <style>
-  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-  .cp-title{font-size:22px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-sub{font-size:14px;color:#6e6e73;margin:0}
-  .cp-form-card{background:#fff;border:1px solid #e0e0e5;border-radius:16px;padding:28px;max-width:560px}
-  .cp-field{margin-bottom:14px}.cp-field label{display:block;font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:5px}
-  .cp-field input,.cp-field select{width:100%;padding:9px 12px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#1d1d1f;background:#fafafa;outline:none;box-sizing:border-box}
-  .cp-field input:focus,.cp-field select:focus{border-color:#000;background:#fff}
-  .cp-input-err{border-color:#c62828!important}.cp-ferr{display:block;font-size:11px;color:#c62828;margin-top:3px}
-  .cp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px}
-  .cp-btn-primary{background:#000;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}.cp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
-  .cp-btn-cancel{padding:9px 18px;border:1px solid #d0d0d5;border-radius:8px;font-size:13px;color:#6e6e73;background:none;cursor:pointer}.cp-btn-cancel:hover{background:#f5f5f7}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .page { padding: 28px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 700px; }
+  .page-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
+  .page-sub   { font-size: 13px; color: #6e6e73; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #e0e0e5; padding: 22px; margin-bottom: 18px; }
+  .card-title { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f5; }
+  .error-box { background: #fff2f2; border: 1px solid #ef9a9a; border-radius: 10px; padding: 12px 16px; color: #c62828; font-size: 13px; margin-bottom: 16px; }
+  .map-section { margin-bottom: 4px; }
+  .map-label { font-size: 11px; font-weight: 700; color: #6e6e73; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+  .map-search-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .map-search-input { flex: 1; border: 1px solid #e0e0e5; border-radius: 8px; padding: 9px 12px; font-size: 13px; outline: none; }
+  .map-search-input:focus { border-color: #000; }
+  .btn-search { background: #000; color: #fff; border: none; border-radius: 8px; padding: 9px 14px; font-size: 14px; cursor: pointer; }
+  .btn-search:hover { opacity: .85; }
+  .map-results { background: #fff; border: 1px solid #e0e0e5; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+  .map-result-item { padding: 9px 12px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f5f5f7; color: #1d1d1f; }
+  .map-result-item:last-child { border-bottom: none; }
+  .map-result-item:hover { background: #f5f5f7; }
+  .form-input, .form-select { width: 100%; border: 1px solid #e0e0e5; border-radius: 8px; padding: 9px 12px; font-size: 13px; outline: none; }
+  .form-input:focus, .form-select:focus { border-color: #000; }
+  .form-input.invalid, .form-select.invalid { border-color: #c62828; }
+  .form-error { font-size: 11px; color: #c62828; margin-top: 3px; display: block; }
+  .map-container { height: 220px; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e5; margin-top: 14px; }
+  .map-legend { display: flex; gap: 12px; margin-top: 8px; }
+  .leg { font-size: 12px; font-weight: 600; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-row { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 11px; font-weight: 700; color: #6e6e73; text-transform: uppercase; letter-spacing: .04em; }
+  .full-width { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-back { background: none; border: 1px solid #e0e0e5; border-radius: 10px; padding: 10px 20px; font-size: 14px; cursor: pointer; color: #1d1d1f; }
+  .btn-back:hover { background: #f5f5f7; }
+  .btn-submit { background: #000; color: #fff; border: none; border-radius: 10px; padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .btn-submit:hover { opacity: .85; }
+  .btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>

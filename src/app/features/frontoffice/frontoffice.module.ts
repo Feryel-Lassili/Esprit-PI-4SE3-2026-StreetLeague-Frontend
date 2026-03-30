@@ -17,6 +17,7 @@ const routes: Routes = [
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
       { path: 'profile', component: ProfileComponent },
       { path: 'teams', loadComponent: () => import('./teams/teams.component').then(m => m.FrontofficeTeamsComponent) },
+      { path: 'venues', loadComponent: () => import('./venues/venues.component').then(m => m.FrontofficeVenuesComponent) },
 
       // Venue Owner routes
       {
@@ -45,6 +46,12 @@ const routes: Routes = [
             canActivate: [roleGuard],
             data: { role: 'VENUE_OWNER' },
             loadComponent: () => import('./venue/components/venue-details/venue-details.component').then(m => m.VenueDetailsComponent)
+          },
+          {
+            path: 'reservations',
+            canActivate: [roleGuard],
+            data: { role: 'VENUE_OWNER' },
+            loadComponent: () => import('./venue/components/owner-reservations/owner-reservations.component').then(m => m.OwnerReservationsComponent)
           },
           { path: '', redirectTo: 'my-venues', pathMatch: 'full' }
         ]

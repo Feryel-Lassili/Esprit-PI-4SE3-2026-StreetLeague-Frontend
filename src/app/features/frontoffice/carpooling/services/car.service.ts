@@ -29,4 +29,10 @@ export class CarService {
   deleteCar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.BASE}/delete/${id}`);
   }
+
+  uploadCarPhoto(id: number, file: File): Observable<{ photoUrl: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ photoUrl: string }>(`${this.BASE}/${id}/upload-photo`, fd);
+  }
 }

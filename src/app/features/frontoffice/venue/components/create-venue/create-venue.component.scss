@@ -1,0 +1,197 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.page {
+  padding: 32px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  max-width: 780px;
+}
+
+.page-title { font-size: 22px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
+.page-sub   { font-size: 13px; color: #6e6e73; margin-bottom: 28px; }
+
+.card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e0e0e5;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f5; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row  { display: flex; flex-direction: column; gap: 5px; margin-bottom: 0; }
+.full-width { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.form-input, .form-select {
+  border: 1px solid #e0e0e5;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+  &:focus { border-color: #000; }
+  &.invalid { border-color: #c62828; }
+}
+
+.form-error { font-size: 11px; color: #c62828; margin-top: 3px; }
+
+/* Map */
+.map-search-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.map-search-input {
+  flex: 1;
+  border: 1px solid #e0e0e5;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  outline: none;
+  &:focus { border-color: #000; }
+}
+.btn-search {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  &:hover { opacity: .85; }
+}
+
+.map-results {
+  background: #fff;
+  border: 1px solid #e0e0e5;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.map-result-item {
+  padding: 10px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f7;
+  &:last-child { border-bottom: none; }
+  &:hover { background: #f5f5f7; }
+}
+
+.map-container {
+  height: 240px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e0e0e5;
+}
+
+/* Photo upload */
+.photo-upload-area {
+  border: 2px dashed #e0e0e5;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  &:hover { border-color: #000; background: #fafafa; }
+  input { display: none; }
+}
+
+.photo-preview-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.photo-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Actions */
+.actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+
+.btn-submit {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  &:hover { opacity: .85; }
+  &:disabled { opacity: .4; cursor: not-allowed; }
+}
+
+.btn-back {
+  background: none;
+  border: 1px solid #e0e0e5;
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #1d1d1f;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  &:hover { background: #f5f5f7; }
+}
+
+.success-box {
+  background: #f1f8e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 10px;
+  padding: 16px;
+  color: #2e7d32;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.error-box {
+  background: #fff2f2;
+  border: 1px solid #ef9a9a;
+  border-radius: 10px;
+  padding: 14px;
+  color: #c62828;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

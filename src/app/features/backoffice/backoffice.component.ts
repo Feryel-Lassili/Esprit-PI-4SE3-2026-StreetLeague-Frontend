@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TeamService } from '../../core/services/team.service';
 import { AdminVenueService } from './venue-management/services/admin-venue.service';
 import { VenueDTO } from '../frontoffice/venue/models/venue.model';
+import { VenueService } from '../frontoffice/venue/services/venue.service';
 
 @Component({
   selector: 'app-backoffice',
@@ -127,6 +128,16 @@ import { VenueDTO } from '../frontoffice/venue/models/venue.model';
     .player-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f5f5f7; }
     .player-row:last-child { border-bottom:none; }
     .cap-tag { font-size:10px; font-weight:700; background:#fffde7; color:#f57f17; padding:2px 7px; border-radius:10px; }
+    /* Reservations admin */
+    .tabs { display:flex; gap:2px; background:#f5f5f7; border-radius:10px; padding:3px; margin-bottom:20px; width:fit-content; }
+    .tab-btn { padding:7px 18px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:500; color:#6e6e73; cursor:pointer; transition:all .15s; }
+    .tab-btn.active { background:#fff; color:#1d1d1f; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+    .btn-confirm { background:#2e7d32; color:#fff; border:none; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; margin-right:4px; }
+    .btn-confirm:hover { opacity:.85; }
+    .btn-verify { background:#185fa5; color:#fff; border:none; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; margin-right:4px; }
+    .btn-verify:hover { opacity:.85; }
+    .btn-unverify { background:#6e6e73; color:#fff; border:none; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; }
+    .btn-unverify:hover { opacity:.85; }
   `],
   template: `
     <div class="layout">
@@ -157,7 +168,7 @@ import { VenueDTO } from '../frontoffice/venue/models/venue.model';
               <!-- Screen-based nav items -->
               <button *ngIf="!item.route" class="nav-item"
                 [class.active]="currentScreen === item.id"
-                (click)="currentScreen = item.id">
+                (click)="currentScreen = item.id; router.navigate(['/backoffice'])">
                 <span class="nav-icon">{{ item.icon }}</span>
                 <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
               </button>
@@ -199,6 +210,8 @@ import { VenueDTO } from '../frontoffice/venue/models/venue.model';
 
           <!-- Router outlet for child pages (venue-management etc.) -->
           <router-outlet></router-outlet>
+
+          <ng-container *ngIf="!isChildRoute">
 
           <!-- DASHBOARD -->
           <div *ngIf="currentScreen === 'dashboard'">
@@ -485,6 +498,107 @@ import { VenueDTO } from '../frontoffice/venue/models/venue.model';
 
           </div>
 
+          <!-- RESERVATIONS ADMIN -->
+          <div *ngIf="currentScreen === 'reservations'">
+
+            <div class="tabs">
+              <button class="tab-btn" [class.active]="resTab === 'reservations'" (click)="resTab = 'reservations'">📅 Reservations</button>
+              <button class="tab-btn" [class.active]="resTab === 'venues'" (click)="resTab = 'venues'">🏟️ Venues</button>
+            </div>
+
+            <!-- Reservations tab -->
+            <div *ngIf="resTab === 'reservations'">
+              <div *ngIf="resLoading" style="text-align:center;padding:40px;color:#6e6e73;"><span class="spinner-sm"></span> Loading…</div>
+              <div *ngIf="resError" style="color:#c62828;padding:16px;">⚠️ {{ resError }}</div>
+              <div class="card" *ngIf="!resLoading && !resError">
+                <div class="card-title">All Reservations ({{ adminReservations.length }})</div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Venue</th>
+                      <th>Player</th>
+                      <th>Date</th>
+                      <th>Duration</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let r of adminReservations">
+                      <td style="color:#aeaeb2;font-size:12px;">{{ r.id }}</td>
+                      <td>
+                        <div style="font-weight:500;">{{ r.venueName }}</div>
+                        <div style="font-size:11px;color:#6e6e73;">{{ r.venueAddress }}</div>
+                      </td>
+                      <td style="font-size:12px;color:#6e6e73;">{{ r.userName }}</td>
+                      <td style="font-size:12px;color:#6e6e73;">{{ r.date | date:'short' }}</td>
+                      <td style="font-size:12px;">{{ r.duration }}h</td>
+                      <td style="font-weight:500;">{{ r.price }} TND</td>
+                      <td>
+                        <span class="pill"
+                          [class.pill-yellow]="r.status === 'PENDING'"
+                          [class.pill-green]="r.status === 'CONFIRMED' || r.status === 'COMPLETED'"
+                          [class.pill-red]="r.status === 'CANCELLED'">{{ r.status }}</span>
+                      </td>
+                      <td>
+                        <button class="btn-confirm" *ngIf="r.status === 'PENDING'" (click)="confirmRes(r.id)">✓ Confirm</button>
+                        <button class="btn-danger" *ngIf="r.status === 'PENDING' || r.status === 'CONFIRMED'" (click)="cancelRes(r.id)">✕ Cancel</button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="adminReservations.length === 0">
+                      <td colspan="8" style="text-align:center;color:#aeaeb2;padding:32px;">No reservations found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Venues tab -->
+            <div *ngIf="resTab === 'venues'">
+              <div *ngIf="venuesResLoading" style="text-align:center;padding:40px;color:#6e6e73;"><span class="spinner-sm"></span> Loading…</div>
+              <div class="card" *ngIf="!venuesResLoading">
+                <div class="card-title">All Venues ({{ adminVenuesList.length }})</div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Address</th>
+                      <th>Sport</th>
+                      <th>Owner</th>
+                      <th>Price/h</th>
+                      <th>Verified</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let v of adminVenuesList">
+                      <td style="font-weight:500;">{{ v.name }}</td>
+                      <td style="font-size:12px;color:#6e6e73;">{{ v.address }}</td>
+                      <td><span class="pill pill-blue">{{ v.sportType }}</span></td>
+                      <td style="font-size:12px;color:#6e6e73;">{{ v.ownerName || '—' }}</td>
+                      <td style="font-weight:500;">{{ v.pricePerHour }} TND</td>
+                      <td>
+                        <span class="pill" [class.pill-green]="v.verified" [class.pill-yellow]="!v.verified">
+                          {{ v.verified ? '✓ Verified' : '⏳ Pending' }}
+                        </span>
+                      </td>
+                      <td>
+                        <button class="btn-verify" *ngIf="!v.verified" (click)="verifyAdminVenue(v)">✓ Verify</button>
+                        <button class="btn-unverify" *ngIf="v.verified" (click)="unverifyAdminVenue(v)">✕ Unverify</button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="adminVenuesList.length === 0">
+                      <td colspan="7" style="text-align:center;color:#aeaeb2;padding:32px;">No venues found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
           <!-- VENUE ALLOCATOR DASHBOARD -->
           <div *ngIf="userRole === 'venue-allocator' && currentScreen === 'allocator'">
             <div class="grid-3" style="margin-bottom:24px;">
@@ -523,6 +637,8 @@ import { VenueDTO } from '../frontoffice/venue/models/venue.model';
               </table>
             </div>
           </div>
+
+          </ng-container>
 
         </div>
       </main>
@@ -605,6 +721,11 @@ export class BackofficeComponent implements OnInit {
   userRole: 'admin' | 'venue-allocator' = 'admin';
   currentScreen = 'dashboard';
 
+  get isChildRoute(): boolean {
+    const url = this.router.url.split('?')[0];
+    return url.includes('/venue-management') || url.includes('/carpooling-management');
+  }
+
   // ── Teams admin ────────────────────────────────────────────────────────────
   allAdminTeams: any[] = [];
   teamsLoading = false;
@@ -647,8 +768,9 @@ export class BackofficeComponent implements OnInit {
     {
       section: 'Management',
       items: [
-        { id: 'users',    label: 'Users',        icon: '👤', route: null },
-        { id: 'teams',    label: 'Teams',        icon: '🏆', route: null },
+        { id: 'users',        label: 'Users',        icon: '👤', route: null },
+        { id: 'teams',        label: 'Teams',        icon: '🏆', route: null },
+        { id: 'reservations', label: 'Reservations', icon: '📅', route: null },
         { id: 'owners',   label: 'Venue Owners', icon: '🏟️', route: '/backoffice/venue-management/owners' },
         { id: 'venues',   label: 'Venues',       icon: '📍', route: '/backoffice/venue-management/venues' },
         { id: 'drivers',  label: 'Driver List',  icon: '🚗', route: '/backoffice/carpooling-management/drivers' },
@@ -771,11 +893,21 @@ export class BackofficeComponent implements OnInit {
     { id: 'BK002', venueName: 'City Stadium', customerName: 'Jane Smith', date: '2026-02-16', totalPrice: 80, status: 'Pending' }
   ];
 
+  // ── Reservations admin ─────────────────────────────────────────────────────
+  resTab: 'reservations' | 'venues' = 'reservations';
+  adminReservations: any[] = [];
+  resLoading = false;
+  resError = '';
+  adminVenuesList: any[] = [];
+  venuesResLoading = false;
+
   constructor(
     private route: ActivatedRoute,
+    public router: Router,
     public authService: AuthService,
     private teamService: TeamService,
-    private adminVenueService: AdminVenueService
+    private adminVenueService: AdminVenueService,
+    private venueService: VenueService
   ) {
     this.route.queryParams.subscribe(params => {
       if (params['role'] === 'venue-allocator') {
@@ -788,6 +920,13 @@ export class BackofficeComponent implements OnInit {
   ngOnInit(): void {
     this.loadTeams();
     this.loadVenues();
+    this.loadAdminReservations();
+    this.loadAdminVenues();
+    // Sync sidebar active item from current URL
+    const url = this.router.url.split('?')[0];
+    const allItems = [...this.adminMenu, ...this.allocatorMenu].flatMap(s => s.items);
+    const matched = allItems.find((i: any) => i.route && url.startsWith(i.route));
+    if (matched) this.currentScreen = matched.id;
   }
 
   // ── Teams: load ────────────────────────────────────────────────────────────
@@ -929,6 +1068,53 @@ export class BackofficeComponent implements OnInit {
         if (idx >= 0) this.allAdminTeams[idx] = this.viewedTeam;
       },
       error: () => alert('Failed to remove player.')
+    });
+  }
+
+  loadAdminReservations(): void {
+    this.resLoading = true;
+    this.resError = '';
+    this.venueService.getAllReservations().subscribe({
+      next: data => { this.adminReservations = data; this.resLoading = false; },
+      error: () => { this.resError = 'Failed to load reservations.'; this.resLoading = false; }
+    });
+  }
+
+  loadAdminVenues(): void {
+    this.venuesResLoading = true;
+    this.venueService.getAllVenuesAdmin().subscribe({
+      next: data => { this.adminVenuesList = data; this.venuesResLoading = false; },
+      error: () => { this.venuesResLoading = false; }
+    });
+  }
+
+  confirmRes(id: number): void {
+    this.venueService.confirmReservation(id).subscribe({
+      next: () => this.loadAdminReservations(),
+      error: () => alert('Failed to confirm reservation.')
+    });
+  }
+
+  cancelRes(id: number): void {
+    if (!confirm('Cancel this reservation?')) return;
+    this.venueService.adminCancelReservation(id).subscribe({
+      next: () => this.loadAdminReservations(),
+      error: () => alert('Failed to cancel reservation.')
+    });
+  }
+
+  verifyAdminVenue(venue: any): void {
+    this.venueService.verifyVenue(venue.id).subscribe({
+      next: () => { venue.verified = true; },
+      error: () => alert('Failed to verify venue.')
+    });
+  }
+
+  unverifyAdminVenue(venue: any): void {
+    if (!confirm(`Unverify "${venue.name}"?`)) return;
+    this.venueService.unverifyVenue(venue.id).subscribe({
+      next: () => { venue.verified = false; },
+      error: () => alert('Failed to unverify venue.')
     });
   }
 

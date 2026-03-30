@@ -364,6 +364,9 @@
 
   &:focus { border-color: var(--accent); }
 }
+.form-input-err { border-color: #ef4444 !important; background: #fff8f8 !important; }
+.form-ferr  { display: block; font-size: 11px; color: #ef4444; margin-top: 4px; }
+.form-fhint { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; }
 .captain-info {
   background: rgba(2,132,199,.08);
   border: 1px solid rgba(2,132,199,.2);

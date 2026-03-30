@@ -135,6 +135,10 @@
             <div class="detail-hero-actions" *ngIf="!isMember(selectedTeam) && !isCaptain(selectedTeam) && currentUserId">
               <button class="btn-hero join" (click)="requestJoin(selectedTeam)">📨 Request to join</button>
             </div>
+            <!-- Member (non-captain) actions -->
+            <div class="detail-hero-actions" *ngIf="isMember(selectedTeam) && !isCaptain(selectedTeam) && currentUserId">
+              <button class="btn-hero del" (click)="leaveTeam(selectedTeam, $event)">🚪 Leave team</button>
+            </div>
           </div>
         </div>
       </div>
@@ -203,11 +207,18 @@
 
     <div class="form-group">
       <label class="form-label">Team name *</label>
-      <input class="form-input" type="text" placeholder="ex: Thunder Hawks" [(ngModel)]="form.name"/>
+      <input class="form-input" type="text" placeholder="ex: Thunder Hawks" [(ngModel)]="form.name"
+        [class.form-input-err]="formTouched && !form.name.trim()"
+        (blur)="formTouched=true"/>
+      <span class="form-ferr" *ngIf="formTouched && !form.name.trim()">Team name is required</span>
+      <span class="form-ferr" *ngIf="formTouched && form.name.trim() && form.name.trim().length < 2">Name must be at least 2 characters</span>
+      <span class="form-fhint" *ngIf="form.name.trim().length >= 2">{{ form.name.trim().length }}/80</span>
     </div>
     <div class="form-group">
       <label class="form-label">Sport *</label>
-      <select class="form-select" [(ngModel)]="form.type">
+      <select class="form-select" [(ngModel)]="form.type"
+        [class.form-input-err]="formTouched && !form.type"
+        (blur)="formTouched=true">
         <option value="">-- Choose a sport --</option>
         <option value="FOOTBALL">⚽ Football</option>
         <option value="BASKETBALL">🏀 Basketball</option>
@@ -215,6 +226,7 @@
         <option value="VOLLEYBALL">🏐 Volleyball</option>
         <option value="HANDBALL">🤾 Handball</option>
       </select>
+      <span class="form-ferr" *ngIf="formTouched && !form.type">Please select a sport</span>
     </div>
 
     <div class="modal-actions">
