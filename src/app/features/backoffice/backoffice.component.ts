@@ -23,7 +23,7 @@ interface WalletAdmin {
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-    imports: [CommonModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
+    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
