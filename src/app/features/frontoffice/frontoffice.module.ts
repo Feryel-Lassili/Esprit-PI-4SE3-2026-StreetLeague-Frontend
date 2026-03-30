@@ -17,7 +17,9 @@ const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
       
-      { path: 'profile', component: ProfileComponent }
+      { path: 'profile', component: ProfileComponent },
+      { path: 'health', loadChildren: () => import('./health/health.module').then(m => m.HealthModule) },
+      { path: 'wallet', loadChildren: () => import('./wallet/wallet.module').then(m => m.WalletModule) }
     ]
   }
 ];

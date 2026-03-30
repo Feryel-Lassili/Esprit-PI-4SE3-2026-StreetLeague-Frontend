@@ -18,7 +18,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                      req.url.includes('/likes') ||
                      req.url.includes('/comments') ||
                      req.url.includes('/comment-reactions')||
-                     req.url.includes('/user/me');
+                     req.url.includes('/user/me') ||
+                     req.url.includes('/wallet') ||
+                    req.url.includes('/medical');
 
  if (token) {
   req = req.clone({

@@ -1,0 +1,539 @@
+<!-- ══════════════════════════════════════
+     PLAYER VIEW
+══════════════════════════════════════ -->
+<div *ngIf="isPlayer()" class="health-root">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🏥 My Health</h1>
+      <p class="page-sub">Medical record, injuries &amp; professional recommendations</p>
+    </div>
+    <div class="header-badges">
+      <span *ngIf="record" class="badge badge--green">✓ Record Active</span>
+      <span *ngIf="pendingReco > 0" class="badge badge--orange">{{ pendingReco }} Awaiting Review</span>
+      <span *ngIf="newRecos > 0"    class="badge badge--blue">{{ newRecos }} New Recommendations</span>
+    </div>
+  </div>
+
+  <div *ngIf="error"   class="alert alert-error">⚠ {{ error }}</div>
+  <div *ngIf="success" class="alert alert-ok">✓ {{ success }}</div>
+
+  <!-- Onboarding -->
+  <div *ngIf="!record && !showCreateRecord" class="onboarding-card">
+    <div class="onboarding-icon">🩺</div>
+    <h2 class="onboarding-title">Create Your Medical Record</h2>
+    <p class="onboarding-sub">
+      Set up your health profile so coaches and health professionals can
+      monitor your wellbeing and provide personalised recommendations.
+    </p>
+    <button class="btn-primary" (click)="openCreate()">Get Started →</button>
+  </div>
+
+  <!-- ── Form (create / edit) ── -->
+  <div *ngIf="showCreateRecord || editingRecord" class="form-card">
+    <div class="form-card__header">
+      <h3>{{ editingRecord ? 'Edit Medical Record' : 'New Medical Record' }}</h3>
+      <button class="icon-btn" (click)="cancelForm()">✕</button>
+    </div>
+
+    <div class="form-grid">
+
+      <!-- Weight -->
+      <div class="field" [class.field--error]="formErrors['weight']">
+        <label>Weight (kg) <span class="required">*</span></label>
+        <input type="number" [(ngModel)]="form.weight" name="weight"
+          placeholder="e.g. 75" min="20" max="300"
+          [class.input--error]="formErrors['weight']" />
+        <span *ngIf="formErrors['weight']" class="field-error">{{ formErrors['weight'] }}</span>
+      </div>
+
+      <!-- Height -->
+      <div class="field" [class.field--error]="formErrors['height']">
+        <label>Height (m) <span class="required">*</span></label>
+        <input type="number" step="0.01" [(ngModel)]="form.height" name="height"
+          placeholder="e.g. 1.80" min="0.5" max="2.5"
+          [class.input--error]="formErrors['height']" />
+        <span *ngIf="formErrors['height']" class="field-error">{{ formErrors['height'] }}</span>
+      </div>
+
+      <!-- Blood Type -->
+      <div class="field" [class.field--error]="formErrors['bloodType']">
+        <label>Blood Type <span class="required">*</span></label>
+        <select [(ngModel)]="form.bloodType" name="bloodType"
+          [class.input--error]="formErrors['bloodType']">
+          <option value="">-- Select --</option>
+          <option *ngFor="let bt of bloodTypes" [value]="bt">{{ bt }}</option>
+        </select>
+        <span *ngIf="formErrors['bloodType']" class="field-error">{{ formErrors['bloodType'] }}</span>
+      </div>
+
+      <!-- Last Checkup -->
+      <div class="field" [class.field--error]="formErrors['lastCheckup']">
+        <label>Last Checkup <span class="required">*</span></label>
+        <input type="date" [(ngModel)]="form.lastCheckup" name="lastCheckup"
+          [class.input--error]="formErrors['lastCheckup']" />
+        <span *ngIf="formErrors['lastCheckup']" class="field-error">{{ formErrors['lastCheckup'] }}</span>
+      </div>
+
+      <!-- Chronic Diseases -->
+      <div class="field field--full">
+        <label>Chronic Diseases <span class="optional">(optional)</span></label>
+        <input type="text" [(ngModel)]="form.chronicDiseases" name="chronicDiseases"
+          placeholder="e.g. Mild asthma, Diabetes — or leave empty if none" />
+      </div>
+
+      <!-- Allergies -->
+      <div class="field field--full">
+        <label>Allergies <span class="optional">(optional)</span></label>
+        <input type="text" [(ngModel)]="form.allergies" name="allergies"
+          placeholder="e.g. Pollen, Penicillin — or leave empty if none" />
+      </div>
+
+    </div>
+
+    <!-- Live BMI preview -->
+    <div *ngIf="form.weight > 0 && form.height > 0" class="bmi-preview">
+      <span class="bmi-preview__label">BMI Preview</span>
+      <span class="bmi-preview__val">{{ (form.weight / (form.height * form.height)).toFixed(1) }}</span>
+      <span class="bmi-preview__badge"
+        [class.bmi-preview__badge--green]="(form.weight / (form.height * form.height)) >= 18.5 && (form.weight / (form.height * form.height)) < 25"
+        [class.bmi-preview__badge--orange]="(form.weight / (form.height * form.height)) >= 25 && (form.weight / (form.height * form.height)) < 30"
+        [class.bmi-preview__badge--red]="(form.weight / (form.height * form.height)) >= 30"
+        [class.bmi-preview__badge--blue]="(form.weight / (form.height * form.height)) < 18.5">
+        {{
+          (form.weight / (form.height * form.height)) < 18.5 ? 'Underweight' :
+          (form.weight / (form.height * form.height)) < 25   ? 'Normal' :
+          (form.weight / (form.height * form.height)) < 30   ? 'Overweight' : 'Obese'
+        }}
+      </span>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" (click)="saveRecord()" [disabled]="saving">
+        {{ saving ? 'Saving…' : 'Save Record' }}
+      </button>
+      <button class="btn-ghost" (click)="cancelForm()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div *ngIf="record && !showCreateRecord && !editingRecord">
+
+    <!-- KPI row -->
+    <div class="stats-row">
+      <div class="stat-card stat-card--accent">
+        <div class="stat-card__label">BMI</div>
+        <div class="stat-card__value">{{ bmi }}</div>
+        <div class="stat-card__sub" [class]="bmiColor">{{ bmiLabel }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Weight</div>
+        <div class="stat-card__value">{{ record.weight }} <span class="unit">kg</span></div>
+        <div class="stat-card__sub neutral">Current</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Height</div>
+        <div class="stat-card__value">{{ record.height }} <span class="unit">m</span></div>
+        <div class="stat-card__sub neutral">Current</div>
+      </div>
+      <div class="stat-card stat-card--red">
+        <div class="stat-card__label">Blood Type</div>
+        <div class="stat-card__value">{{ record.bloodType }}</div>
+        <div class="stat-card__sub neutral">On file</div>
+      </div>
+      <div class="stat-card" [class.stat-card--orange]="injuries.length > 0">
+        <div class="stat-card__label">Injuries</div>
+        <div class="stat-card__value">{{ injuries.length }}</div>
+        <div class="stat-card__sub" [class]="injuries.length > 0 ? 'warn' : 'good'">
+          {{ injuries.length === 0 ? 'All clear' : 'Recorded' }}
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Last Checkup</div>
+        <div class="stat-card__value small">{{ record.lastCheckup | date:'d MMM y' }}</div>
+        <div class="stat-card__sub neutral">Scheduled</div>
+      </div>
+    </div>
+
+    <!-- 3-col grid -->
+    <div class="grid-root">
+
+      <!-- Col 1 — Record + Notifs -->
+      <div class="col">
+        <div class="panel">
+          <div class="panel__head">
+            <h3>📋 Medical Record</h3>
+            <button class="link-btn" (click)="startEdit()">Edit</button>
+          </div>
+          <div class="record-fields">
+            <div class="record-row">
+              <span class="rec-label">Chronic Diseases</span>
+              <span class="rec-val">{{ record.chronicDiseases || 'None' }}</span>
+            </div>
+            <div class="record-row">
+              <span class="rec-label">Allergies</span>
+              <span class="rec-val">{{ record.allergies || 'None' }}</span>
+            </div>
+            <div class="record-row">
+              <span class="rec-label">Last Checkup</span>
+              <span class="rec-val">{{ record.lastCheckup | date:'dd MMM yyyy' }}</span>
+            </div>
+            <div class="record-row">
+              <span class="rec-label">Blood Type</span>
+              <span class="rec-val blood">{{ record.bloodType }}</span>
+            </div>
+          </div>
+          <div class="mini-chart">
+            <div class="mini-chart__label">Body Stats</div>
+            <div class="mini-chart__bars">
+              <div class="chart-bar-wrap" *ngFor="let s of bodyStats">
+                <div class="chart-bar-bg">
+                  <div class="chart-bar" [style.height.%]="s.pct" [class]="'chart-bar--'+s.color"></div>
+                </div>
+                <span class="chart-bar-label">{{ s.label }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" *ngIf="notifications.length > 0">
+          <div class="panel__head"><h3>🔔 Notifications</h3></div>
+          <div class="notif-list">
+            <div *ngFor="let n of notifications" class="notif-row" [class.unread]="n.unread">
+              <div class="notif-dot" [class]="'notif-dot--'+n.type"></div>
+              <div class="notif-body">
+                <p class="notif-msg">{{ n.message }}</p>
+                <p class="notif-time">{{ n.time }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2 — Injuries -->
+      <div class="col">
+        <div class="panel">
+          <div class="panel__head">
+            <h3>🩹 Injuries</h3>
+            <div class="panel__head-actions">
+              <div class="sev-filters">
+                <button *ngFor="let s of ['ALL','MINOR','MODERATE','SEVERE']"
+                  class="sev-btn"
+                  [class.active]="severityFilter === s"
+                  [class]="s !== 'ALL' ? 'sev-btn--'+s.toLowerCase() : ''"
+                  (click)="applyFilter(s)">{{ s }}</button>
+              </div>
+              <button class="btn-sm-black" (click)="showInjuryForm = !showInjuryForm; injuryErrors = {}">
+                {{ showInjuryForm ? '✕ Cancel' : '+ Declare' }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="showInjuryForm" class="injury-form">
+            <!-- Report -->
+            <div [class.field--error]="injuryErrors['report']">
+              <textarea [(ngModel)]="injuryForm.report" name="injuryReport"
+                placeholder="Describe the injury in detail (min. 10 characters)…"
+                rows="3" class="injury-textarea"
+                [class.input--error]="injuryErrors['report']"></textarea>
+              <span *ngIf="injuryErrors['report']" class="field-error" style="margin-top:4px; display:block;">
+                {{ injuryErrors['report'] }}
+              </span>
+            </div>
+            <div class="injury-form-row">
+              <!-- Date -->
+              <div class="field" [class.field--error]="injuryErrors['date']">
+                <label>Date <span class="required">*</span></label>
+                <input type="date" [(ngModel)]="injuryForm.date" name="injuryDate"
+                  [class.input--error]="injuryErrors['date']" />
+                <span *ngIf="injuryErrors['date']" class="field-error">{{ injuryErrors['date'] }}</span>
+              </div>
+              <!-- Severity -->
+              <div class="field" [class.field--error]="injuryErrors['severity']">
+                <label>Severity <span class="required">*</span></label>
+                <select [(ngModel)]="injuryForm.severity" name="injurySeverity"
+                  [class.input--error]="injuryErrors['severity']">
+                  <option value="MINOR">Minor</option>
+                  <option value="MODERATE">Moderate</option>
+                  <option value="SEVERE">Severe</option>
+                </select>
+                <span *ngIf="injuryErrors['severity']" class="field-error">{{ injuryErrors['severity'] }}</span>
+              </div>
+            </div>
+            <button class="btn-primary" style="width:100%; margin-top:10px;"
+              (click)="declareInjury()" [disabled]="saving">
+              {{ saving ? 'Submitting…' : 'Submit Injury Report' }}
+            </button>
+          </div>
+
+          <div *ngIf="injuries.length === 0 && !showInjuryForm" class="empty-injuries">
+            <div class="empty-icon">✅</div>
+            <p>No injuries recorded — great shape!</p>
+          </div>
+
+          <div class="injury-timeline">
+            <div *ngFor="let inj of injuries" class="injury-card"
+              [class]="'injury-card--' + inj.severity.toLowerCase()">
+              <div class="injury-card__header">
+                <div class="inj-left">
+                  <span class="sev-pill" [class]="'sev-pill--'+inj.severity.toLowerCase()">
+                    {{ sevIcon(inj.severity) }} {{ inj.severity }}
+                  </span>
+                  <span class="inj-date">{{ inj.date | date:'d MMM yyyy' }}</span>
+                </div>
+                <button class="delete-btn" (click)="deleteInjury(inj.id!)">🗑</button>
+              </div>
+              <p class="inj-report">{{ inj.report }}</p>
+              <div *ngIf="inj.recommendation" class="reco-box reco-box--filled">
+                <div class="reco-box__header">
+                  <span class="reco-who">👨‍⚕️ Health Professional</span>
+                  <span class="reco-new-badge">Recommendation</span>
+                </div>
+                <p class="reco-text">{{ inj.recommendation }}</p>
+              </div>
+              <div *ngIf="!inj.recommendation" class="reco-box reco-box--pending">
+                <span class="reco-pending">⏳ Awaiting professional review…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3 — Recommendations + Insights + Tips -->
+      <div class="col">
+        <div class="panel">
+          <div class="panel__head"><h3>💊 Recommendations</h3></div>
+          <div *ngIf="recoCount === 0" class="empty-state-small">No recommendations yet</div>
+          <div *ngFor="let inj of injuriesWithReco" class="reco-summary-card">
+            <div class="reco-summary__top">
+              <span class="sev-pill sev-pill--sm" [class]="'sev-pill--'+inj.severity.toLowerCase()">{{ inj.severity }}</span>
+              <span class="reco-summary__date">{{ inj.date | date:'d MMM' }}</span>
+            </div>
+            <p class="reco-summary__injury">{{ inj.report | slice:0:60 }}{{ inj.report.length > 60 ? '…' : '' }}</p>
+            <div class="reco-summary__box">
+              <span class="reco-author">👨‍⚕️ Professional:</span>
+              <p class="reco-summary__text">{{ inj.recommendation }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__head"><h3>📊 Injury Insights</h3></div>
+          <div class="insight-bars">
+            <div *ngFor="let ins of injuryInsights" class="insight-row">
+              <div class="insight-top">
+                <span class="insight-label">{{ ins.label }}</span>
+                <span class="insight-count">{{ ins.count }}</span>
+              </div>
+              <div class="insight-bar-bg">
+                <div class="insight-bar" [class]="'insight-bar--'+ins.color" [style.width.%]="ins.pct"></div>
+              </div>
+            </div>
+            <div *ngIf="injuries.length === 0" class="empty-state-small">No data yet</div>
+          </div>
+        </div>
+
+        <div class="tips-card">
+          <h3 class="tips-title">💡 General Health Tips</h3>
+          <ul class="tips-list">
+            <li *ngFor="let tip of healthTips">
+              <span class="tip-icon">{{ tip.icon }}</span>
+              <span>{{ tip.text }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HEALTH PROFESSIONAL VIEW
+══════════════════════════════════════ -->
+<div *ngIf="isHealthPro()" class="health-root">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">🩺 Health Professional Dashboard</h1>
+      <p class="page-sub">Review player injuries and medical records</p>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge--orange">{{ proStats.pending }} Pending Review</span>
+      <span class="badge badge--blue">{{ proStats.pending + proStats.reviewed }} Total Cases</span>
+      <span class="badge badge--green">{{ allProRecords.length }} Records</span>
+    </div>
+  </div>
+
+  <div *ngIf="error"   class="alert alert-error">⚠ {{ error }}</div>
+  <div *ngIf="success" class="alert alert-ok">✓ {{ success }}</div>
+
+  <!-- Pro KPI row -->
+  <div class="stats-row pro-stats-row">
+    <div class="stat-card stat-card--orange">
+      <div class="stat-card__label">Pending Review</div>
+      <div class="stat-card__value">{{ proStats.pending }}</div>
+      <div class="stat-card__sub warn">Awaiting input</div>
+    </div>
+    <div class="stat-card stat-card--accent">
+      <div class="stat-card__label">Reviewed</div>
+      <div class="stat-card__value">{{ proStats.reviewed }}</div>
+      <div class="stat-card__sub good">Completed</div>
+    </div>
+    <div class="stat-card stat-card--red">
+      <div class="stat-card__label">Severe Cases</div>
+      <div class="stat-card__value">{{ proStats.severe }}</div>
+      <div class="stat-card__sub warn">High priority</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Total Players</div>
+      <div class="stat-card__value">{{ proStats.players }}</div>
+      <div class="stat-card__sub neutral">Monitored</div>
+    </div>
+    <div class="stat-card stat-card--accent">
+      <div class="stat-card__label">Medical Records</div>
+      <div class="stat-card__value">{{ allProRecords.length }}</div>
+      <div class="stat-card__sub neutral">On file</div>
+    </div>
+  </div>
+
+  <!-- Main tabs -->
+  <div class="pro-tabs">
+    <button class="pro-tab" [class.active]="mainTab === 'INJURIES'" (click)="mainTab = 'INJURIES'">
+      🩹 Injuries
+      <span *ngIf="proStats.pending > 0" class="tab-badge">{{ proStats.pending }}</span>
+    </button>
+    <button class="pro-tab" [class.active]="mainTab === 'RECORDS'" (click)="mainTab = 'RECORDS'">
+      📋 Medical Records
+      <span *ngIf="allProRecords.length > 0" class="tab-badge">{{ allProRecords.length }}</span>
+    </button>
+  </div>
+
+  <!-- INJURIES TAB -->
+  <div *ngIf="mainTab === 'INJURIES'">
+    <div class="pro-tabs">
+      <button *ngFor="let tab of proTabs"
+        class="pro-tab" [class.active]="proActiveTab === tab.key"
+        (click)="proActiveTab = tab.key">
+        {{ tab.label }}
+        <span *ngIf="tab.count > 0" class="tab-badge">{{ tab.count }}</span>
+      </button>
+    </div>
+
+    <div class="pro-injuries-grid">
+      <div *ngIf="filteredProInjuries.length === 0" class="empty-pro">
+        <div style="font-size:40px; margin-bottom:12px;">✅</div>
+        <p>No cases in this category</p>
+      </div>
+
+      <div *ngFor="let inj of filteredProInjuries" class="pro-injury-card"
+        [class]="'pro-injury-card--' + inj.severity.toLowerCase()">
+
+        <div class="pro-card__header">
+          <div class="pro-card__left">
+            <span class="sev-pill" [class]="'sev-pill--'+inj.severity.toLowerCase()">
+              {{ sevIcon(inj.severity) }} {{ inj.severity }}
+            </span>
+            <span class="inj-date">{{ inj.date | date:'d MMM yyyy' }}</span>
+          </div>
+          <span *ngIf="!inj.recommendation" class="status-badge status--pending">⏳ Pending</span>
+          <span *ngIf="inj.recommendation"  class="status-badge status--done">✓ Reviewed</span>
+        </div>
+
+        <div class="pro-card__report">
+          <p class="pro-report-label">📝 Injury Report</p>
+          <p class="pro-report-text">{{ inj.report }}</p>
+        </div>
+
+        <div *ngIf="inj.recommendation && editingRecoId !== inj.id"
+          class="reco-box reco-box--filled" style="margin-bottom:10px;">
+          <div class="reco-box__header">
+            <span class="reco-who">Your recommendation:</span>
+            <button class="link-btn" (click)="startEditReco(inj)">Edit</button>
+          </div>
+          <p class="reco-text">{{ inj.recommendation }}</p>
+        </div>
+
+        <div *ngIf="editingRecoId === inj.id" class="reco-form">
+          <textarea [(ngModel)]="recoText" name="recoText" rows="3" class="injury-textarea"
+            placeholder="Write your medical recommendation (min. 10 characters)…"
+            [class.input--error]="recoError"></textarea>
+          <span *ngIf="recoError" class="field-error" style="margin-top:4px; display:block;">{{ recoError }}</span>
+          <div class="reco-form-actions">
+            <button class="btn-primary" style="font-size:13px; padding:9px 20px;"
+              (click)="submitReco(inj)" [disabled]="saving">
+              {{ saving ? 'Saving…' : 'Submit Recommendation' }}
+            </button>
+            <button class="btn-ghost" style="font-size:13px; padding:9px 16px;"
+              (click)="cancelReco()">Cancel</button>
+          </div>
+        </div>
+
+        <button *ngIf="!inj.recommendation && editingRecoId !== inj.id"
+          class="btn-sm-black" style="margin-top:10px;"
+          (click)="startEditReco(inj)">
+          + Add Recommendation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS TAB -->
+  <div *ngIf="mainTab === 'RECORDS'">
+    <div *ngIf="allProRecords.length === 0" class="empty-pro">
+      <div style="font-size:40px; margin-bottom:12px;">📋</div>
+      <p>No medical records found</p>
+    </div>
+    <div class="records-grid">
+      <div *ngFor="let rec of allProRecords" class="record-pro-card">
+
+        <!-- Header avec Record ID + Player ID -->
+        <div class="record-pro-card__header">
+          <div class="rec-pro-left">
+            <span class="blood-badge">{{ rec.bloodType }}</span>
+            <div class="rec-pro-ids">
+              <span class="rec-pro-id">Record #{{ rec.id }}</span>
+              <span class="rec-player-id" *ngIf="rec.playerProfileId">
+                👤 Player #{{ rec.playerProfileId }}
+              </span>
+            </div>
+          </div>
+          <span *ngIf="rec.lastCheckup" class="inj-date">
+            {{ rec.lastCheckup | date:'d MMM yyyy' }}
+          </span>
+        </div>
+
+        <div class="rec-pro-body">
+          <div class="rec-pro-stat">
+            <span class="rec-pro-label">Weight</span>
+            <span class="rec-pro-val">{{ rec.weight }} kg</span>
+          </div>
+          <div class="rec-pro-stat">
+            <span class="rec-pro-label">Height</span>
+            <span class="rec-pro-val">{{ rec.height }} m</span>
+          </div>
+          <div class="rec-pro-stat">
+            <span class="rec-pro-label">BMI</span>
+            <span class="rec-pro-val">{{ calcBmi(rec) }}</span>
+          </div>
+          <div class="rec-pro-stat">
+            <span class="rec-pro-label">Blood</span>
+            <span class="rec-pro-val blood">{{ rec.bloodType }}</span>
+          </div>
+        </div>
+
+        <div class="rec-pro-details">
+          <div class="rec-pro-row" *ngIf="rec.chronicDiseases">
+            <span class="rec-pro-label">Chronic</span>
+            <span class="rec-pro-val" style="font-size:12px;">{{ rec.chronicDiseases }}</span>
+          </div>
+          <div class="rec-pro-row" *ngIf="rec.allergies">
+            <span class="rec-pro-label">Allergies</span>
+            <span class="rec-pro-val" style="font-size:12px;">{{ rec.allergies }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

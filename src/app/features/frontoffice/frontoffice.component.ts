@@ -126,6 +126,7 @@ export class FrontofficeComponent {
         { path: '/shop',    label: 'Shop',      icon: '🛍️' },
         { path: '/wallet',  label: 'Wallet',    icon: '💳' },
         { path: '/profile', label: 'Profile',   icon: '👤' },
+        { path: '/health', label: 'Health', icon: '🏥' },
       ]
     }
   ];
