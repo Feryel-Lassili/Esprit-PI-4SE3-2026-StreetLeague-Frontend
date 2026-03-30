@@ -1,0 +1,552 @@
+- Generating browser application bundles (phase: setup)...
+√ Browser application bundle generation complete.
+[32m31 03 2026 00:07:14.920:INFO [karma-server]: [39mKarma v6.4.4 server started at http://localhost:9877/
+[32m31 03 2026 00:07:14.921:INFO [launcher]: [39mLaunching browsers Chrome with concurrency unlimited
+[32m31 03 2026 00:07:14.924:INFO [launcher]: [39mStarting browser Chrome
+[32m31 03 2026 00:07:16.448:INFO [Chrome 146.0.0.0 (Windows 10)]: [39mConnected on socket SUUTL46VKfb7Dk78AAAB with id 67445925
+Chrome 146.0.0.0 (Windows 10): Executed 0 of 264[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 1 of 264[32m SUCCESS[39m (0 secs / 0.008 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 2 of 264[32m SUCCESS[39m (0 secs / 0.011 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getRefereeProfile should GET /referees/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 2 of 264[32m SUCCESS[39m (0 secs / 0.011 secs)
+WARN: 'Spec 'ProfileService getRefereeProfile should GET /referees/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 3 of 264[32m SUCCESS[39m (0 secs / 0.014 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 4 of 264[32m SUCCESS[39m (0 secs / 0.016 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getHealthProfessionalProfile should GET /health-professionals/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 4 of 264[32m SUCCESS[39m (0 secs / 0.016 secs)
+WARN: 'Spec 'ProfileService getHealthProfessionalProfile should GET /health-professionals/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 5 of 264[32m SUCCESS[39m (0 secs / 0.017 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 6 of 264[32m SUCCESS[39m (0 secs / 0.018 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 7 of 264[32m SUCCESS[39m (0 secs / 0.019 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getCoachProfile should GET /coaches/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 7 of 264[32m SUCCESS[39m (0 secs / 0.019 secs)
+WARN: 'Spec 'ProfileService getCoachProfile should GET /coaches/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 8 of 264[32m SUCCESS[39m (0 secs / 0.02 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 9 of 264[32m SUCCESS[39m (0 secs / 0.021 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getAdminProfile should GET /admins/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 9 of 264[32m SUCCESS[39m (0 secs / 0.021 secs)
+WARN: 'Spec 'ProfileService getAdminProfile should GET /admins/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 10 of 264[32m SUCCESS[39m (0 secs / 0.021 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getPlayerProfile should GET /players/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 10 of 264[32m SUCCESS[39m (0 secs / 0.021 secs)
+WARN: 'Spec 'ProfileService getPlayerProfile should GET /players/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 11 of 264[32m SUCCESS[39m (0 secs / 0.023 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 12 of 264[32m SUCCESS[39m (0 secs / 0.024 secs)
+[1A[2KWARN: [36m'Spec 'ProfileService getVenueOwnerProfile should GET /venue-owners/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 12 of 264[32m SUCCESS[39m (0 secs / 0.024 secs)
+WARN: 'Spec 'ProfileService getVenueOwnerProfile should GET /venue-owners/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 13 of 264[32m SUCCESS[39m (0 secs / 0.025 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 14 of 264[32m SUCCESS[39m (0 secs / 0.025 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 15 of 264[32m SUCCESS[39m (0 secs / 0.052 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 16 of 264[32m SUCCESS[39m (0 secs / 0.054 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 17 of 264[32m SUCCESS[39m (0 secs / 0.055 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 18 of 264[32m SUCCESS[39m (0 secs / 0.056 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 19 of 264[32m SUCCESS[39m (0 secs / 0.057 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 20 of 264[32m SUCCESS[39m (0 secs / 0.057 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 21 of 264[32m SUCCESS[39m (0 secs / 0.058 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 22 of 264[32m SUCCESS[39m (0 secs / 0.059 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 23 of 264[32m SUCCESS[39m (0 secs / 0.06 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 24 of 264[32m SUCCESS[39m (0 secs / 0.061 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 25 of 264[32m SUCCESS[39m (0 secs / 0.062 secs)
+[1A[2KWARN: [36m'Spec 'WalletService getStats should GET /wallet/stats' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 25 of 264[32m SUCCESS[39m (0 secs / 0.062 secs)
+WARN: 'Spec 'WalletService getStats should GET /wallet/stats' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 26 of 264[32m SUCCESS[39m (0 secs / 0.062 secs)
+[1A[2KWARN: [36m'Spec 'WalletService getBalance should GET /wallet/balance' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 26 of 264[32m SUCCESS[39m (0 secs / 0.062 secs)
+WARN: 'Spec 'WalletService getBalance should GET /wallet/balance' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 27 of 264[32m SUCCESS[39m (0 secs / 0.063 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 28 of 264[32m SUCCESS[39m (0 secs / 0.064 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 29 of 264[32m SUCCESS[39m (0 secs / 0.064 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 30 of 264[32m SUCCESS[39m (0 secs / 0.065 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 31 of 264[32m SUCCESS[39m (0 secs / 0.066 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 32 of 264[32m SUCCESS[39m (0 secs / 0.067 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 33 of 264[32m SUCCESS[39m (0 secs / 0.068 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 34 of 264[32m SUCCESS[39m (0 secs / 0.069 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 34 of 264[32m SUCCESS[39m (0 secs / 0.069 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 34 of 264[32m SUCCESS[39m (0 secs / 0.069 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 35 of 264[32m SUCCESS[39m (0 secs / 0.093 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 35 of 264[32m SUCCESS[39m (0 secs / 0.093 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 35 of 264[32m SUCCESS[39m (0 secs / 0.093 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 35 of 264[32m SUCCESS[39m (0 secs / 0.093 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 35 of 264[32m SUCCESS[39m (0 secs / 0.093 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 36 of 264[32m SUCCESS[39m (0 secs / 0.096 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 36 of 264[32m SUCCESS[39m (0 secs / 0.096 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 36 of 264[32m SUCCESS[39m (0 secs / 0.096 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 37 of 264[32m SUCCESS[39m (0 secs / 0.099 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 37 of 264[32m SUCCESS[39m (0 secs / 0.099 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 37 of 264[32m SUCCESS[39m (0 secs / 0.099 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 38 of 264[32m SUCCESS[39m (0 secs / 0.101 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 38 of 264[32m SUCCESS[39m (0 secs / 0.101 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 38 of 264[32m SUCCESS[39m (0 secs / 0.101 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KERROR: [36m'Failed to load pending merch:', Object{status: 403}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 38 of 264[32m SUCCESS[39m (0 secs / 0.101 secs)
+ERROR: 'Failed to load pending merch:', Object{status: 403}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 38 of 264[32m SUCCESS[39m (0 secs / 0.101 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 39 of 264[32m SUCCESS[39m (0 secs / 0.103 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 39 of 264[32m SUCCESS[39m (0 secs / 0.103 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 39 of 264[32m SUCCESS[39m (0 secs / 0.103 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 40 of 264[32m SUCCESS[39m (0 secs / 0.106 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 40 of 264[32m SUCCESS[39m (0 secs / 0.106 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 40 of 264[32m SUCCESS[39m (0 secs / 0.106 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KLOG: [36m'Pending merch response:', [Object{id: 1, name: 'Liverpool Jersey', price: 60, stock: 5, category: 'Jersey', image: 'http://img.com/jersey.jpg', sportType: 'FOOTBALL', status: 'PENDING', sellerName: 'player1', submittedAt: '2026-03-30T10:00:00'}][39m
+Chrome 146.0.0.0 (Windows 10): Executed 40 of 264[32m SUCCESS[39m (0 secs / 0.106 secs)
+LOG: 'Pending merch response:', [Object{id: 1, name: 'Liverpool Jersey', price: 60, stock: 5, category: 'Jersey', image: 'http://img.com/jersey.jpg', sportType: 'FOOTBALL', status: 'PENDING', sellerName: 'player1', submittedAt: '2026-03-30T10:00:00'}]
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 40 of 264[32m SUCCESS[39m (0 secs / 0.106 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 41 of 264[32m SUCCESS[39m (0 secs / 0.108 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 41 of 264[32m SUCCESS[39m (0 secs / 0.108 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 41 of 264[32m SUCCESS[39m (0 secs / 0.108 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 42 of 264[32m SUCCESS[39m (0 secs / 0.111 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 42 of 264[32m SUCCESS[39m (0 secs / 0.111 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 42 of 264[32m SUCCESS[39m (0 secs / 0.111 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 43 of 264[32m SUCCESS[39m (0 secs / 0.112 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 43 of 264[32m SUCCESS[39m (0 secs / 0.112 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 43 of 264[32m SUCCESS[39m (0 secs / 0.112 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 44 of 264[32m SUCCESS[39m (0 secs / 0.113 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 44 of 264[32m SUCCESS[39m (0 secs / 0.113 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 44 of 264[32m SUCCESS[39m (0 secs / 0.113 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 44 of 264[32m SUCCESS[39m (0 secs / 0.113 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 44 of 264[32m SUCCESS[39m (0 secs / 0.113 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 45 of 264[32m SUCCESS[39m (0 secs / 0.115 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 45 of 264[32m SUCCESS[39m (0 secs / 0.115 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 45 of 264[32m SUCCESS[39m (0 secs / 0.115 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 46 of 264[32m SUCCESS[39m (0 secs / 0.117 secs)
+[1A[2KLOG: [36m'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 46 of 264[32m SUCCESS[39m (0 secs / 0.117 secs)
+LOG: 'Pending merch response:', Object{content: [Object{id: ..., name: ..., price: ..., stock: ..., category: ..., image: ..., sportType: ..., status: ..., sellerName: ..., submittedAt: ...}], totalElements: 1, totalPages: 1, currentPage: 0, pageSize: 20}
+[1A[2KLOG: [36m'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 46 of 264[32m SUCCESS[39m (0 secs / 0.117 secs)
+LOG: 'Merch stats:', Object{pending: 1, approved: 1, rejected: 0}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 47 of 264[32m SUCCESS[39m (0 secs / 0.119 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 48 of 264[32m SUCCESS[39m (0 secs / 0.15 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 49 of 264[32m SUCCESS[39m (0 secs / 0.155 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 50 of 264[32m SUCCESS[39m (0 secs / 0.159 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 51 of 264[32m SUCCESS[39m (0 secs / 0.163 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 52 of 264[32m SUCCESS[39m (0 secs / 0.167 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 53 of 264[32m SUCCESS[39m (0 secs / 0.17 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 54 of 264[32m SUCCESS[39m (0 secs / 0.173 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 55 of 264[32m SUCCESS[39m (0 secs / 0.178 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 56 of 264[32m SUCCESS[39m (0 secs / 0.182 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 57 of 264[32m SUCCESS[39m (0 secs / 0.185 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 58 of 264[32m SUCCESS[39m (0 secs / 0.189 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 59 of 264[32m SUCCESS[39m (0 secs / 0.193 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 60 of 264[32m SUCCESS[39m (0 secs / 0.196 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 61 of 264[32m SUCCESS[39m (0 secs / 0.199 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 62 of 264[32m SUCCESS[39m (0 secs / 0.202 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 63 of 264[32m SUCCESS[39m (0 secs / 0.21 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 64 of 264[32m SUCCESS[39m (0 secs / 0.213 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 65 of 264[32m SUCCESS[39m (0 secs / 0.216 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 66 of 264[32m SUCCESS[39m (0 secs / 0.219 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 67 of 264[32m SUCCESS[39m (0 secs / 0.222 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 68 of 264[32m SUCCESS[39m (0 secs / 0.225 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 69 of 264[32m SUCCESS[39m (0 secs / 0.228 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 70 of 264[32m SUCCESS[39m (0 secs / 0.23 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 71 of 264[32m SUCCESS[39m (0 secs / 0.233 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 72 of 264[32m SUCCESS[39m (0 secs / 0.235 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 73 of 264[32m SUCCESS[39m (0 secs / 0.237 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 74 of 264[32m SUCCESS[39m (0 secs / 0.24 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 75 of 264[32m SUCCESS[39m (0 secs / 0.244 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 76 of 264[32m SUCCESS[39m (0 secs / 0.247 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 77 of 264[32m SUCCESS[39m (0 secs / 0.25 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 78 of 264[32m SUCCESS[39m (0 secs / 0.253 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 79 of 264[32m SUCCESS[39m (0 secs / 0.255 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 80 of 264[32m SUCCESS[39m (0 secs / 0.256 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 81 of 264[32m SUCCESS[39m (0 secs / 0.257 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 82 of 264[32m SUCCESS[39m (0 secs / 0.258 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 83 of 264[32m SUCCESS[39m (0 secs / 0.259 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 84 of 264[32m SUCCESS[39m (0 secs / 0.259 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 85 of 264[32m SUCCESS[39m (0 secs / 0.26 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 86 of 264[32m SUCCESS[39m (0 secs / 0.261 secs)
+[1A[2KWARN: [36m'Spec 'AuthService getMyUserId should call coach profile endpoint for ROLE_COACH' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 86 of 264[32m SUCCESS[39m (0 secs / 0.261 secs)
+WARN: 'Spec 'AuthService getMyUserId should call coach profile endpoint for ROLE_COACH' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 87 of 264[32m SUCCESS[39m (0 secs / 0.261 secs)
+[1A[2KWARN: [36m'Spec 'AuthService getMyUserId should call admin profile endpoint for ROLE_ADMIN' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 87 of 264[32m SUCCESS[39m (0 secs / 0.261 secs)
+WARN: 'Spec 'AuthService getMyUserId should call admin profile endpoint for ROLE_ADMIN' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 88 of 264[32m SUCCESS[39m (0 secs / 0.262 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 89 of 264[32m SUCCESS[39m (0 secs / 0.263 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 90 of 264[32m SUCCESS[39m (0 secs / 0.264 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 91 of 264[32m SUCCESS[39m (0 secs / 0.265 secs)
+[1A[2KERROR: [36m'Login API error:', HttpErrorResponse{headers: HttpHeaders{normalizedNames: Map{}, lazyUpdate: null, headers: Map{}}, status: 401, statusText: 'Unauthorized', url: 'http://localhost:8089/SpringSecurity/auth/login', ok: false, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:8089/SpringSecurity/auth/login: 401 Unauthorized', error: 'Unauthorized'}[39m
+Chrome 146.0.0.0 (Windows 10): Executed 91 of 264[32m SUCCESS[39m (0 secs / 0.265 secs)
+ERROR: 'Login API error:', HttpErrorResponse{headers: HttpHeaders{normalizedNames: Map{}, lazyUpdate: null, headers: Map{}}, status: 401, statusText: 'Unauthorized', url: 'http://localhost:8089/SpringSecurity/auth/login', ok: false, name: 'HttpErrorResponse', message: 'Http failure response for http://localhost:8089/SpringSecurity/auth/login: 401 Unauthorized', error: 'Unauthorized'}
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 92 of 264[32m SUCCESS[39m (0 secs / 0.267 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 93 of 264[32m SUCCESS[39m (0 secs / 0.268 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 94 of 264[32m SUCCESS[39m (0 secs / 0.276 secs)
+[1A[2KERROR: [36mError: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at R3Injector.assertNotDestroyed (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:3173:19)
+    at runInInjectionContext (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:3409:18)
+    at selector (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/router/fesm2022/router.mjs:4820:83)
+    at onError (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/catchError.js:10:39)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:23:21)
+    at OperatorSubscriber.error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
+    at onError (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/tap.js:28:28)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:23:21)
+    at OperatorSubscriber.error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:64:30)[39m
+Chrome 146.0.0.0 (Windows 10): Executed 94 of 264[32m SUCCESS[39m (0 secs / 0.276 secs)
+ERROR: Error: NG0205: Injector has already been destroyed.
+Error: NG0205: Injector has already been destroyed.
+    at R3Injector.assertNotDestroyed (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:3173:19)
+    at runInInjectionContext (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:3409:18)
+    at selector (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/router/fesm2022/router.mjs:4820:83)
+    at onError (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/catchError.js:10:39)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:23:21)
+    at OperatorSubscriber.error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
+    at onError (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/tap.js:28:28)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:23:21)
+    at OperatorSubscriber.error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
+    at OperatorSubscriber._error (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:64:30)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 95 of 264[32m SUCCESS[39m (0 secs / 0.277 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 96 of 264[32m SUCCESS[39m (0 secs / 0.277 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 97 of 264[32m SUCCESS[39m (0 secs / 0.278 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 98 of 264[32m SUCCESS[39m (0 secs / 0.279 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 99 of 264[32m SUCCESS[39m (0 secs / 0.28 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 100 of 264[32m SUCCESS[39m (0 secs / 0.28 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 101 of 264[32m SUCCESS[39m (0 secs / 0.28 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 102 of 264[32m SUCCESS[39m (0 secs / 0.281 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 103 of 264[32m SUCCESS[39m (0 secs / 0.281 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 104 of 264[32m SUCCESS[39m (0 secs / 0.282 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 105 of 264[32m SUCCESS[39m (0 secs / 0.283 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 106 of 264[32m SUCCESS[39m (0 secs / 0.284 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 107 of 264[32m SUCCESS[39m (0 secs / 0.285 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 108 of 264[32m SUCCESS[39m (0 secs / 0.286 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 109 of 264[32m SUCCESS[39m (0 secs / 0.286 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 110 of 264[32m SUCCESS[39m (0 secs / 0.287 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 111 of 264[32m SUCCESS[39m (0 secs / 0.3 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 112 of 264[32m SUCCESS[39m (0 secs / 0.303 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 113 of 264[32m SUCCESS[39m (0 secs / 0.304 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 114 of 264[32m SUCCESS[39m (0 secs / 0.306 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 115 of 264[32m SUCCESS[39m (0 secs / 0.308 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 116 of 264[32m SUCCESS[39m (0 secs / 0.31 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 117 of 264[32m SUCCESS[39m (0 secs / 0.312 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 118 of 264[32m SUCCESS[39m (0 secs / 0.313 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 119 of 264[32m SUCCESS[39m (0 secs / 0.315 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 120 of 264[32m SUCCESS[39m (0 secs / 0.316 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 121 of 264[32m SUCCESS[39m (0 secs / 0.317 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 122 of 264[32m SUCCESS[39m (0 secs / 0.318 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 123 of 264[32m SUCCESS[39m (0 secs / 0.319 secs)
+[1A[2K[31mChrome 146.0.0.0 (Windows 10) BackofficeOrdersComponent applyFilter should filter orders by status FAILED[39m
+	Expected $.length = 0 to equal 1.
+	Expected $[0] = undefined to equal Object({ id: 1, status: 'CONFIRMED', user: Object({ id: 101, username: 'John Doe', email: 'john@example.com' }), createdAt: Date(Sun Jan 01 2023 01:00:00 GMT+0100 (Central European Standard Time)), totalAmount: 100, shippingAddress: '123 Main St', phoneNumber: '123-456-7890' }).
+	    at <Jasmine>
+	    at UserContext.apply (src/app/features/backoffice/orders-management.component.spec.ts:188:40)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+	    at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+	    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+Chrome 146.0.0.0 (Windows 10): Executed 124 of 264[31m (1 FAILED)[39m (0 secs / 0.321 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 125 of 264[31m (1 FAILED)[39m (0 secs / 0.323 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 126 of 264[31m (1 FAILED)[39m (0 secs / 0.327 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 127 of 264[31m (1 FAILED)[39m (0 secs / 0.328 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 128 of 264[31m (1 FAILED)[39m (0 secs / 0.329 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 129 of 264[31m (1 FAILED)[39m (0 secs / 0.329 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 130 of 264[31m (1 FAILED)[39m (0 secs / 0.331 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 131 of 264[31m (1 FAILED)[39m (0 secs / 0.35 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 132 of 264[31m (1 FAILED)[39m (0 secs / 0.351 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 133 of 264[31m (1 FAILED)[39m (0 secs / 0.352 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 134 of 264[31m (1 FAILED)[39m (0 secs / 0.353 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 135 of 264[31m (1 FAILED)[39m (0 secs / 0.354 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 136 of 264[31m (1 FAILED)[39m (0 secs / 0.356 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 137 of 264[31m (1 FAILED)[39m (0 secs / 0.357 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 138 of 264[31m (1 FAILED)[39m (0 secs / 0.358 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 139 of 264[31m (1 FAILED)[39m (0 secs / 0.359 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 140 of 264[31m (1 FAILED)[39m (0 secs / 0.36 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 141 of 264[31m (1 FAILED)[39m (0 secs / 0.361 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 142 of 264[31m (1 FAILED)[39m (0 secs / 0.362 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 143 of 264[31m (1 FAILED)[39m (0 secs / 0.363 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 144 of 264[31m (1 FAILED)[39m (0 secs / 0.364 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 145 of 264[31m (1 FAILED)[39m (0 secs / 0.367 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 146 of 264[31m (1 FAILED)[39m (0 secs / 0.368 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 147 of 264[31m (1 FAILED)[39m (0 secs / 0.369 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 148 of 264[31m (1 FAILED)[39m (0 secs / 0.37 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 149 of 264[31m (1 FAILED)[39m (0 secs / 0.371 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 150 of 264[31m (1 FAILED)[39m (0 secs / 0.372 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 151 of 264[31m (1 FAILED)[39m (0 secs / 0.373 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getApprovedPlayerMerchandise should GET /player-merch/approved' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 151 of 264[31m (1 FAILED)[39m (0 secs / 0.373 secs)
+WARN: 'Spec 'ShopService getApprovedPlayerMerchandise should GET /player-merch/approved' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 152 of 264[31m (1 FAILED)[39m (0 secs / 0.374 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getProductReviews should GET /products/:id/reviews' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 152 of 264[31m (1 FAILED)[39m (0 secs / 0.374 secs)
+WARN: 'Spec 'ShopService getProductReviews should GET /products/:id/reviews' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 153 of 264[31m (1 FAILED)[39m (0 secs / 0.374 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 154 of 264[31m (1 FAILED)[39m (0 secs / 0.375 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 155 of 264[31m (1 FAILED)[39m (0 secs / 0.375 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 156 of 264[31m (1 FAILED)[39m (0 secs / 0.376 secs)
+[1A[2KWARN: [36m'Spec 'ShopService adminGetMerchandiseStats should GET /player-merch/admin/stats' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 156 of 264[31m (1 FAILED)[39m (0 secs / 0.376 secs)
+WARN: 'Spec 'ShopService adminGetMerchandiseStats should GET /player-merch/admin/stats' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 157 of 264[31m (1 FAILED)[39m (0 secs / 0.376 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getLowStockProducts should GET /products/low-stock' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 157 of 264[31m (1 FAILED)[39m (0 secs / 0.376 secs)
+WARN: 'Spec 'ShopService getLowStockProducts should GET /products/low-stock' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 158 of 264[31m (1 FAILED)[39m (0 secs / 0.377 secs)
+[1A[2KWARN: [36m'Spec 'ShopService adminGetAllOrders should GET /orders/admin/all' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 158 of 264[31m (1 FAILED)[39m (0 secs / 0.377 secs)
+WARN: 'Spec 'ShopService adminGetAllOrders should GET /orders/admin/all' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 159 of 264[31m (1 FAILED)[39m (0 secs / 0.377 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 160 of 264[31m (1 FAILED)[39m (0 secs / 0.378 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getOrder should GET /orders/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 160 of 264[31m (1 FAILED)[39m (0 secs / 0.378 secs)
+WARN: 'Spec 'ShopService getOrder should GET /orders/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 161 of 264[31m (1 FAILED)[39m (0 secs / 0.378 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 162 of 264[31m (1 FAILED)[39m (0 secs / 0.379 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 163 of 264[31m (1 FAILED)[39m (0 secs / 0.38 secs)
+[1A[2KWARN: [36m'Spec 'ShopService searchProducts without params should GET /products/search' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 163 of 264[31m (1 FAILED)[39m (0 secs / 0.38 secs)
+WARN: 'Spec 'ShopService searchProducts without params should GET /products/search' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 164 of 264[31m (1 FAILED)[39m (0 secs / 0.38 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 165 of 264[31m (1 FAILED)[39m (0 secs / 0.381 secs)
+[1A[2KWARN: [36m'Spec 'ShopService adminGetOrdersByStatus should GET /orders/admin/status/:status' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 165 of 264[31m (1 FAILED)[39m (0 secs / 0.381 secs)
+WARN: 'Spec 'ShopService adminGetOrdersByStatus should GET /orders/admin/status/:status' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 166 of 264[31m (1 FAILED)[39m (0 secs / 0.381 secs)
+[1A[2KWARN: [36m'Spec 'ShopService adminGetStats should GET /orders/admin/stats' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 166 of 264[31m (1 FAILED)[39m (0 secs / 0.381 secs)
+WARN: 'Spec 'ShopService adminGetStats should GET /orders/admin/stats' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 167 of 264[31m (1 FAILED)[39m (0 secs / 0.382 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 168 of 264[31m (1 FAILED)[39m (0 secs / 0.382 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 169 of 264[31m (1 FAILED)[39m (0 secs / 0.383 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 170 of 264[31m (1 FAILED)[39m (0 secs / 0.383 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 171 of 264[31m (1 FAILED)[39m (0 secs / 0.384 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 172 of 264[31m (1 FAILED)[39m (0 secs / 0.384 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 173 of 264[31m (1 FAILED)[39m (0 secs / 0.385 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 174 of 264[31m (1 FAILED)[39m (0 secs / 0.385 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getMySubmissions should GET /player-merch/my-submissions' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 174 of 264[31m (1 FAILED)[39m (0 secs / 0.385 secs)
+WARN: 'Spec 'ShopService getMySubmissions should GET /player-merch/my-submissions' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 175 of 264[31m (1 FAILED)[39m (0 secs / 0.386 secs)
+[1A[2KLOG: [36m'API response:', [][39m
+Chrome 146.0.0.0 (Windows 10): Executed 175 of 264[31m (1 FAILED)[39m (0 secs / 0.386 secs)
+LOG: 'API response:', []
+[1A[2KWARN: [36m'Spec 'ShopService getAllProducts should GET /products' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 175 of 264[31m (1 FAILED)[39m (0 secs / 0.386 secs)
+WARN: 'Spec 'ShopService getAllProducts should GET /products' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 176 of 264[31m (1 FAILED)[39m (0 secs / 0.387 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getMyOrders should GET /orders/my-orders' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 176 of 264[31m (1 FAILED)[39m (0 secs / 0.387 secs)
+WARN: 'Spec 'ShopService getMyOrders should GET /orders/my-orders' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 177 of 264[31m (1 FAILED)[39m (0 secs / 0.387 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 178 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 179 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getProduct should GET /products/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 179 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+WARN: 'Spec 'ShopService getProduct should GET /products/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 180 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 181 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 182 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 183 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+[1A[2KWARN: [36m'Spec 'ShopService getMyCart should GET /cart' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 183 of 264[31m (1 FAILED)[39m (0 secs / 0.388 secs)
+WARN: 'Spec 'ShopService getMyCart should GET /cart' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 184 of 264[31m (1 FAILED)[39m (0 secs / 0.389 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 185 of 264[31m (1 FAILED)[39m (0 secs / 0.389 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 186 of 264[31m (1 FAILED)[39m (0 secs / 0.39 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 187 of 264[31m (1 FAILED)[39m (0 secs / 0.39 secs)
+[1A[2KWARN: [36m'Spec 'ShopService adminGetPendingMerchandise should GET /player-merch/admin/pending' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 187 of 264[31m (1 FAILED)[39m (0 secs / 0.39 secs)
+WARN: 'Spec 'ShopService adminGetPendingMerchandise should GET /player-merch/admin/pending' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 188 of 264[31m (1 FAILED)[39m (0 secs / 0.391 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 189 of 264[31m (1 FAILED)[39m (0 secs / 0.391 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 190 of 264[31m (1 FAILED)[39m (0 secs / 0.399 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 191 of 264[31m (1 FAILED)[39m (0 secs / 0.432 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 192 of 264[31m (1 FAILED)[39m (0 secs / 0.434 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 193 of 264[31m (1 FAILED)[39m (0 secs / 0.435 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 194 of 264[31m (1 FAILED)[39m (0 secs / 0.436 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 195 of 264[31m (1 FAILED)[39m (0 secs / 0.437 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 196 of 264[31m (1 FAILED)[39m (0 secs / 0.438 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 197 of 264[31m (1 FAILED)[39m (0 secs / 0.44 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 198 of 264[31m (1 FAILED)[39m (0 secs / 0.442 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 199 of 264[31m (1 FAILED)[39m (0 secs / 0.444 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 200 of 264[31m (1 FAILED)[39m (0 secs / 0.446 secs)
+[1A[2KLOG: [36m'[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 200 of 264[31m (1 FAILED)[39m (0 secs / 0.446 secs)
+LOG: '[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 201 of 264[31m (1 FAILED)[39m (0 secs / 0.449 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 202 of 264[31m (1 FAILED)[39m (0 secs / 0.451 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 203 of 264[31m (1 FAILED)[39m (0 secs / 0.452 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 204 of 264[31m (1 FAILED)[39m (0 secs / 0.454 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 205 of 264[31m (1 FAILED)[39m (0 secs / 0.455 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 206 of 264[31m (1 FAILED)[39m (0 secs / 0.457 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 207 of 264[31m (1 FAILED)[39m (0 secs / 0.458 secs)
+[1A[2KLOG: [36m'[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 207 of 264[31m (1 FAILED)[39m (0 secs / 0.458 secs)
+LOG: '[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 208 of 264[31m (1 FAILED)[39m (0 secs / 0.46 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 209 of 264[31m (1 FAILED)[39m (0 secs / 0.462 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 210 of 264[31m (1 FAILED)[39m (0 secs / 0.463 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 211 of 264[31m (1 FAILED)[39m (0 secs / 0.464 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 212 of 264[31m (1 FAILED)[39m (0 secs / 0.465 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 213 of 264[31m (1 FAILED)[39m (0 secs / 0.467 secs)
+[1A[2KLOG: [36m'[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 213 of 264[31m (1 FAILED)[39m (0 secs / 0.467 secs)
+LOG: '[submitSponsorship] payload:', '{"amount":500,"startDate":"2026-03-01","endDate":"2026-03-10","team":{"id":1}}'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 214 of 264[31m (1 FAILED)[39m (0 secs / 0.47 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 215 of 264[31m (1 FAILED)[39m (0 secs / 0.472 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 216 of 264[31m (1 FAILED)[39m (0 secs / 0.473 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 217 of 264[31m (1 FAILED)[39m (0 secs / 0.474 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 218 of 264[31m (1 FAILED)[39m (0 secs / 0.491 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 219 of 264[31m (1 FAILED)[39m (0 secs / 0.503 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 220 of 264[31m (1 FAILED)[39m (0 secs / 0.508 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 221 of 264[31m (1 FAILED)[39m (0 secs / 0.513 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 222 of 264[31m (1 FAILED)[39m (0 secs / 0.516 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 223 of 264[31m (1 FAILED)[39m (0 secs / 0.519 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 224 of 264[31m (1 FAILED)[39m (0 secs / 0.523 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 225 of 264[31m (1 FAILED)[39m (0 secs / 0.526 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 226 of 264[31m (1 FAILED)[39m (0 secs / 0.529 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 227 of 264[31m (1 FAILED)[39m (0 secs / 0.532 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 228 of 264[31m (1 FAILED)[39m (0 secs / 0.535 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 229 of 264[31m (1 FAILED)[39m (0 secs / 0.538 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 230 of 264[31m (1 FAILED)[39m (0 secs / 0.542 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 231 of 264[31m (1 FAILED)[39m (0 secs / 0.546 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getSponsorshipsByVenue should GET /sponsorships/venue/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 231 of 264[31m (1 FAILED)[39m (0 secs / 0.546 secs)
+WARN: 'Spec 'SponsorService getSponsorshipsByVenue should GET /sponsorships/venue/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 232 of 264[31m (1 FAILED)[39m (0 secs / 0.547 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 233 of 264[31m (1 FAILED)[39m (0 secs / 0.547 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 234 of 264[31m (1 FAILED)[39m (0 secs / 0.548 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getAllSponsorships should GET /sponsorships/admin/all' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 234 of 264[31m (1 FAILED)[39m (0 secs / 0.548 secs)
+WARN: 'Spec 'SponsorService getAllSponsorships should GET /sponsorships/admin/all' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 235 of 264[31m (1 FAILED)[39m (0 secs / 0.549 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService cancelSponsorship should DELETE /sponsorships/:id/cancel' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 235 of 264[31m (1 FAILED)[39m (0 secs / 0.549 secs)
+WARN: 'Spec 'SponsorService cancelSponsorship should DELETE /sponsorships/:id/cancel' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 236 of 264[31m (1 FAILED)[39m (0 secs / 0.55 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 237 of 264[31m (1 FAILED)[39m (0 secs / 0.55 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 238 of 264[31m (1 FAILED)[39m (0 secs / 0.551 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getSponsorshipsByEvent should GET /sponsorships/event/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 238 of 264[31m (1 FAILED)[39m (0 secs / 0.551 secs)
+WARN: 'Spec 'SponsorService getSponsorshipsByEvent should GET /sponsorships/event/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 239 of 264[31m (1 FAILED)[39m (0 secs / 0.552 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService deleteSponsor should DELETE /sponsors/admin/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 239 of 264[31m (1 FAILED)[39m (0 secs / 0.552 secs)
+WARN: 'Spec 'SponsorService deleteSponsor should DELETE /sponsors/admin/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 240 of 264[31m (1 FAILED)[39m (0 secs / 0.554 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getAdminStats should GET /sponsorships/admin/stats' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 240 of 264[31m (1 FAILED)[39m (0 secs / 0.554 secs)
+WARN: 'Spec 'SponsorService getAdminStats should GET /sponsorships/admin/stats' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 241 of 264[31m (1 FAILED)[39m (0 secs / 0.555 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService deleteSponsorship should DELETE /sponsorships/admin/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 241 of 264[31m (1 FAILED)[39m (0 secs / 0.555 secs)
+WARN: 'Spec 'SponsorService deleteSponsorship should DELETE /sponsorships/admin/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 242 of 264[31m (1 FAILED)[39m (0 secs / 0.557 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getPendingSponsorships should GET /sponsorships/pending' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 242 of 264[31m (1 FAILED)[39m (0 secs / 0.557 secs)
+WARN: 'Spec 'SponsorService getPendingSponsorships should GET /sponsorships/pending' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 243 of 264[31m (1 FAILED)[39m (0 secs / 0.558 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getSponsorship should GET /sponsorships/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 243 of 264[31m (1 FAILED)[39m (0 secs / 0.558 secs)
+WARN: 'Spec 'SponsorService getSponsorship should GET /sponsorships/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 244 of 264[31m (1 FAILED)[39m (0 secs / 0.559 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getAllSponsors should GET /sponsors' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 244 of 264[31m (1 FAILED)[39m (0 secs / 0.559 secs)
+WARN: 'Spec 'SponsorService getAllSponsors should GET /sponsors' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 245 of 264[31m (1 FAILED)[39m (0 secs / 0.56 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getAvailableTargets should GET /sponsorships/available-targets' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 245 of 264[31m (1 FAILED)[39m (0 secs / 0.56 secs)
+WARN: 'Spec 'SponsorService getAvailableTargets should GET /sponsorships/available-targets' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 246 of 264[31m (1 FAILED)[39m (0 secs / 0.561 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getSponsorshipsByTeam should GET /sponsorships/team/:id' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 246 of 264[31m (1 FAILED)[39m (0 secs / 0.561 secs)
+WARN: 'Spec 'SponsorService getSponsorshipsByTeam should GET /sponsorships/team/:id' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 247 of 264[31m (1 FAILED)[39m (0 secs / 0.561 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 248 of 264[31m (1 FAILED)[39m (0 secs / 0.563 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getMyProfile should GET /sponsors/my-profile' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 248 of 264[31m (1 FAILED)[39m (0 secs / 0.563 secs)
+WARN: 'Spec 'SponsorService getMyProfile should GET /sponsors/my-profile' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 249 of 264[31m (1 FAILED)[39m (0 secs / 0.564 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 250 of 264[31m (1 FAILED)[39m (0 secs / 0.565 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 251 of 264[31m (1 FAILED)[39m (0 secs / 0.566 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 252 of 264[31m (1 FAILED)[39m (0 secs / 0.568 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 253 of 264[31m (1 FAILED)[39m (0 secs / 0.568 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getMySponsorships should GET /sponsorships/my-sponsorships' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 253 of 264[31m (1 FAILED)[39m (0 secs / 0.568 secs)
+WARN: 'Spec 'SponsorService getMySponsorships should GET /sponsorships/my-sponsorships' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 254 of 264[31m (1 FAILED)[39m (0 secs / 0.569 secs)
+[1A[2KWARN: [36m'Spec 'SponsorService getActiveSponsorships should GET /sponsorships/active' has no expectations.'[39m
+Chrome 146.0.0.0 (Windows 10): Executed 254 of 264[31m (1 FAILED)[39m (0 secs / 0.569 secs)
+WARN: 'Spec 'SponsorService getActiveSponsorships should GET /sponsorships/active' has no expectations.'
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 255 of 264[31m (1 FAILED)[39m (0 secs / 0.57 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 256 of 264[31m (1 FAILED)[39m (0 secs / 0.571 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 257 of 264[31m (1 FAILED)[39m (0 secs / 0.571 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 258 of 264[31m (1 FAILED)[39m (0 secs / 0.572 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 259 of 264[31m (1 FAILED)[39m (0 secs / 0.572 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 260 of 264[31m (1 FAILED)[39m (0 secs / 0.574 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 261 of 264[31m (1 FAILED)[39m (0 secs / 0.575 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 262 of 264[31m (1 FAILED)[39m (0 secs / 0.576 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 263 of 264[31m (1 FAILED)[39m (0 secs / 0.577 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 264 of 264[31m (1 FAILED)[39m (0 secs / 0.577 secs)
+[1A[2KChrome 146.0.0.0 (Windows 10): Executed 264 of 264[31m (1 FAILED)[39m (1.947 secs / 0.577 secs)
+[31mTOTAL: 1 FAILED, 263 SUCCESS[39m
+√ Browser application bundle generation complete.
+
+=============================== Coverage summary ===============================
+Statements   : 86.27% ( 786/911 )
+Branches     : 63.63% ( 147/231 )
+Functions    : 88.58% ( 295/333 )
+Lines        : 89.84% ( 681/758 )
+================================================================================
+√ Browser application bundle generation complete.

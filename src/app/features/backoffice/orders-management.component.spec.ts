@@ -224,6 +224,12 @@ describe('BackofficeOrdersComponent', () => {
       expect(mockShopService.adminUpdateOrderStatus).toHaveBeenCalledWith(1, 'CONFIRMED');
       expect(mockToastService.error).toHaveBeenCalledWith('Failed to update status');
     });
+
+    it('should return early when newStatus is empty string', () => {
+      component.orders = [...mockOrders];
+      component.onStatusChange(mockOrders[0], '' as any);
+      expect(mockShopService.adminUpdateOrderStatus).not.toHaveBeenCalled();
+    });
   });
 
   describe('deleteOrder', () => {

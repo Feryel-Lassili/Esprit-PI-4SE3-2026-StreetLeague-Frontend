@@ -261,9 +261,10 @@ export class BackofficeOrdersComponent implements OnInit {
   }
 
   applyFilter() {
-    this.filteredOrders = this.filterStatus
+    const source = this.filterStatus
       ? this.orders.filter(o => o.status === this.filterStatus)
       : [...this.orders];
+    this.filteredOrders = source.map(o => ({ ...o }));
   }
 
   onStatusChange(order: Order, newStatus: OrderStatus) {
@@ -272,6 +273,10 @@ export class BackofficeOrdersComponent implements OnInit {
     this.shopService.adminUpdateOrderStatus(order.id, newStatus).subscribe({
       next: updated => {
         order.status = updated.status;
+        this.orders = this.orders.map(o =>
+          o.id === order.id ? { ...o, status: updated.status } : { ...o }
+        );
+        this.applyFilter();
         this.updatingId = null;
         this.toast.success(`Order #${order.id} → ${newStatus}`);
         this.loadStats();

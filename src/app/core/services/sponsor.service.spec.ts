@@ -109,4 +109,52 @@ describe('SponsorService', () => {
     service.getAllSponsorships().subscribe();
     http.expectOne(`${BASE}/sponsorships/admin/all`).flush([]);
   });
+
+  it('updateProfile should PUT /sponsors/update', () => {
+    service.updateProfile({ companyName: 'Acme', budget: 5000 }).subscribe();
+    const req = http.expectOne(`${BASE}/sponsors/update`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+  });
+
+  it('getSponsorship should GET /sponsorships/:id', () => {
+    service.getSponsorship(1).subscribe();
+    http.expectOne(`${BASE}/sponsorships/1`).flush({});
+  });
+
+  it('getSponsorshipsByTeam should GET /sponsorships/team/:id', () => {
+    service.getSponsorshipsByTeam(1).subscribe();
+    http.expectOne(`${BASE}/sponsorships/team/1`).flush([]);
+  });
+
+  it('getSponsorshipsByEvent should GET /sponsorships/event/:id', () => {
+    service.getSponsorshipsByEvent(1).subscribe();
+    http.expectOne(`${BASE}/sponsorships/event/1`).flush([]);
+  });
+
+  it('getSponsorshipsByVenue should GET /sponsorships/venue/:id', () => {
+    service.getSponsorshipsByVenue(1).subscribe();
+    http.expectOne(`${BASE}/sponsorships/venue/1`).flush([]);
+  });
+
+  it('renewSponsorship should PUT /sponsorships/:id/renew', () => {
+    service.renewSponsorship(1, 3).subscribe();
+    const req = http.expectOne(`${BASE}/sponsorships/1/renew?months=3`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+  });
+
+  it('uploadPaymentProof should POST /sponsorships/:id/payment-proof', () => {
+    service.uploadPaymentProof(1, 'http://proof.com/doc.pdf').subscribe();
+    const req = http.expectOne(`${BASE}/sponsorships/1/payment-proof?proofUrl=http://proof.com/doc.pdf`);
+    expect(req.request.method).toBe('POST');
+    req.flush({});
+  });
+
+  it('updateSponsorship should PUT /sponsorships/admin/:id', () => {
+    service.updateSponsorship(1, { amount: 1000 }).subscribe();
+    const req = http.expectOne(`${BASE}/sponsorships/admin/1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+  });
 });

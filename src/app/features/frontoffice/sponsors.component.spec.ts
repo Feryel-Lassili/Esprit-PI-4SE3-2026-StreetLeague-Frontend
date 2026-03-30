@@ -284,4 +284,196 @@ describe('FrontofficeSponsorsComponent', () => {
     expect(comp.sponsorForm.get('amount')!.value).toBeNull();
     expect(comp.paymentProofFile).toBeNull();
   });
+
+  // --- submitSponsorship target types ---
+  it('should submit with correct EVENT payload', async () => {
+    const comp = await setup(true);
+    sponsorSvc.submitSponsorship.and.returnValue(of({ ...mockSponsorship, id: 11 }));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.sponsorForm.patchValue({ targetId: '2|EVENT', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
+    comp.submitSponsorship();
+    const payload = (sponsorSvc.submitSponsorship.calls.mostRecent().args as any)[0];
+    expect(payload.event).toEqual({ id: 2 });
+  });
+
+  it('should submit with correct VENUE payload', async () => {
+    const comp = await setup(true);
+    sponsorSvc.submitSponsorship.and.returnValue(of({ ...mockSponsorship, id: 12 }));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.sponsorForm.patchValue({ targetId: '3|VENUE', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
+    comp.submitSponsorship();
+    const payload = (sponsorSvc.submitSponsorship.calls.mostRecent().args as any)[0];
+    expect(payload.venue).toEqual({ id: 3 });
+  });
+
+  it('should submit with correct TOURNAMENT payload', async () => {
+    const comp = await setup(true);
+    sponsorSvc.submitSponsorship.and.returnValue(of({ ...mockSponsorship, id: 13 }));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.sponsorForm.patchValue({ targetId: '4|TOURNAMENT', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
+    comp.submitSponsorship();
+    const payload = (sponsorSvc.submitSponsorship.calls.mostRecent().args as any)[0];
+    expect(payload.tournament).toEqual({ id: 4 });
+  });
+
+  it('should include description and benefits when provided', async () => {
+    const comp = await setup(true);
+    sponsorSvc.submitSponsorship.and.returnValue(of({ ...mockSponsorship, id: 14 }));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.sponsorForm.patchValue({ targetId: '1|TEAM', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10', description: 'Great deal', benefits: ['LOGO_PLACEMENT'] });
+    comp.submitSponsorship();
+    const payload = (sponsorSvc.submitSponsorship.calls.mostRecent().args as any)[0];
+    expect(payload.description).toBe('Great deal');
+    expect(payload.expectedBenefits).toEqual(['LOGO_PLACEMENT']);
+  });
+
+  it('should handle upload proof error non-blocking', async () => {
+    const comp = await setup(true);
+    const created = { ...mockSponsorship, id: 15 };
+    sponsorSvc.submitSponsorship.and.returnValue(of(created));
+    sponsorSvc.uploadPaymentProofFile.and.returnValue(throwError(() => new Error('upload fail')));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.sponsorForm.patchValue({ targetId: '1|TEAM', amount: 500, startDate: '2026-03-01', endDate: '2026-03-10' });
+    comp.paymentProofFile = new File(['data'], 'proof.pdf');
+    comp.submitSponsorship();
+    expect(comp.showSponsorshipForm).toBeFalse();
+  });
+
+  // --- cancelSponsorship ---
+  it('should cancel sponsorship after confirm', async () => {
+    const comp = await setup(true);
+    spyOn(window, 'confirm').and.returnValue(true);
+    sponsorSvc.cancelSponsorship.and.returnValue(of(undefined));
+    sponsorSvc.getMySponsorships.and.returnValue(of([]));
+    comp.cancelSponsorship(7);
+    expect(sponsorSvc.cancelSponsorship).toHaveBeenCalledWith(7);
+  });
+
+  it('should not cancel when confirm is dismissed', async () => {
+    const comp = await setup(true);
+    spyOn(window, 'confirm').and.returnValue(false);
+    comp.cancelSponsorship(7);
+    expect(sponsorSvc.cancelSponsorship).not.toHaveBeenCalled();
+  });
+
+  it('should set error on cancel failure', async () => {
+    const comp = await setup(true);
+    spyOn(window, 'confirm').and.returnValue(true);
+    sponsorSvc.cancelSponsorship.and.returnValue(throwError(() => new Error('fail')));
+    comp.cancelSponsorship(7);
+    expect(comp.error).toBe('Failed to cancel');
+  });
+
+  // --- loadSponsors error ---
+  it('should set error on loadSponsors failure', async () => {
+    sponsorSvc = makeSponsorSvc();
+    sponsorSvc.getAllSponsors.and.returnValue(throwError(() => new Error('fail')));
+    authSvc = makeAuthSvc();
+    await TestBed.configureTestingModule({
+      imports: [FrontofficeSponsorsComponent, ReactiveFormsModule, CommonModule],
+      providers: [
+        { provide: SponsorService, useValue: sponsorSvc },
+        { provide: AuthService, useValue: authSvc }
+      ]
+    }).compileComponents();
+    const fixture = TestBed.createComponent(FrontofficeSponsorsComponent);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.error).toBe('Failed to load sponsors');
+  });
+
+  // --- loadMySponsorships ---
+  it('should load my sponsorships', async () => {
+    const comp = await setup(true);
+    sponsorSvc.getMySponsorships.and.returnValue(of([mockSponsorship]));
+    comp.loadMySponsorships();
+    expect(comp.mySponsorships.length).toBe(1);
+  });
+
+  it('should handle non-array my sponsorships response', async () => {
+    const comp = await setup(true);
+    sponsorSvc.getMySponsorships.and.returnValue(of(null as any));
+    comp.loadMySponsorships();
+    expect(comp.mySponsorships).toEqual([]);
+  });
+
+  it('should set error on loadMySponsorships failure', async () => {
+    const comp = await setup(true);
+    sponsorSvc.getMySponsorships.and.returnValue(throwError(() => new Error('fail')));
+    comp.loadMySponsorships();
+    expect(comp.error).toBe('Failed to load sponsorships');
+  });
+
+  // --- loadPendingSponsorships error ---
+  it('should clear pending on loadPendingSponsorships failure', async () => {
+    const comp = await setup(false, true);
+    sponsorSvc.getPendingSponsorships.and.returnValue(throwError(() => new Error('fail')));
+    comp.loadPendingSponsorships();
+    expect(comp.pendingSponsorships).toEqual([]);
+  });
+
+  // --- loadAvailableTargets ---
+  it('should handle array response for available targets', async () => {
+    const comp = await setup(true);
+    sponsorSvc.getAvailableTargets.and.returnValue(of([{ id: 1, name: 'Team A', type: 'TEAM' }] as any));
+    comp.loadAvailableTargets();
+    expect(comp.availableTargets.length).toBe(1);
+  });
+
+  it('should handle error for available targets', async () => {
+    const comp = await setup(true);
+    sponsorSvc.getAvailableTargets.and.returnValue(throwError(() => new Error('fail')));
+    comp.loadAvailableTargets();
+    expect(comp.availableTargets).toEqual([]);
+  });
+
+  // --- getLogoSrc extra branches ---
+  it('getLogoSrc should return data:image as-is', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('data:image/png;base64,abc')).toBe('data:image/png;base64,abc');
+  });
+
+  it('getLogoSrc should prefix localhost: with http://', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('localhost:8080/img.png')).toBe('http://localhost:8080/img.png');
+  });
+
+  it('getLogoSrc should expand lhost: shorthand', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('lhost:8080/img.png')).toBe('http://localhost:8080/img.png');
+  });
+
+  it('getLogoSrc should prefix /SpringSecurity/ path with apiOrigin', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('/SpringSecurity/uploads/logo.png')).toContain('/SpringSecurity/uploads/logo.png');
+  });
+
+  it('getLogoSrc should prefix / path with apiOrigin', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('/some/logo.png')).toContain('/some/logo.png');
+  });
+
+  it('getLogoSrc should fallback to apiBaseUrl for plain filename', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('logo.png')).toContain('logo.png');
+  });
+
+  it('getLogoSrc should return empty for emoji', async () => {
+    const comp = await setup();
+    expect(comp.getLogoSrc('🏢')).toBe('');
+  });
+
+  // --- approve/reject error ---
+  it('should set error on approveSponsorship failure', async () => {
+    const comp = await setup(false, true);
+    sponsorSvc.approveSponsorship.and.returnValue(throwError(() => new Error('fail')));
+    comp.approveSponsorship(7);
+    expect(comp.error).toBe('Failed to approve');
+  });
+
+  it('should set error on rejectSponsorship failure', async () => {
+    const comp = await setup(false, true);
+    sponsorSvc.rejectSponsorship.and.returnValue(throwError(() => new Error('fail')));
+    comp.rejectSponsorship(7);
+    expect(comp.error).toBe('Failed to reject');
+  });
 });
