@@ -15,7 +15,7 @@ describe('PredictionService', () => {
 
   const mockDto: PredictionDto = {
     virtualTeamId: 1, captainPlayerId: 10,
-    players: [{ playerId: 10, playerName: 'John Doe', playerPosition: 'FWD', playerRating: 8 }]
+    players: [{ playerId: 10, playerName: 'John Doe', playerPosition: 'FWD', playerRating: 8, predictGoal: true }]
   };
 
   beforeEach(() => {

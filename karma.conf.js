@@ -1,5 +1,10 @@
-const puppeteer = require('puppeteer');
-process.env.CHROME_BIN = puppeteer.executablePath();
+let puppeteer;
+try {
+  puppeteer = require('puppeteer');
+  process.env.CHROME_BIN = puppeteer.executablePath();
+} catch (err) {
+  console.warn('Puppeteer not found, attempting to use system Chrome');
+}
 
 module.exports = function (config) {
   config.set({
@@ -22,6 +27,10 @@ module.exports = function (config) {
       reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
     reporters: ['progress', 'kjhtml'],
+    port: 9876,
+    colors: true,
+    logLevel: config.LOG_INFO,
+    autoWatch: true,
     browsers: ['ChromeHeadless'],
     customLaunchers: {
       ChromeHeadless: {
@@ -31,8 +40,13 @@ module.exports = function (config) {
           '--headless',
           '--disable-gpu',
           '--disable-translate',
-          '--disable-extensions'
+          '--disable-extensions',
+          '--disable-dev-shm-usage'
         ]
+      },
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-dev-shm-usage']
       }
     },
     restartOnFileChange: true
