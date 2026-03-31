@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -45,7 +45,7 @@ import { AuthService } from '../../core/services/auth.service';
       <aside class="sidebar" [class.collapsed]="!sidebarOpen">
 
         <div class="sidebar-header">
-          <div class="logo-box"><span>S</span></div>
+          <div class="logo-box"><img src="logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>
           <span class="logo-text" *ngIf="sidebarOpen">StreetLeague</span>
           <button class="toggle-btn" (click)="sidebarOpen = !sidebarOpen">☰</button>
         </div>
@@ -56,7 +56,8 @@ import { AuthService } from '../../core/services/auth.service';
             <a class="nav-item"
               *ngFor="let item of section.items"
               [routerLink]="item.path"
-              [class.active]="isActive(item.path, item.exact)">
+              [class.active]="currentPath === item.path"
+              (click)="currentPath = item.path">
               <span class="nav-icon">{{ item.icon }}</span>
               <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
             </a>
@@ -92,50 +93,45 @@ import { AuthService } from '../../core/services/auth.service';
     </div>
   `
 })
-export class FrontofficeComponent {
+export class FrontofficeComponent implements OnInit {
   sidebarOpen = true;
+  currentPath = '/home';
+  isPlayer = false;
 
-  get menu() {
-    const role = this.authService.getUserRole()?.replace('ROLE_', '') || '';
-    const isVenueOwner = role === 'VENUE_OWNER';
-
-    type MenuItem = { path: string; label: string; icon: string; exact: boolean };
-    const sections: { section: string; items: MenuItem[] }[] = [
-      {
-        section: 'Main',
-        items: [
-          { path: '/home',   label: 'Home',    icon: '🏠', exact: true },
-          { path: '/teams',  label: 'Teams',   icon: '🏆', exact: false },
-          { path: '/venues', label: 'Venues',  icon: '🏟️', exact: false },
-          { path: '/profile', label: 'Profile', icon: '👤', exact: false },
-        ]
-      }
-    ];
-
-    if (isVenueOwner) {
-      sections.push({
-        section: 'My Venue',
-        items: [
-          { path: '/venue/my-venues',       label: 'My Venues',        icon: '🏟️', exact: false },
-          { path: '/venue/reservations',    label: 'My Reservations',  icon: '📅', exact: false },
-          { path: '/venue/create',          label: 'Create Venue',     icon: '➕', exact: true },
-        ]
-      });
-    }
-
-    sections.push({
-      section: 'Carpooling',
+  menu = [
+    {
+      section: 'Main',
       items: [
-        { path: '/carpooling',           label: 'Browse Trips', icon: '🛣️', exact: true },
-        { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕', exact: true },
-        { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗', exact: false },
-        { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒', exact: false },
-        { path: '/cars',                 label: 'My Cars',      icon: '🔧', exact: false },
+        { path: '/home',    label: 'Home',      icon: '🏠' },
+        { path: '/explore', label: 'Explore',   icon: '🔍' },
       ]
-    });
-
-    return sections;
-  }
+    },
+    {
+      section: 'Sports',
+      items: [
+        { path: '/teams',   label: 'Teams',     icon: '👥' },
+        { path: '/venues',  label: 'Venues',    icon: '📍' },
+        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
+      ]
+    },
+    {
+      section: 'Social',
+      items: [
+        { path: '/community', label: 'Community', icon: '💬' },
+        { path: '/sponsors', label: 'Sponsors', icon: '💰' },
+        { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
+      ]
+    },
+    {
+      section: 'More',
+      items: [
+        { path: '/shop',    label: 'Shop',      icon: '🛍️' },
+        { path: '/wallet',  label: 'Wallet',    icon: '💳' },
+        { path: '/profile', label: 'Profile',   icon: '👤' },
+        { path: '/health', label: 'Health', icon: '🏥' },
+      ]
+    }
+  ];
 
   get userEmail(): string {
     return this.authService.getCurrentUser()?.email || 'user@street.com';
@@ -150,18 +146,23 @@ export class FrontofficeComponent {
   }
 
   getTitle(): string {
-    const url = this.router.url.split('?')[0];
     const all = this.menu.flatMap(s => s.items);
-    const match = all.filter(i => url.startsWith(i.path)).sort((a, b) => b.path.length - a.path.length)[0];
-    return match?.label || 'Home';
+    return all.find(i => i.path === this.currentPath)?.label || 'Home';
   }
 
-  isActive(path: string, exact: boolean): boolean {
-    const url = this.router.url.split('?')[0];
-    return exact ? url === path : url.startsWith(path);
+  constructor(private authService: AuthService, private router: Router) {
+    this.currentPath = this.router.url || '/home';
   }
 
-  constructor(private authService: AuthService, private router: Router) {}
+  ngOnInit() {
+    this.isPlayer = this.authService.hasRole('PLAYER');
+    if (this.isPlayer) {
+      const moreSection = this.menu.find(s => s.section === 'More');
+      if (moreSection) {
+        moreSection.items.push({ path: '/my-merchandise', label: 'My Merch', icon: '🏅' });
+      }
+    }
+  }
 
   logout() { this.authService.logout(); }
-}
+}

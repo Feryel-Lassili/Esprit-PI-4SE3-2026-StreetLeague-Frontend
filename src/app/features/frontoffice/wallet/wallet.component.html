@@ -1,0 +1,278 @@
+<div class="wallet-root">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">💳 Digital Wallet</h1>
+      <p class="page-sub">Manage your points, payments &amp; transfers</p>
+    </div>
+    <div class="role-badge-wrap">
+      <span class="role-chip">{{ incomeIcon }} {{ roleLabel }}</span>
+      <span class="balance-chip">{{ wallet?.points ?? 0 }} pts</span>
+    </div>
+  </div>
+
+  <!-- ── Role description banner (non-player) ── -->
+  <div *ngIf="!isPlayer() && roleDescription" class="role-banner">
+    <span class="role-banner__icon">ℹ️</span>
+    <p class="role-banner__text">{{ roleDescription }}</p>
+  </div>
+
+  <!-- ── Alerts ── -->
+  <div *ngIf="error"   class="alert alert-error">⚠ {{ error }}</div>
+  <div *ngIf="success" class="alert alert-ok">✓ {{ success }}</div>
+
+  <div class="grid-root">
+
+    <!-- ══════════════════════════════
+         COL 1 — Balance + Actions
+    ══════════════════════════════ -->
+    <div class="col col-left">
+
+      <!-- Balance Card -->
+      <div class="balance-card">
+        <div class="balance-card__label">Available Balance</div>
+        <div class="balance-card__amount">
+          <span *ngIf="!loading">{{ wallet?.points ?? 0 }}</span>
+          <span *ngIf="loading" class="skeleton">——</span>
+          <span class="balance-card__unit">pts</span>
+        </div>
+        <div class="balance-card__actions">
+          <button class="btn-card" (click)="activeTab='deposit'">⬆ Add Funds</button>
+          <button class="btn-card btn-card--outline" (click)="activeTab='transfer'">🔄 Send</button>
+        </div>
+      </div>
+
+      <!-- This Month Stats -->
+      <div class="stats-card">
+        <h3 class="card-title">This Month</h3>
+        <div class="stats-list">
+          <div class="stat-row">
+            <div class="stat-dot stat-dot--green"></div>
+            <div class="stat-info">
+              <span class="stat-value green">{{ monthDeposits }}</span>
+              <span class="stat-label">Deposits</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-dot stat-dot--red"></div>
+            <div class="stat-info">
+              <span class="stat-value red">{{ monthExpenses }}</span>
+              <span class="stat-label">Expenses</span>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-dot stat-dot--blue"></div>
+            <div class="stat-info">
+              <span class="stat-value blue">{{ monthTransfers }}</span>
+              <span class="stat-label">Transfers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Recharge (Player + Sponsor only) -->
+      <div *ngIf="isPlayer() || isSponsor()" class="recharge-card">
+        <h3 class="recharge-title">⚡ Quick Recharge</h3>
+        <div class="recharge-presets">
+          <button *ngFor="let p of presets" class="preset-btn"
+            [class.active]="depositAmount === p"
+            (click)="depositAmount = p">{{ p }}</button>
+        </div>
+        <input type="number" [(ngModel)]="depositAmount"
+          name="depositAmount" placeholder="Custom amount"
+          class="recharge-input" min="1" />
+        <button class="recharge-btn" (click)="deposit()"
+          [disabled]="actionLoading || !depositAmount">
+          {{ actionLoading && activeTab==='deposit' ? 'Processing…' : 'Add to Wallet' }}
+        </button>
+      </div>
+
+      <!-- Income card (non-player roles) -->
+      <div *ngIf="!isPlayer() && !isSponsor()" class="income-card">
+        <h3 class="income-title">{{ incomeIcon }} Received Income</h3>
+        <div class="income-stats">
+          <div class="income-stat">
+            <span class="income-val green">+{{ incomeStats.received }}</span>
+            <span class="income-label">Total Received (pts)</span>
+          </div>
+          <div class="income-stat">
+            <span class="income-val">{{ incomeStats.count }}</span>
+            <span class="income-label">Transactions</span>
+          </div>
+        </div>
+        <p class="income-note">
+          <span *ngIf="isCoach()">      💡 Training fees from your players are credited here automatically.</span>
+          <span *ngIf="isReferee()">    💡 Honoraires are credited after each validated match.</span>
+          <span *ngIf="isHealthPro()">  💡 Platform rewards for validated recommendations appear here.</span>
+          <span *ngIf="isVenueOwner()"> 💡 Booking revenue from your venues is credited automatically.</span>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════
+         COL 2 — Transactions
+    ══════════════════════════════ -->
+    <div class="col col-center">
+
+      <!-- Tx header + filters -->
+      <div class="tx-header">
+        <h3 class="card-title">Recent Transactions</h3>
+        <div class="tx-filters">
+          <button *ngFor="let f of txFilters" class="filter-btn"
+            [class.active]="txFilter === f"
+            (click)="setFilter(f)">{{ f }}</button>
+        </div>
+      </div>
+
+      <!-- Tx list -->
+      <div class="tx-list">
+        <div *ngIf="loading" class="empty-state">Loading…</div>
+        <div *ngIf="!loading && filteredTx.length === 0" class="empty-state">
+          <div style="font-size:32px; margin-bottom:8px;">📭</div>
+          No transactions yet
+        </div>
+        <div *ngFor="let tx of filteredTx" class="tx-row">
+          <div class="tx-icon" [class]="'tx-icon--' + txColor(tx)">{{ txEmoji(tx) }}</div>
+          <div class="tx-body">
+            <p class="tx-name">{{ txLabel(tx) }}</p>
+            <p class="tx-time">{{ tx.date | date:'d MMM, h:mm a' }}</p>
+          </div>
+          <div class="tx-right">
+            <span class="tx-amount" [class.green]="tx.amount > 0" [class.red]="tx.amount < 0">
+              {{ tx.amount > 0 ? '+' : '' }}{{ tx.amount }}
+            </span>
+            <span class="tx-badge" [class]="'tx-badge--' + txColor(tx)">
+              {{ tx.earnedPoints > 0 ? '+' : '' }}{{ tx.earnedPoints }} pts
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action panel -->
+      <div class="action-panel">
+        <div class="action-tabs">
+          <button class="action-tab" [class.active]="activeTab==='withdraw'"
+            (click)="activeTab='withdraw'">Withdraw</button>
+          <button class="action-tab" [class.active]="activeTab==='transfer'"
+            (click)="activeTab='transfer'">Transfer</button>
+          <button *ngIf="isPlayer() || isSponsor()"
+            class="action-tab" [class.active]="activeTab==='deposit'"
+            (click)="activeTab='deposit'">Deposit</button>
+        </div>
+
+        <!-- Withdraw -->
+        <div *ngIf="activeTab==='withdraw'" class="action-body">
+          <label class="action-label">Amount to withdraw</label>
+          <input type="number" [(ngModel)]="withdrawAmount" name="withdrawAmount"
+            placeholder="Enter amount" class="action-input" min="1" />
+          <label class="action-label" style="margin-top:8px;">Description (optional)</label>
+          <input type="text" [(ngModel)]="withdrawDescription" name="withdrawDescription"
+            placeholder="e.g. ATM withdrawal" class="action-input" />
+          <button class="action-btn action-btn--black" (click)="withdraw()"
+            [disabled]="actionLoading || !withdrawAmount">
+            {{ actionLoading ? 'Processing…' : 'Withdraw Points' }}
+          </button>
+        </div>
+
+        <!-- Transfer -->
+        <div *ngIf="activeTab==='transfer'" class="action-body">
+          <label class="action-label">Recipient User ID</label>
+          <input type="number" [(ngModel)]="transferUserId" name="transferUserId"
+            placeholder="User ID" class="action-input" min="1" />
+          <label class="action-label" style="margin-top:8px;">Amount</label>
+          <input type="number" [(ngModel)]="transferAmount" name="transferAmount"
+            placeholder="Amount" class="action-input" min="1" />
+          <label class="action-label" style="margin-top:8px;">Description (optional)</label>
+          <input type="text" [(ngModel)]="transferDescription" name="transferDescription"
+            placeholder="e.g. Payment for services" class="action-input" />
+          <button class="action-btn action-btn--gray" (click)="transfer()"
+            [disabled]="actionLoading || !transferAmount || !transferUserId">
+            {{ actionLoading ? 'Processing…' : 'Send Points' }}
+          </button>
+        </div>
+
+        <!-- Deposit -->
+        <div *ngIf="activeTab==='deposit' && (isPlayer() || isSponsor())" class="action-body">
+          <label class="action-label">Amount to deposit</label>
+          <input type="number" [(ngModel)]="depositAmount" name="depositAmountPanel"
+            placeholder="Enter amount" class="action-input" min="1" />
+          <button class="action-btn action-btn--black" (click)="deposit()"
+            [disabled]="actionLoading || !depositAmount">
+            {{ actionLoading ? 'Processing…' : 'Add Funds' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         COL 3 — Insights + Info
+    ══════════════════════════════ -->
+    <div class="col col-right">
+
+      <!-- Spending Insights (Player) -->
+      <div *ngIf="isPlayer()" class="insights-card">
+        <h3 class="card-title">📊 Spending Insights</h3>
+        <div class="insights-list">
+          <div *ngFor="let s of insights" class="insight-row">
+            <div class="insight-top">
+              <span class="insight-label">{{ s.label }}</span>
+              <span class="insight-pct">{{ s.pct }}%</span>
+            </div>
+            <div class="insight-bar-bg">
+              <div class="insight-bar" [style.width.%]="s.pct"
+                [class]="'insight-bar--' + s.color"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sponsor budget info -->
+      <div *ngIf="isSponsor()" class="insights-card">
+        <h3 class="card-title">💰 Budget Overview</h3>
+        <div class="insights-list">
+          <div class="insight-row">
+            <div class="insight-top">
+              <span class="insight-label">Tournaments Sponsored</span>
+              <span class="insight-pct">60%</span>
+            </div>
+            <div class="insight-bar-bg">
+              <div class="insight-bar insight-bar--black" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="insight-row">
+            <div class="insight-top">
+              <span class="insight-label">Teams Supported</span>
+              <span class="insight-pct">40%</span>
+            </div>
+            <div class="insight-bar-bg">
+              <div class="insight-bar insight-bar--gray" style="width:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How Points Work -->
+      <div class="points-info-card">
+        <h3 class="card-title">💡 How Points Work</h3>
+        <ul class="points-rules">
+          <li><span class="rule-icon">➕</span><span>Earn <strong>1 pt</strong> per 10 units deposited</span></li>
+          <li><span class="rule-icon">🛒</span><span>Earn <strong>1% loyalty points</strong> on every shop purchase</span></li>
+          <li><span class="rule-icon">🏟️</span><span>Use points to book <strong>venues</strong></span></li>
+          <li><span class="rule-icon">🛍️</span><span>Spend in the <strong>shop</strong></span></li>
+          <li><span class="rule-icon">🏆</span><span>Pay <strong>events &amp; tournaments</strong></span></li>
+          <li><span class="rule-icon">🔄</span><span><strong>Transfer</strong> points to teammates</span></li>
+          <li><span class="rule-icon">↩️</span><span>Cancelled orders are <strong>refunded</strong> automatically</span></li>
+          <li *ngIf="isPlayer()">    <span class="rule-icon">🏅</span><span>Earn <strong>90% revenue</strong> when your merch sells</span></li>
+          <li *ngIf="isCoach()">      <span class="rule-icon">🏋️</span><span>Receive <strong>training fees</strong> from players</span></li>
+          <li *ngIf="isReferee()">    <span class="rule-icon">🟡</span><span>Receive <strong>honoraires</strong> per match</span></li>
+          <li *ngIf="isHealthPro()">  <span class="rule-icon">🩺</span><span>Earn <strong>platform rewards</strong> per recommendation</span></li>
+          <li *ngIf="isVenueOwner()"> <span class="rule-icon">🏟️</span><span>Earn from <strong>venue bookings</strong></span></li>
+          <li *ngIf="isSponsor()">    <span class="rule-icon">💰</span><span>Inject <strong>budget</strong> to sponsor events</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>

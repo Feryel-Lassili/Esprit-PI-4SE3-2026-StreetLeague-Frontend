@@ -6,6 +6,8 @@ import { authGuard } from '../../core/guards/auth.guard';
 import { roleGuard } from '../../core/guards/role.guard';
 import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
+import { FrontofficeShopComponent } from './shop.component';
+import { PlayerMerchandiseComponent } from './player-merchandise.component';
 
 const routes: Routes = [
   {
@@ -16,7 +18,11 @@ const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
       { path: 'profile', component: ProfileComponent },
+
+      // Teams
       { path: 'teams', loadComponent: () => import('./teams/teams.component').then(m => m.FrontofficeTeamsComponent) },
+
+      // Venues (player)
       { path: 'venues', loadComponent: () => import('./venues/venues.component').then(m => m.FrontofficeVenuesComponent) },
 
       // Venue Owner routes
@@ -75,14 +81,29 @@ const routes: Routes = [
         children: [
           { path: '', loadComponent: () => import('./carpooling/components/my-cars/my-cars.component').then(m => m.MyCarsComponent) }
         ]
-      }
+      },
+
+      // Shop & Merchandise
+      { path: 'shop', component: FrontofficeShopComponent },
+      { path: 'my-merchandise', component: PlayerMerchandiseComponent },
+
+      // Sponsors
+      { path: 'sponsors', loadComponent: () => import('./sponsors.component').then(m => m.FrontofficeSponsorsComponent) },
+
+      // Health
+      { path: 'health', loadChildren: () => import('./health/health.module').then(m => m.HealthModule) },
+
+      // Wallet
+      { path: 'wallet', loadChildren: () => import('./wallet/wallet.module').then(m => m.WalletModule) }
     ]
   }
 ];
 
 @NgModule({
   declarations: [
-    ProfileComponent
+    ProfileComponent,
+    FrontofficeShopComponent,
+    PlayerMerchandiseComponent
   ],
   imports: [
     CommonModule,
