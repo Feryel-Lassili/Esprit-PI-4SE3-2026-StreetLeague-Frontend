@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { VirtualTeamService, SportType } from '../../core/services/virtual-team.service';
+import { AuthService } from '../../core/services/auth.service';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 interface Player {
@@ -621,7 +622,8 @@ function tennisSlots(): Slot[] {
     </button>
     <button class="nav-btn" [class.active]="viewMode==='prediction'" (click)="viewMode='prediction'">
       🎯 Prediction
-      <span class="nav-badge" *ngIf="currentPrediction">1</span>
+      <span class="nav-badge" *ngIf="predStatusMap[predSport]==='PENDING'">⏳</span>
+      <span class="nav-badge green" *ngIf="newResultBanner">!</span>
     </button>
     <div class="nav-pts">
       <span class="nav-pts-icon">💰</span>
@@ -1025,10 +1027,25 @@ function tennisSlots(): Slot[] {
 
         <!-- ═══ PENDING ═══ -->
         <ng-container *ngIf="currentPrediction && currentPrediction.status==='PENDING'">
+
+          <!-- "New result" banner (appears after refresh detects RESOLVED) -->
+          <div *ngIf="newResultBanner" style="background:linear-gradient(135deg,#1d7a3d,#34c759);color:white;border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <span style="font-size:28px">🏆</span>
+            <div>
+              <div style="font-size:14px;font-weight:800;">Your results are ready!</div>
+              <div style="font-size:12px;opacity:.85;">Scroll down to see the breakdown</div>
+            </div>
+          </div>
+
           <div class="pw-card">
             <div class="pw-icon">⏳</div>
             <div class="pw-title">Prediction locked in!</div>
-            <div class="pw-sub">Week {{ currentPrediction.weekNumber }} / {{ currentPrediction.weekYear }} · Results appear at the start of next week</div>
+            <div class="pw-sub">Week {{ currentPrediction.weekNumber }} / {{ currentPrediction.weekYear }} · Waiting for admin to resolve</div>
+            <button (click)="doRefreshPred()" [disabled]="refreshingPred"
+              style="background:#f0f6ff;border:2px solid #bee3f8;color:#0066cc;border-radius:12px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;transition:opacity .15s;"
+              [style.opacity]="refreshingPred ? '.6' : '1'">
+              {{ refreshingPred ? '⏳ Checking…' : '🔄 Check for results' }}
+            </button>
             <div style="font-size:12px;color:#aeaeb2;">Your picks this week:</div>
             <div class="pw-chips">
               <div *ngFor="let pp of currentPrediction.playerPredictions" class="pw-chip" [class.no-pred]="!pp.predictGoal && !pp.isCaptain">
@@ -1042,37 +1059,6 @@ function tennisSlots(): Slot[] {
             </div>
           </div>
 
-          <!-- Simulate panel -->
-          <div class="sim-panel">
-            <div class="sim-header">
-              <span class="sim-title">🧪 Simulate match results (test)</span>
-              <button class="sim-toggle" (click)="showTestPanel=!showTestPanel">{{ showTestPanel?'▲ Hide':'▼ Show' }}</button>
-            </div>
-            <ng-container *ngIf="showTestPanel">
-              <div *ngFor="let pp of currentPrediction.playerPredictions" class="sim-row">
-                <span style="font-size:16px">{{ avatarForPosition(pp.playerPosition) }}</span>
-                <div class="sim-name">{{ pp.playerName }}<span *ngIf="pp.isCaptain"> 👑</span><span *ngIf="pp.predictGoal" style="color:#34c759;font-size:10px"> ✓</span></div>
-                <ng-container *ngIf="predSport==='FOOTBALL'">
-                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="5" [(ngModel)]="testStats[pp.playerId].goals"><span class="stat-label">⚽ goals</span></div>
-                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].yellow"><span class="stat-label">🟡</span></div>
-                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].red"><span class="stat-label">🔴</span></div>
-                </ng-container>
-                <ng-container *ngIf="predSport==='BASKETBALL'">
-                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="60" [(ngModel)]="testStats[pp.playerId].bpts"><span class="stat-label">🏀 pts</span></div>
-                </ng-container>
-                <ng-container *ngIf="predSport==='TENNIS'">
-                  <button class="win-toggle" [class.yes]="testStats[pp.playerId].win"
-                          (click)="testStats[pp.playerId].win=!testStats[pp.playerId].win">
-                    {{ testStats[pp.playerId].win ? '🎾 Win' : '🎾 Loss' }}
-                  </button>
-                </ng-container>
-              </div>
-              <button class="resolve-btn" [disabled]="resolveState==='loading'" (click)="saveAndResolve()">
-                <span *ngIf="resolveState!=='loading'">⚡ Resolve Now</span>
-                <span *ngIf="resolveState==='loading'">Resolving…</span>
-              </button>
-            </ng-container>
-          </div>
         </ng-container>
 
           <!-- History in pending phase -->
@@ -1108,6 +1094,18 @@ function tennisSlots(): Slot[] {
 
         <!-- ═══ RESOLVED ═══ -->
         <ng-container *ngIf="currentPrediction && currentPrediction.status==='RESOLVED'">
+
+          <!-- Notification banner when results just came in -->
+          <div *ngIf="newResultBanner" style="background:linear-gradient(135deg,#1d7a3d,#34c759);color:white;border-radius:16px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:28px">🎉</span>
+              <div>
+                <div style="font-size:14px;font-weight:800;">Admin resolved your prediction!</div>
+                <div style="font-size:12px;opacity:.85;">Your Week {{ currentPrediction.weekNumber }} results are below</div>
+              </div>
+            </div>
+            <button (click)="newResultBanner=false" style="background:rgba(255,255,255,.25);border:none;color:white;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;">✕</button>
+          </div>
 
           <div class="res-hero"
                [class.win]="currentPrediction.totalPointsEarned > 0"
@@ -1162,9 +1160,15 @@ function tennisSlots(): Slot[] {
           </div>
 
           <!-- New Prediction button -->
-          <button class="new-pred-btn" (click)="startNewPrediction()">
-            ➕ New Prediction for Next Week
-          </button>
+          <div style="background:white;border:1px solid #e8e8ed;border-radius:20px;padding:20px 24px;margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#1d1d1f;">Ready for the next week?</div>
+              <div style="font-size:12px;color:#aeaeb2;margin-top:2px;">Pick your captain and predict who will score / win</div>
+            </div>
+            <button class="new-pred-btn" style="width:auto;padding:12px 28px;margin-top:0;" (click)="startNewPrediction()">
+              ➕ Add New Prediction
+            </button>
+          </div>
 
           <!-- History accordion -->
           <div class="hist-section" *ngIf="pastPredictions.length > 0">
@@ -1172,7 +1176,7 @@ function tennisSlots(): Slot[] {
               📜 Past Predictions ({{ pastPredictions.length }})
               <span>{{ showHistory ? '▲' : '▼' }}</span>
             </button>
-            <div *ngIf="showHistory" class="hist-list">
+            <div *ngIf="showHistory || newResultBanner" class="hist-list">
               <div *ngFor="let h of pastPredictions" class="hist-card"
                    [class.hwin]="h.totalPointsEarned > 0"
                    [class.hloss]="h.totalPointsEarned < 0"
@@ -1240,11 +1244,14 @@ export class FrontofficeFantasyComponent implements OnInit {
   resolveState   = 'idle';
   testStats: Record<number, { goals: number; yellow: number; red: number; bpts: number; win: boolean }> = {};
   teamName = '';
+  refreshingPred = false;
+  newResultBanner = false;
 
-  // ── Budget: 200 pts shared pool. Decreases when buying, increases when selling ──
+  // ── Budget: starts at 200, increases with prediction earnings (persisted via VirtualTeam.earnedPoints) ──
   userPoints = 200;
+  private baseUserPoints = 200; // never changes — the starting grant
 
-  private readonly currentUserId = 1;
+  private get currentUserId(): number { return (this.authService.getCurrentUser() as any)?.id ?? 0; }
   private readonly BASE = 'http://localhost:8089/SpringSecurity';
 
   // ── Players ─────────────────────────────────────────────────────────────────
@@ -1292,7 +1299,7 @@ export class FrontofficeFantasyComponent implements OnInit {
     TENNIS:     ['P1'],
   };
 
-  constructor(private http: HttpClient, private teamService: VirtualTeamService) {}
+  constructor(private http: HttpClient, private teamService: VirtualTeamService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadAllSportPlayers();
@@ -1434,6 +1441,10 @@ export class FrontofficeFantasyComponent implements OnInit {
   loadAllMyTeams(): void {
     this.teamService.getTeamsByUser(this.currentUserId).subscribe({
       next: (teams) => {
+        // Sum all earned prediction points across teams and add to base budget
+        const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
+        this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
+
         const sports = [...new Set(teams.map((t: any) => t.sportType as Sport))];
         sports.forEach((sport: Sport) => {
           // Use already-fetched allPlayersMap once available; poll until ready
@@ -1509,6 +1520,7 @@ export class FrontofficeFantasyComponent implements OnInit {
     this.currentPrediction      = null;
     this.predHistory            = [];
     this.showHistory            = false;
+    this.newResultBanner        = false;
     const dbId = this.savedTeams[sport]?.dbId;
     if (dbId) this.loadCurrentPrediction(dbId, sport);
   }
@@ -1610,27 +1622,23 @@ export class FrontofficeFantasyComponent implements OnInit {
   loadCurrentPrediction(teamId: number, sport?: string): void {
     this.http.get<PredictionResult>(`${this.BASE}/predictions/current/${teamId}`).subscribe({
       next: (p) => {
-        this.currentPrediction = p;
-        this.initTestStats(p);
-        if (sport) this.predStatusMap[sport] = p.status;
+        if (p && p.id) {
+          // Real current-week prediction (PENDING or RESOLVED)
+          this.currentPrediction = p;
+          this.initTestStats(p);
+          if (sport) this.predStatusMap[sport] = p.status;
+        } else {
+          // Server returned null (no prediction this week) → show setup form
+          this.currentPrediction = null;
+          if (sport) this.predStatusMap[sport] = '';
+        }
         this.loadPredictionHistory(teamId);
       },
       error: () => {
-        // No current-week prediction — fall back to most recent from history
-        this.http.get<PredictionResult[]>(`${this.BASE}/predictions/history/${teamId}`).subscribe({
-          next: (list) => {
-            this.predHistory = list ?? [];
-            const latest = list?.[0] ?? null;
-            if (latest) {
-              this.currentPrediction = latest;
-              this.initTestStats(latest);
-              if (sport) this.predStatusMap[sport] = latest.status;
-            } else {
-              this.currentPrediction = null;
-            }
-          },
-          error: () => { this.currentPrediction = null; }
-        });
+        // No prediction this week → show setup form
+        this.currentPrediction = null;
+        if (sport) this.predStatusMap[sport] = '';
+        this.loadPredictionHistory(teamId);
       }
     });
   }
@@ -1691,6 +1699,41 @@ export class FrontofficeFantasyComponent implements OnInit {
     this.showTestPanel                 = false;
     this.resolveState                  = 'idle';
     this.predState                     = 'idle';
+    this.newResultBanner               = false;
+  }
+
+  doRefreshPred(): void {
+    const dbId = this.savedTeams[this.predSport]?.dbId;
+    if (!dbId) return;
+    this.refreshingPred = true;
+    this.http.get<PredictionResult>(`${this.BASE}/predictions/current/${dbId}`).subscribe({
+      next: (p) => {
+        this.refreshingPred = false;
+        // Guard: if server returns null/empty, do NOT wipe out the current pending state
+        if (!p) return;
+        const wasJustResolved = this.currentPrediction?.status === 'PENDING' && p.status === 'RESOLVED';
+        this.currentPrediction = p;
+        this.predStatusMap[this.predSport] = p.status;
+        if (wasJustResolved) {
+          const pts = p.totalPointsEarned;
+          this.newResultBanner = true;
+          this.showToast(
+            pts > 0 ? `🏆 Results are in! +${pts.toFixed(1)} pts added to your budget!`
+            : pts < 0 ? `😤 Results are in. ${pts.toFixed(1)} pts from your budget`
+            : '😐 Results are in. No points gained or lost',
+            pts >= 0 ? 'success' : 'error'
+          );
+          this.teamService.getTeamsByUser(this.currentUserId).subscribe({
+            next: (teams) => {
+              const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
+              this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
+            }
+          });
+          this.loadPredictionHistory(dbId);
+        }
+      },
+      error: () => { this.refreshingPred = false; }
+    });
   }
 
   // ── Admin: save stats then resolve ───────────────────────────────────────────
@@ -1728,11 +1771,16 @@ export class FrontofficeFantasyComponent implements OnInit {
         if (resolved) {
           this.currentPrediction = resolved;
           this.predStatusMap[this.predSport] = resolved.status;
-          // Auto-apply earned/lost points to user balance
+          // Reload earned pts from server (authoritative)
           const pts = resolved.totalPointsEarned ?? 0;
-          this.userPoints = Math.round((this.userPoints + pts) * 10) / 10;
-          if (pts > 0) this.showToast(`🏆 +${pts.toFixed(1)} pts added to your balance!`, 'success');
-          else if (pts < 0) this.showToast(`😤 ${pts.toFixed(1)} pts deducted from your balance`, 'error');
+          this.teamService.getTeamsByUser(this.currentUserId).subscribe({
+            next: (teams) => {
+              const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
+              this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
+            }
+          });
+          if (pts > 0) this.showToast(`🏆 +${pts.toFixed(1)} pts added to your budget!`, 'success');
+          else if (pts < 0) this.showToast(`😤 ${pts.toFixed(1)} pts deducted from your budget`, 'error');
           else this.showToast('😐 No points gained or lost this week', 'success');
           // Reload history so new entry appears
           const dbId = this.savedTeams[this.predSport]?.dbId;

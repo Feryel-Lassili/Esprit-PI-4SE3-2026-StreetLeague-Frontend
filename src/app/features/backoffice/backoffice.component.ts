@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { PredictionService, PredictionResponse } from '../../core/services/prediction.service';
 import { BackofficeShopComponent } from './shop-management.component';
 import { BackofficeOrdersComponent } from './orders-management.component';
 import { BackofficeSponsorComponent } from './sponsor-management.component';
@@ -23,7 +25,7 @@ interface WalletAdmin {
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
+    imports: [CommonModule, FormsModule, RouterOutlet, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -199,7 +201,7 @@ interface WalletAdmin {
             <div class="nav-section" *ngIf="sidebarOpen">{{ section.section }}</div>
             <button class="nav-item" *ngFor="let item of section.items"
               [class.active]="currentScreen === item.id"
-              (click)="currentScreen = item.id">
+              (click)="navigate(item)">
               <span class="nav-icon">{{ item.icon }}</span>
               <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
             </button>
@@ -401,26 +403,103 @@ interface WalletAdmin {
 
           <!-- FANTASY -->
           <div *ngIf="currentScreen === 'fantasy'">
-            <div class="grid-4" style="margin-bottom:24px;">
-              <div class="card" *ngFor="let s of fantasyStats">
-                <div class="stat-label">{{ s.label }}</div>
-                <div class="stat-value">{{ s.value }}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <div>
+                <div style="font-size:18px; font-weight:600; color:#1d1d1f;">🎮 Fantasy Predictions</div>
+                <div style="font-size:13px; color:#6e6e73; margin-top:4px;">Enter match stats and resolve pending predictions</div>
               </div>
+              <button class="action-btn" (click)="fpLoaded=false; loadFantasyPredictions()">🔄 Refresh</button>
             </div>
-            <div class="card">
-              <div class="card-title">Active leagues</div>
-              <table class="table">
-                <thead><tr><th>League</th><th>Players</th><th>Prize</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                  <tr *ngFor="let l of fantasyLeagues">
-                    <td style="font-weight:500;">{{ l.name }}</td>
-                    <td>{{ l.players }}</td>
-                    <td>{{ l.prize }} TND</td>
-                    <td><span class="pill" [class.pill-green]="l.status==='Active'" [class.pill-yellow]="l.status==='Upcoming'">{{ l.status }}</span></td>
-                    <td><button class="action-btn">Manage</button></td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <div *ngIf="fantasyError" class="w-alert w-alert-error" style="margin-bottom:16px;">⚠ {{ fantasyError }}</div>
+
+            <div *ngIf="fantasyLoading" style="text-align:center; padding:40px; color:#aeaeb2; font-size:13px;">Loading predictions…</div>
+
+            <div *ngIf="!fantasyLoading && fantasyPredictions.length === 0" style="text-align:center; padding:60px; color:#aeaeb2;">
+              <div style="font-size:32px; margin-bottom:12px;">✅</div>
+              <div style="font-size:15px; font-weight:500; color:#1d1d1f;">No pending predictions</div>
+              <div style="font-size:13px; margin-top:4px;">All predictions have been resolved</div>
+            </div>
+
+            <div *ngFor="let pred of fantasyPredictions" class="card" style="margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div style="font-size:15px; font-weight:600; color:#1d1d1f;">Team #{{ pred.virtualTeamId }} — Week {{ pred.weekNumber }}/{{ pred.weekYear }}</div>
+                  <div style="font-size:12px; color:#6e6e73; margin-top:4px;">
+                    {{ pred.playerPredictions.length }} players · Captain #{{ pred.captainPlayerId }} · Created {{ pred.createdAt }}
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+                  <span class="pill pill-yellow">PENDING</span>
+                  <button class="action-btn" (click)="toggleFP(pred.id)">
+                    {{ expandedFP === pred.id ? 'Collapse ▲' : 'Manage ▼' }}
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="expandedFP === pred.id" style="margin-top:16px; border-top:1px solid #f5f5f7; padding-top:16px;">
+                <table class="table" style="margin-bottom:12px;">
+                  <thead>
+                    <tr>
+                      <th>Player</th><th>Pos</th><th>Cap</th><th>Predicted</th><th>Stats to Enter</th><th>Points Preview</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let pp of pred.playerPredictions">
+                      <td style="font-weight:500;">{{ pp.playerName }}</td>
+                      <td><span class="pill pill-blue">{{ pp.playerPosition }}</span></td>
+                      <td style="text-align:center;">{{ pp.isCaptain ? '⭐' : '' }}</td>
+                      <td style="color:#6e6e73; font-size:12px;">{{ pp.predictGoal ? '✓ Goal/Win' : '— None' }}</td>
+                      <td>
+                        <div *ngIf="sportOf(pp.playerPosition) === 'football'" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                          <label style="font-size:11px; color:#6e6e73;">⚽</label>
+                          <input type="number" min="0" style="width:48px; border:1px solid #e0e0e5; border-radius:6px; padding:4px 6px; font-size:12px;" [(ngModel)]="getStatInput(pred.id, pp.playerId).goalsScored" />
+                          <label style="font-size:11px; color:#6e6e73;">🟡</label>
+                          <input type="number" min="0" style="width:40px; border:1px solid #e0e0e5; border-radius:6px; padding:4px 6px; font-size:12px;" [(ngModel)]="getStatInput(pred.id, pp.playerId).yellowCards" />
+                          <label style="font-size:11px; color:#6e6e73;">🔴</label>
+                          <input type="number" min="0" style="width:40px; border:1px solid #e0e0e5; border-radius:6px; padding:4px 6px; font-size:12px;" [(ngModel)]="getStatInput(pred.id, pp.playerId).redCards" />
+                        </div>
+                        <div *ngIf="sportOf(pp.playerPosition) === 'basketball'" style="display:flex; gap:8px; align-items:center;">
+                          <label style="font-size:11px; color:#6e6e73;">🏀 Pts</label>
+                          <input type="number" min="0" style="width:60px; border:1px solid #e0e0e5; border-radius:6px; padding:4px 6px; font-size:12px;" [(ngModel)]="getStatInput(pred.id, pp.playerId).basketballPoints" />
+                        </div>
+                        <div *ngIf="sportOf(pp.playerPosition) === 'tennis'" style="display:flex; gap:8px; align-items:center;">
+                          <label style="font-size:11px; color:#6e6e73;">🎾 Won?</label>
+                          <input type="checkbox" [(ngModel)]="getStatInput(pred.id, pp.playerId).tennisWin" style="width:16px; height:16px; cursor:pointer;" />
+                        </div>
+                      </td>
+                      <td>
+                        <ng-container *ngIf="calcPoints(pp, getStatInput(pred.id, pp.playerId)) as calc">
+                          <div style="display:flex; flex-direction:column; gap:2px;">
+                            <span style="font-size:14px; font-weight:700;" [style.color]="calc.color">
+                              {{ calc.points >= 0 ? '+' : '' }}{{ calc.points }} pts
+                            </span>
+                            <span style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;" [style.color]="calc.color">
+                              {{ calc.result }}
+                            </span>
+                          </div>
+                        </ng-container>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Total preview bar -->
+                <div style="background:#f5f5f7; border-radius:10px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                  <span style="font-size:13px; color:#6e6e73; font-weight:500;">Total points this week</span>
+                  <span style="font-size:20px; font-weight:700;"
+                    [style.color]="calcTotal(pred) >= 0 ? '#2e7d32' : '#c62828'">
+                    {{ calcTotal(pred) >= 0 ? '+' : '' }}{{ (calcTotal(pred) | number:'1.0-2') }} pts
+                  </span>
+                </div>
+
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                  <button class="btn-ghost" (click)="expandedFP = null">Cancel</button>
+                  <button class="btn-primary" [disabled]="resolvingFP === pred.id" (click)="resolveFantasyPrediction(pred)">
+                    {{ resolvingFP === pred.id ? 'Resolving…' : '✓ Confirm & Resolve' }}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -662,6 +741,9 @@ interface WalletAdmin {
           </div>
           <!-- END WALLET ADMIN -->
 
+          <!-- VENUE MANAGEMENT / CARPOOLING MANAGEMENT (router-outlet) -->
+          <router-outlet *ngIf="currentScreen === 'venue-management' || currentScreen === 'carpooling-management'"></router-outlet>
+
         </div>
       </main>
     </div>
@@ -705,7 +787,6 @@ export class BackofficeComponent implements OnInit {
       section: 'Management',
       items: [
         { id: 'users', label: 'Users & Teams', icon: '👥' },
-        { id: 'venues', label: 'Venues', icon: '📍' },
         { id: 'orders', label: 'Orders', icon: '📦' },
         { id: 'merchandise', label: 'Player Merch', icon: '🏅' },
         { id: 'health', label: 'Health', icon: '🏥' },
@@ -720,8 +801,14 @@ export class BackofficeComponent implements OnInit {
         { id: 'fantasy', label: 'Fantasy Game', icon: '🎮' },
         { id: 'community', label: 'Community (AI)', icon: '💬' },
       ]
+    },
+    {
+      section: 'Modules',
+      items: [
+        { id: 'venue-management',     label: 'Venue Management',     icon: '🏟️', route: '/backoffice/venue-management' },
+        { id: 'carpooling-management', label: 'Carpooling Management', icon: '🚗', route: '/backoffice/carpooling-management' },
+      ]
     }
-    
   ];
 
   allocatorMenu = [
@@ -731,10 +818,21 @@ export class BackofficeComponent implements OnInit {
     ]}
   ];
 
+  // ── Fantasy admin state ───────────────────────────────────
+  fantasyPredictions: PredictionResponse[] = [];
+  fantasyLoading = false;
+  fantasyError = '';
+  expandedFP: number | null = null;
+  resolvingFP: number | null = null;
+  private fpStatInputs: { [predId: number]: { [playerId: number]: any } } = {};
+  fpLoaded = false;
+
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     public authService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private predictionService: PredictionService
   ) {}
 
   ngOnInit() {
@@ -749,6 +847,13 @@ export class BackofficeComponent implements OnInit {
   // ── Navigation ────────────────────────────────────────────
   getCurrentMenu() { return this.userRole === 'admin' ? this.adminMenu : this.allocatorMenu; }
 
+  navigate(item: any) {
+    this.currentScreen = item.id;
+    if (item.route) {
+      this.router.navigate([item.route]);
+    }
+  }
+
   getTitle(): string {
     const all = [...this.adminMenu, ...this.allocatorMenu].flatMap(s => s.items);
     return all.find(i => i.id === this.currentScreen)?.label || 'Dashboard';
@@ -759,11 +864,137 @@ export class BackofficeComponent implements OnInit {
     this.currentScreen = this.userRole === 'admin' ? 'dashboard' : 'allocator';
   }
 
-  // ── Wallet: load on screen change ─────────────────────────
+  // ── Wallet / Fantasy: load on screen change ───────────────
   ngDoCheck() {
     if (this.currentScreen === 'wallet' && !this.walletLoading && this.wallets.length === 0) {
       this.loadWallets();
     }
+    if (this.currentScreen === 'fantasy' && !this.fantasyLoading && !this.fpLoaded) {
+      this.loadFantasyPredictions();
+    }
+  }
+
+  // ── Fantasy admin methods ─────────────────────────────────
+  loadFantasyPredictions() {
+    this.fantasyLoading = true;
+    this.fantasyError = '';
+    this.predictionService.getPendingPredictions().subscribe({
+      next: p => { this.fantasyPredictions = p; this.fantasyLoading = false; this.fpLoaded = true; },
+      error: () => { this.fantasyError = 'Failed to load predictions'; this.fantasyLoading = false; this.fpLoaded = true; }
+    });
+  }
+
+  sportOf(pos: string): 'tennis' | 'basketball' | 'football' {
+    if (pos === 'P1') return 'tennis';
+    if (['PG', 'SG', 'SF', 'PF', 'C'].includes(pos)) return 'basketball';
+    return 'football';
+  }
+
+  getStatInput(predId: number, playerId: number): any {
+    if (!this.fpStatInputs[predId]) this.fpStatInputs[predId] = {};
+    if (!this.fpStatInputs[predId][playerId]) {
+      this.fpStatInputs[predId][playerId] = { goalsScored: 0, yellowCards: 0, redCards: 0, basketballPoints: 0, tennisWin: false };
+    }
+    return this.fpStatInputs[predId][playerId];
+  }
+
+  toggleFP(id: number) {
+    this.expandedFP = this.expandedFP === id ? null : id;
+  }
+
+  calcPoints(pp: any, si: any): { points: number; result: string; color: string } {
+    let points = 0;
+    let result = 'PENDING';
+    const sport = this.sportOf(pp.playerPosition);
+
+    if (sport === 'tennis') {
+      const won = !!si.tennisWin;
+      if (pp.predictGoal) {
+        if (won) { points = pp.playerRating / 10 * 1.5; result = 'CORRECT'; }
+        else      { points = -2; result = 'WRONG'; }
+      } else {
+        if (won) { points = pp.playerRating / 10; result = 'CORRECT'; }
+        else     { result = 'WRONG'; }
+      }
+
+    } else if (sport === 'basketball') {
+      const bpts = si.basketballPoints || 0;
+      if (pp.predictGoal) {
+        if (bpts >= 30)      { points = pp.playerRating / 8 * 1.5; result = 'CORRECT'; }
+        else if (bpts >= 20) { points = pp.playerRating / 10;      result = 'PARTIAL'; }
+        else                  { points = -2;                        result = 'WRONG';   }
+      } else {
+        if (bpts >= 30)      { points = pp.playerRating / 8;  result = 'CORRECT'; }
+        else if (bpts >= 20) { points = pp.playerRating / 10; result = 'CORRECT'; }
+        else                  { result = 'WRONG'; }
+      }
+      if (pp.isCaptain) points *= 2;
+
+    } else {
+      // Football
+      const goals  = si.goalsScored  || 0;
+      const yellow = si.yellowCards  || 0;
+      const red    = si.redCards     || 0;
+      if (pp.predictGoal) {
+        if (goals > 0) { points += (pp.playerRating / 10) * goals * 1.5; result = 'CORRECT'; }
+        else           { points -= 2; result = 'WRONG'; }
+      } else {
+        if (goals > 0) { points += (pp.playerRating / 10) * goals; result = 'PARTIAL'; }
+        else           { result = 'CORRECT'; }
+      }
+      points -= yellow * 3;
+      points -= red * 6;
+      if (goals > 0 && (yellow > 0 || red > 0)) result = 'PARTIAL';
+      if (pp.isCaptain) points *= 2;
+    }
+
+    const color = result === 'CORRECT' ? '#2e7d32'
+                : result === 'PARTIAL' ? '#f57f17'
+                : result === 'WRONG'   ? '#c62828'
+                : '#6e6e73';
+    return { points: Math.round(points * 100) / 100, result, color };
+  }
+
+  calcTotal(pred: any): number {
+    return pred.playerPredictions.reduce((sum: number, pp: any) => {
+      const si = this.getStatInput(pred.id, pp.playerId);
+      return sum + this.calcPoints(pp, si).points;
+    }, 0);
+  }
+
+  resolveFantasyPrediction(pred: PredictionResponse) {
+    this.resolvingFP = pred.id;
+    this.fantasyError = '';
+    const statCalls = pred.playerPredictions.map(pp => {
+      const si = this.getStatInput(pred.id, pp.playerId);
+      const sport = this.sportOf(pp.playerPosition);
+      return this.predictionService.savePlayerStat({
+        playerId: pp.playerId,
+        playerName: pp.playerName,
+        sportType: sport === 'tennis' ? 'TENNIS' : sport === 'basketball' ? 'BASKETBALL' : 'FOOTBALL',
+        weekNumber: pred.weekNumber,
+        weekYear: pred.weekYear,
+        goalsScored: si.goalsScored || 0,
+        yellowCards: si.yellowCards || 0,
+        redCards: si.redCards || 0,
+        basketballPoints: si.basketballPoints || 0,
+        tennisWin: si.tennisWin || false
+      });
+    });
+    const save$ = statCalls.length > 0 ? forkJoin(statCalls) : of([]);
+    save$.subscribe({
+      next: () => {
+        this.predictionService.resolvePrediction(pred.id).subscribe({
+          next: () => {
+            this.fantasyPredictions = this.fantasyPredictions.filter(p => p.id !== pred.id);
+            this.resolvingFP = null;
+            this.expandedFP = null;
+          },
+          error: () => { this.fantasyError = 'Failed to resolve prediction'; this.resolvingFP = null; }
+        });
+      },
+      error: () => { this.fantasyError = 'Failed to save player stats'; this.resolvingFP = null; }
+    });
   }
 
   loadWallets() {
@@ -920,15 +1151,6 @@ export class BackofficeComponent implements OnInit {
   pendingCerts = [
     { name: 'Karim Dridi', cert: 'FIFA Referee License'  },
     { name: 'Nour Belhaj', cert: 'UEFA Coaching Badge'   }
-  ];
-  fantasyStats = [
-    { label: 'Active leagues', value: '24' }, { label: 'Total players', value: '1,840' },
-    { label: 'Prize pool',     value: '12,500 TND' }, { label: 'Matches today', value: '8' }
-  ];
-  fantasyLeagues = [
-    { name: 'Spring Championship', players: 120, prize: 2000, status: 'Active'   },
-    { name: 'Summer Cup',          players: 64,  prize: 1000, status: 'Upcoming' },
-    { name: 'Pro League',          players: 200, prize: 5000, status: 'Active'   }
   ];
   sponsors = [
     { company: 'SportsPro TN', budget: 50000, status: 'Active',   contact: 'contact@sportspro.tn' },

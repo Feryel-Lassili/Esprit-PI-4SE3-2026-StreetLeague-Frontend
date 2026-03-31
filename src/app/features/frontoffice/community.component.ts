@@ -70,12 +70,10 @@ const REACTIONS = [
     .page { max-width: 680px; margin: 0 auto; padding: 24px 16px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
-    /* ── Header ── */
     .page-header { margin-bottom: 24px; }
     .page-header h1 { font-size: 28px; font-weight: 900; color: #1d1d1f; letter-spacing: -.02em; }
     .page-header p  { font-size: 14px; color: #6e6e73; margin-top: 4px; }
 
-    /* ── Compose ── */
     .compose { background: white; border: 1px solid #e0e0e5; border-radius: 20px;
                padding: 16px; margin-bottom: 20px; }
     .compose-top    { display: flex; gap: 10px; align-items: flex-start; }
@@ -92,10 +90,8 @@ const REACTIONS = [
                 border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .post-btn:disabled { opacity: .4; cursor: default; }
 
-    /* ── Feed ── */
     .feed { display: flex; flex-direction: column; gap: 14px; }
 
-    /* ── Post card ── */
     .post-card { background: white; border: 1px solid #e0e0e5; border-radius: 20px; overflow: visible; }
     .post-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
     .post-avatar { width: 40px; height: 40px; border-radius: 50%;
@@ -110,7 +106,6 @@ const REACTIONS = [
     .post-menu:hover { background: #f5f5f7; }
     .post-content { padding: 12px 16px; font-size: 15px; color: #1d1d1f; line-height: 1.55; }
 
-    /* ── Reaction summary ── */
     .reaction-summary { padding: 4px 16px 8px; display: flex; align-items: center;
                         justify-content: space-between; }
     .reaction-pills   { display: flex; gap: 4px; }
@@ -120,10 +115,7 @@ const REACTIONS = [
     .comment-count { font-size: 12px; color: #6e6e73; cursor: pointer; }
     .comment-count:hover { text-decoration: underline; }
 
-    /* ── Action bar ── */
     .post-actions { display: flex; border-top: 1px solid #f0f0f5; position: relative; }
-
-    /* ── Like wrap — KEY FIX: overflow visible so picker shows above ── */
     .like-wrap { flex: 1; position: relative; }
 
     .action-btn { width: 100%; display: flex; align-items: center; justify-content: center;
@@ -134,34 +126,21 @@ const REACTIONS = [
     .action-btn.loved   { color: #ff3b30; }
     .action-btn-icon    { font-size: 16px; }
 
-    /* ── Reaction picker — FIXED positioning ── */
     .reaction-picker {
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      border: 1px solid #e0e0e5;
-      border-radius: 40px;
-      padding: 8px 14px;
-      display: flex;
-      gap: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.15);
-      z-index: 9999;
-      white-space: nowrap;
-      pointer-events: all;
+      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      background: white; border: 1px solid #e0e0e5; border-radius: 40px; padding: 8px 14px;
+      display: flex; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.15);
+      z-index: 9999; white-space: nowrap; pointer-events: all;
     }
     .reaction-option { font-size: 26px; cursor: pointer; transition: transform .15s;
                        line-height: 1; display: inline-block; }
     .reaction-option:hover { transform: scale(1.5) translateY(-4px); }
 
-    /* ── Other action buttons ── */
     .action-btn-plain { flex: 1; display: flex; align-items: center; justify-content: center;
                         gap: 6px; padding: 10px; background: none; border: none; cursor: pointer;
                         font-size: 13px; font-weight: 600; color: #6e6e73; transition: all .15s; }
     .action-btn-plain:hover { background: #f5f5f7; color: #1d1d1f; }
 
-    /* ── Comments section ── */
     .comments-section { border-top: 1px solid #f0f0f5; padding: 12px 16px; }
     .comment-item   { display: flex; gap: 8px; margin-bottom: 12px; }
     .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: #f0f0f5;
@@ -173,14 +152,12 @@ const REACTIONS = [
     .comment-author { font-size: 12px; font-weight: 700; color: #1d1d1f; }
     .comment-text   { font-size: 13px; color: #1d1d1f; margin-top: 2px; line-height: 1.4; }
 
-    /* ── Comment reaction pills (always visible) ── */
     .comment-reaction-pills { display: flex; gap: 3px; margin-top: 3px; padding-left: 4px; flex-wrap: wrap; }
     .comment-reaction-pill  { background: white; border: 1px solid #e0e0e5; border-radius: 20px;
                                padding: 1px 7px; font-size: 11px; display: flex;
                                align-items: center; gap: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
     .comment-reaction-pill-count { font-weight: 700; color: #1d1d1f; font-size: 10px; }
 
-    /* ── Comment footer ── */
     .comment-footer { display: flex; align-items: center; gap: 8px; margin-top: 4px;
                       padding-left: 4px; flex-wrap: wrap; }
     .comment-time   { font-size: 11px; color: #aeaeb2; }
@@ -189,35 +166,23 @@ const REACTIONS = [
     .comment-action:hover   { color: #007aff; }
     .comment-action.reacted { color: #007aff; }
 
-    /* ── Comment reaction picker — FIXED ── */
     .comment-reaction-wrap   { position: relative; display: inline-block; }
     .comment-reaction-picker {
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 0;
-      background: white;
-      border: 1px solid #e0e0e5;
-      border-radius: 40px;
-      padding: 6px 12px;
-      display: flex;
-      gap: 6px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.12);
-      z-index: 9999;
-      white-space: nowrap;
-      pointer-events: all;
+      position: absolute; bottom: calc(100% + 6px); left: 0;
+      background: white; border: 1px solid #e0e0e5; border-radius: 40px; padding: 6px 12px;
+      display: flex; gap: 6px; box-shadow: 0 4px 20px rgba(0,0,0,.12);
+      z-index: 9999; white-space: nowrap; pointer-events: all;
     }
     .comment-reaction-option { font-size: 20px; cursor: pointer; transition: transform .15s;
                                line-height: 1; display: inline-block; }
     .comment-reaction-option:hover { transform: scale(1.4) translateY(-3px); }
 
-    /* ── Replies ── */
     .replies-section { margin-top: 6px; padding-left: 40px; }
     .reply-item   { display: flex; gap: 8px; margin-bottom: 8px; }
     .reply-avatar { width: 26px; height: 26px; border-radius: 50%; background: #e8f0fe;
                     display: flex; align-items: center; justify-content: center;
                     font-size: 9px; font-weight: 700; color: #185fa5; flex-shrink: 0; }
 
-    /* ── Add comment / reply ── */
     .add-comment { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
     .add-reply   { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
     .comment-input-wrap { flex: 1; display: flex; align-items: center;
@@ -231,20 +196,17 @@ const REACTIONS = [
     .send-btn:hover    { background: #0066cc; }
     .send-btn:disabled { opacity: .4; cursor: default; }
 
-    /* ── Loading / empty ── */
     .loading { text-align: center; padding: 40px; color: #aeaeb2; font-size: 14px; }
     .empty   { text-align: center; padding: 48px 24px; }
     .empty-icon { font-size: 48px; margin-bottom: 12px; }
     .empty p    { font-size: 14px; color: #aeaeb2; }
 
-    /* ── Toast ── */
     .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
              padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 600;
              z-index: 9999; box-shadow: 0 6px 24px rgba(0,0,0,.2); white-space: nowrap; }
     .toast.success { background: #1d1d1f; color: white; }
     .toast.error   { background: #ff3b30; color: white; }
 
-    /* ── Confirm modal ── */
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4);
                        display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .confirm-box     { background: white; border-radius: 16px; padding: 28px 32px;
@@ -333,14 +295,12 @@ const REACTIONS = [
         <span class="comment-count"
               *ngIf="(post.comments?.length || 0) > 0"
               (click)="post.showComments = !post.showComments">
-          {{ post.comments?.length }} comment{{ post.comments!.length !== 1 ? 's' : '' }}
+          {{ getTotalCommentCount(post) }} comment{{ getTotalCommentCount(post) !== 1 ? 's' : '' }}
         </span>
       </div>
 
       <!-- Action bar -->
       <div class="post-actions">
-
-        <!-- Like with reaction picker -->
         <div class="like-wrap">
           <button class="action-btn"
                   [class.reacted]="post.userLike && post.userLike.likeType === 'LIKE'"
@@ -353,8 +313,6 @@ const REACTIONS = [
             </span>
             {{ post.userLike ? capitalize(post.userLike.likeType) : 'Like' }}
           </button>
-
-          <!-- Reaction picker — rendered OUTSIDE overflow hidden -->
           <div class="reaction-picker"
                *ngIf="post.showReactions"
                (mouseenter)="clearHideTimer(post)"
@@ -365,36 +323,26 @@ const REACTIONS = [
                   (click)="reactToPost(post, r.type)">{{ r.emoji }}</span>
           </div>
         </div>
-
-        <!-- Comment -->
         <button class="action-btn-plain" (click)="toggleComments(post)">
-          <span class="action-btn-icon">💬</span>
-          Comment
+          <span class="action-btn-icon">💬</span> Comment
         </button>
-
-        <!-- Share -->
         <button class="action-btn-plain" (click)="sharePost(post)">
-          <span class="action-btn-icon">↗️</span>
-          Share
+          <span class="action-btn-icon">↗️</span> Share
         </button>
-
       </div>
 
       <!-- Comments section -->
       <div class="comments-section" *ngIf="post.showComments">
 
-        <!-- Comment list -->
         <div *ngFor="let comment of post.comments" class="comment-item">
           <div class="comment-avatar">{{ comment.username[0].toUpperCase() }}</div>
           <div class="comment-bubble">
 
-            <!-- Bubble -->
             <div class="comment-box">
               <div class="comment-author">{{ comment.username }}</div>
               <div class="comment-text">{{ comment.content }}</div>
             </div>
 
-            <!-- Reaction pills always visible -->
             <div class="comment-reaction-pills"
                  *ngIf="comment.reactions && comment.reactions.length > 0">
               <span *ngFor="let r of getCommentReactionSummary(comment.reactions)"
@@ -404,11 +352,8 @@ const REACTIONS = [
               </span>
             </div>
 
-            <!-- Footer -->
             <div class="comment-footer">
               <span class="comment-time">{{ formatTime(comment.creationDate) }}</span>
-
-              <!-- Like reaction -->
               <div class="comment-reaction-wrap">
                 <button class="comment-action"
                         [class.reacted]="comment.userReaction"
@@ -428,8 +373,6 @@ const REACTIONS = [
                         (click)="reactToComment(comment, r.type)">{{ r.emoji }}</span>
                 </div>
               </div>
-
-              <!-- Reply button with count -->
               <button class="comment-action"
                       (click)="comment.showReplies = !comment.showReplies">
                 💬
@@ -438,14 +381,12 @@ const REACTIONS = [
                 </span>
                 {{ comment.showReplies ? 'Cancel' : 'Reply' }}
               </button>
-
-              <!-- Delete -->
               <button class="comment-action"
                       *ngIf="comment.userId === currentUserId"
                       (click)="askDelete(comment.id, 'comment')">Delete</button>
             </div>
 
-            <!-- Replies — ALWAYS VISIBLE -->
+            <!-- Replies list -->
             <div class="replies-section"
                  *ngIf="comment.replies && comment.replies.length > 0">
               <div *ngFor="let reply of comment.replies" class="reply-item">
@@ -455,8 +396,13 @@ const REACTIONS = [
                     <div class="comment-author">{{ reply.username }}</div>
                     <div class="comment-text">{{ reply.content }}</div>
                   </div>
+                  <!-- ✅ FIX: Reply button added here -->
                   <div class="comment-footer">
                     <span class="comment-time">{{ formatTime(reply.creationDate) }}</span>
+                    <button class="comment-action"
+                            (click)="comment.showReplies = true; comment.newReply = '@' + reply.username + ' '">
+                      💬 Reply
+                    </button>
                     <button class="comment-action"
                             *ngIf="reply.userId === currentUserId"
                             (click)="askDelete(reply.id, 'comment')">Delete</button>
@@ -465,7 +411,7 @@ const REACTIONS = [
               </div>
             </div>
 
-            <!-- Reply input — only when toggled -->
+            <!-- Reply input -->
             <div class="replies-section" *ngIf="comment.showReplies">
               <div class="add-reply">
                 <div class="reply-avatar">{{ userInitial }}</div>
@@ -536,7 +482,6 @@ export class CommunityComponent implements OnInit {
 
   ngOnInit(): void { this.loadPosts(); }
 
-  // ── Load ────────────────────────────────────────────────────────────────────
   loadPosts(): void {
     this.loading = true;
     this.http.get<PostDto[]>(`${this.BASE}/posts`).subscribe({
@@ -595,7 +540,6 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  // ── Create post ─────────────────────────────────────────────────────────────
   createPost(): void {
     if (!this.newPostContent.trim()) return;
     this.posting = true;
@@ -616,7 +560,6 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  // ── Delete ──────────────────────────────────────────────────────────────────
   askDelete(id: number, type: 'post' | 'comment'): void {
     this.confirmTarget = id;
     this.confirmType   = type;
@@ -648,7 +591,6 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  // ── Like post ───────────────────────────────────────────────────────────────
   toggleLike(post: PostDto): void {
     if (post.userLike) {
       this.http.delete(`${this.BASE}/likes/${post.userLike.id}`).subscribe({
@@ -687,7 +629,6 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  // ── React to comment ────────────────────────────────────────────────────────
   toggleCommentReaction(comment: CommentDto): void {
     if (comment.userReaction) {
       this.http.delete(`${this.BASE}/comment-reactions/${comment.userReaction.id}`).subscribe({
@@ -729,7 +670,6 @@ export class CommunityComponent implements OnInit {
     });
   }
 
-  // ── Comments ────────────────────────────────────────────────────────────────
   toggleComments(post: PostDto): void { post.showComments = !post.showComments; }
 
   submitComment(post: PostDto): void {
@@ -755,21 +695,19 @@ export class CommunityComponent implements OnInit {
     }).subscribe({
       next: (reply) => {
         comment.replies?.push(reply);
-        comment.newReply  = '';
+        comment.newReply    = '';
         comment.showReplies = true;
       },
       error: () => this.showToast('Could not post reply', 'error')
     });
   }
 
-  // ── Share ────────────────────────────────────────────────────────────────────
   sharePost(post: PostDto): void {
     navigator.clipboard.writeText(`${window.location.origin}/community/post/${post.id}`)
       .then(() => this.showToast('Link copied! 🔗', 'success'))
       .catch(() => this.showToast('Could not copy link', 'error'));
   }
 
-  // ── Hover timers ─────────────────────────────────────────────────────────────
   scheduleHideReactions(post: PostDto): void {
     const t = setTimeout(() => { post.showReactions = false; }, 500);
     this.hideTimers.set(post, t);
@@ -787,7 +725,12 @@ export class CommunityComponent implements OnInit {
     this.hideTimers.delete(comment);
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
+  getTotalCommentCount(post: PostDto): number {
+    const comments = post.comments ?? [];
+    const repliesCount = comments.reduce((sum, c) => sum + (c.replies?.length ?? 0), 0);
+    return comments.length + repliesCount;
+  }
+
   getReactionSummary(likes: LikeDto[]): { emoji: string; count: number }[] {
     const map = new Map<string, number>();
     likes.forEach(l => map.set(l.likeType, (map.get(l.likeType) ?? 0) + 1));

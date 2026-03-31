@@ -97,52 +97,69 @@ import { filter } from 'rxjs/operators';
 export class FrontofficeComponent implements OnInit {
   sidebarOpen = true;
   currentPath = '/home';
-  isPlayer = false;
+  menu: { section: string; items: { path: string; label: string; icon: string }[] }[] = [];
 
-  menu = [
-    {
-      section: 'Main',
-      items: [
-        { path: '/home',    label: 'Home',      icon: '🏠' },
-        { path: '/explore', label: 'Explore',   icon: '🔍' },
-      ]
-    },
-    {
-      section: 'Sports',
-      items: [
-        { path: '/teams',   label: 'Teams',     icon: '👥' },
-        { path: '/venues',  label: 'Venues',    icon: '📍' },
-        { path: '/venues/create', label: 'Create Venue', icon: '🏟️' },
-        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
-      ]
-    },
-    {
-      section: 'Social',
-      items: [
+  private buildMenu(role: string) {
+    const isVenueOwner = role.includes('VENUE_OWNER');
+    const isPlayer     = role.includes('PLAYER');
+    const isSponsor    = role.includes('SPONSOR');
+
+    const main = { section: 'Main', items: [
+      { path: '/home',    label: 'Home',    icon: '🏠' },
+    ]};
+
+    const more = { section: 'More', items: [
+      { path: '/profile', label: 'Profile', icon: '👤' },
+      { path: '/wallet',  label: 'Wallet',  icon: '💳' },
+      { path: '/health',  label: 'Health',  icon: '🏥' },
+    ]};
+
+    if (isVenueOwner) {
+      return [
+        main,
+        { section: 'My Venue', items: [
+          { path: '/venue/my-venues',    label: 'My Venues',    icon: '🏟️' },
+          { path: '/venue/create',       label: 'Create Venue', icon: '➕' },
+          { path: '/venue/reservations', label: 'Reservations', icon: '📅' },
+        ]},
+        more,
+      ];
+    }
+
+    const sections: typeof this.menu = [
+      main,
+      { section: 'Sports', items: [
+        { path: '/teams',   label: 'Teams',   icon: '👥' },
+        { path: '/venues',  label: 'Venues',  icon: '📍' },
+        { path: '/fantasy', label: 'Fantasy', icon: '🎮' },
+      ]},
+      { section: 'Social', items: [
         { path: '/community', label: 'Community', icon: '💬' },
         { path: '/sponsors',  label: 'Sponsors',  icon: '💰' },
-      ]
-    },
-    {
-      section: 'Carpooling',
-      items: [
+      ]},
+    ];
+
+    if (isPlayer) {
+      sections.push({ section: 'Carpooling', items: [
         { path: '/carpooling',           label: 'Browse Trips', icon: '🗺️' },
         { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗' },
         { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒' },
         { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕' },
         { path: '/cars',                 label: 'My Cars',      icon: '🚘' },
-      ]
-    },
-    {
-      section: 'More',
-      items: [
-        { path: '/shop',    label: 'Shop',      icon: '🛍️' },
-        { path: '/wallet',  label: 'Wallet',    icon: '💳' },
-        { path: '/profile', label: 'Profile',   icon: '👤' },
-        { path: '/health', label: 'Health', icon: '🏥' },
-      ]
+      ]});
+      more.items.unshift(
+        { path: '/shop',           label: 'Shop',     icon: '🛍️' },
+        { path: '/my-merchandise', label: 'My Merch', icon: '🏅' },
+      );
     }
-  ];
+
+    if (isSponsor) {
+      more.items.unshift({ path: '/shop', label: 'Shop', icon: '🛍️' });
+    }
+
+    sections.push(more);
+    return sections;
+  }
 
   get userEmail(): string {
     return this.authService.getCurrentUser()?.email || 'user@street.com';
@@ -173,13 +190,7 @@ export class FrontofficeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isPlayer = this.authService.hasRole('PLAYER');
-    if (this.isPlayer) {
-      const moreSection = this.menu.find(s => s.section === 'More');
-      if (moreSection) {
-        moreSection.items.push({ path: '/my-merchandise', label: 'My Merch', icon: '🏅' });
-      }
-    }
+    this.menu = this.buildMenu(this.authService.getUserRole() || '');
   }
 
   logout() { this.authService.logout(); }

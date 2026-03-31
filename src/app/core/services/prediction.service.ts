@@ -13,6 +13,20 @@ export interface PlayerPredictionEntryDto {
   playerName: string;
   playerPosition: string;
   playerRating: number;
+  predictGoal: boolean;
+}
+
+export interface PlayerStatDto {
+  playerId: number;
+  playerName: string;
+  sportType: string;
+  weekNumber: number;
+  weekYear: number;
+  goalsScored: number;
+  yellowCards: number;
+  redCards: number;
+  basketballPoints: number;
+  tennisWin: boolean;
 }
 
 export interface PredictionResponse {
@@ -34,6 +48,7 @@ export interface PlayerPredictionResponse {
   playerPosition: string;
   playerRating: number;
   isCaptain: boolean;
+  predictGoal: boolean;
   goalsScored: number;
   yellowCards: number;
   redCards: number;
@@ -59,5 +74,17 @@ export class PredictionService {
 
   getHistory(virtualTeamId: number): Observable<PredictionResponse[]> {
     return this.http.get<PredictionResponse[]>(`${this.base}/history/${virtualTeamId}`);
+  }
+
+  getPendingPredictions(): Observable<PredictionResponse[]> {
+    return this.http.get<PredictionResponse[]>(`${this.base}/admin/pending`);
+  }
+
+  savePlayerStat(dto: PlayerStatDto): Observable<void> {
+    return this.http.post<void>(`${this.base}/admin/stats`, dto);
+  }
+
+  resolvePrediction(predictionId: number): Observable<PredictionResponse> {
+    return this.http.post<PredictionResponse>(`${this.base}/admin/resolve/${predictionId}`, {});
   }
 }
