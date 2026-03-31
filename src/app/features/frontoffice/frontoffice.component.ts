@@ -116,8 +116,8 @@ export class FrontofficeComponent {
     {
       section: 'Social',
       items: [
-        { path: '/community', label: 'Community', icon: '💬' },
-        { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
+       { path: 'community', label: 'Community', icon: '💬' },
+       { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
       ]
     },
     {

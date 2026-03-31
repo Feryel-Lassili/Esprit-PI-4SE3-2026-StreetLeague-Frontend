@@ -354,99 +354,169 @@ function tennisSlots(): Slot[] {
     .build-btn    { background: #1d1d1f; color: white; border: none; padding: 11px 22px;
                     border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
 
-    /* ── Prediction redesign ── */
-    .pred-page       { display: flex; flex-direction: column; gap: 16px; }
-    .pred-topbar     { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .pred-title      { font-size: 22px; font-weight: 900; color: #1d1d1f; }
-    .pred-sport-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pred-sport-tab  { padding: 7px 16px; border-radius: 20px; border: 1.5px solid #e0e0e5;
-                       background: white; font-size: 12px; font-weight: 700; color: #6e6e73;
-                       cursor: pointer; transition: all .15s; }
-    .pred-sport-tab.active   { background: #1d1d1f; color: white; border-color: #1d1d1f; }
-    .pred-sport-tab:disabled { opacity: .35; cursor: not-allowed; }
-    .no-team-warn    { background: #fff8e1; border: 1px solid #ffd54f; border-radius: 12px;
-                       padding: 12px 16px; font-size: 13px; color: #795548; }
+    /* ═══════════ PREDICTION — full redesign ═══════════ */
+    .pred-wrap       { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
-    /* Setup cards */
-    .pred-card       { background: white; border-radius: 16px; border: 1px solid #e0e0e5; padding: 18px 20px; }
-    .pred-step-label { font-size: 11px; font-weight: 800; letter-spacing: .07em; color: #aeaeb2;
-                       text-transform: uppercase; margin-bottom: 12px; }
-    .captain-chips   { display: flex; gap: 8px; flex-wrap: wrap; }
-    .captain-chip    { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px;
-                       border: 1.5px solid #e0e0e5; background: white; font-size: 12px; font-weight: 700;
+    /* Sport selector bar */
+    .psb             { display: flex; gap: 10px; }
+    .psb-tab         { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+                       padding: 14px 10px; border-radius: 16px; border: 2px solid #e0e0e5;
+                       background: white; cursor: pointer; transition: all .2s; position: relative; }
+    .psb-tab:disabled{ opacity: .35; cursor: not-allowed; }
+    .psb-tab.active  { border-color: #007aff; background: #f0f6ff; }
+    .psb-tab-icon    { font-size: 26px; }
+    .psb-tab-name    { font-size: 12px; font-weight: 800; color: #1d1d1f; }
+    .psb-tab-status  { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .psb-tab-status.none     { background: #f0f0f5; color: #aeaeb2; }
+    .psb-tab-status.pending  { background: #fff3cd; color: #856404; }
+    .psb-tab-status.resolved { background: #d4edda; color: #155724; }
+    .psb-tab-status.noteam   { background: #f0f0f5; color: #c0c0c5; }
+
+    /* Setup form */
+    .pf-card         { background: white; border-radius: 20px; border: 1px solid #e8e8ed; padding: 22px 24px; }
+    .pf-section-title{ font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+                       color: #aeaeb2; margin-bottom: 14px; }
+
+    /* Captain row */
+    .captain-grid    { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; }
+    .cap-chip        { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border-radius: 12px;
+                       border: 2px solid #e0e0e5; background: white; font-size: 12px; font-weight: 700;
                        color: #1d1d1f; cursor: pointer; transition: all .15s; }
-    .captain-chip.sel { background: #ffd60a; border-color: #ffd60a; }
+    .cap-chip:hover  { border-color: #aaa; }
+    .cap-chip.sel    { border-color: #ffd60a; background: #fffbf0; }
+    .cap-chip-crown  { font-size: 14px; }
 
-    .ppc-row         { display: flex; align-items: center; gap: 10px; padding: 10px 0;
-                       border-bottom: 1px solid #f0f0f5; }
-    .ppc-row:last-child { border-bottom: none; }
-    .ppc-avatar      { font-size: 22px; width: 34px; text-align: center; }
-    .ppc-name        { font-size: 13px; font-weight: 700; color: #1d1d1f; }
-    .ppc-pos         { font-size: 11px; color: #aeaeb2; }
-    .ppc-info        { flex: 1; }
-    .ppc-toggle      { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #e0e0e5;
-                       background: white; font-size: 11px; font-weight: 700; color: #6e6e73;
+    /* Player predict rows */
+    .pp-row          { display: flex; align-items: center; gap: 12px; padding: 12px 0;
+                       border-bottom: 1px solid #f2f2f7; }
+    .pp-row:last-child { border-bottom: none; }
+    .pp-ava          { font-size: 24px; width: 36px; text-align: center; flex-shrink: 0; }
+    .pp-info         { flex: 1; min-width: 0; }
+    .pp-name         { font-size: 13px; font-weight: 700; color: #1d1d1f;
+                       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pp-pos          { font-size: 11px; color: #aeaeb2; margin-top: 1px; }
+    .pp-tog          { flex-shrink: 0; padding: 7px 14px; border-radius: 20px;
+                       border: 2px solid #e0e0e5; background: white;
+                       font-size: 11px; font-weight: 800; color: #6e6e73;
                        cursor: pointer; transition: all .15s; white-space: nowrap; }
-    .ppc-toggle.on   { background: #34c759; border-color: #34c759; color: white; }
-    .ppc-pts         { font-size: 12px; font-weight: 800; color: #007aff; min-width: 40px; text-align: right; }
+    .pp-tog:hover    { border-color: #bbb; }
+    .pp-tog.on       { border-color: #34c759; background: #34c759; color: white; }
+    .pp-rating       { font-size: 12px; font-weight: 800; color: #aeaeb2;
+                       flex-shrink: 0; min-width: 38px; text-align: right; }
 
-    .pred-submit-btn { width: 100%; background: #007aff; color: white; border: none; padding: 14px;
-                       border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all .2s; }
-    .pred-submit-btn:disabled { opacity: .35; cursor: default; }
-    .pred-submit-btn.loading  { background: #6e6e73; }
-    .pred-submit-btn.success  { background: #34c759; }
-    .pred-locked-info { text-align: center; font-size: 12px; color: #aeaeb2; margin-top: 6px; }
+    /* Submit button */
+    .pred-go         { width: 100%; padding: 15px; border: none; border-radius: 14px;
+                       font-size: 15px; font-weight: 900; cursor: pointer; transition: all .2s;
+                       background: #007aff; color: white; letter-spacing: .01em; }
+    .pred-go:disabled{ opacity: .35; cursor: default; }
+    .pred-go.loading { background: #6e6e73; }
+    .pred-go.success { background: #34c759; }
 
-    /* Results screen */
-    .result-banner   { border-radius: 20px; padding: 32px 24px; text-align: center; }
-    .result-banner.win  { background: linear-gradient(135deg,#d4edda,#b8f0c8); }
-    .result-banner.loss { background: linear-gradient(135deg,#f8d7da,#fce4e6); }
-    .result-banner.draw { background: linear-gradient(135deg,#fff3cd,#fff8e1); }
-    .result-emoji    { font-size: 52px; display: block; margin-bottom: 10px; }
-    .result-msg      { font-size: 22px; font-weight: 900; color: #1d1d1f; }
-    .result-sub      { font-size: 12px; color: #6e6e73; margin-top: 6px; }
-    .result-pts      { font-size: 42px; font-weight: 900; margin-top: 12px; line-height: 1; }
-    .result-pts.pos  { color: #34c759; }
-    .result-pts.neg  { color: #ff3b30; }
-    .result-pts.zero { color: #aeaeb2; }
+    /* Pending waiting card */
+    .pw-card         { background: white; border-radius: 20px; border: 1px solid #e8e8ed;
+                       padding: 40px 24px; text-align: center; }
+    .pw-icon         { font-size: 52px; margin-bottom: 14px; }
+    .pw-title        { font-size: 20px; font-weight: 900; color: #1d1d1f; margin-bottom: 6px; }
+    .pw-sub          { font-size: 13px; color: #aeaeb2; margin-bottom: 20px; }
+    .pw-chips        { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .pw-chip         { display: flex; align-items: center; gap: 5px; padding: 6px 14px;
+                       border-radius: 20px; background: #f0f6ff; border: 1px solid #bee3f8;
+                       font-size: 12px; font-weight: 700; color: #1d1d1f; }
+    .pw-chip.no-pred { background: #f5f5f7; border-color: #e0e0e5; color: #aeaeb2; }
 
-    .result-grid     { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 12px; }
-    .rpc             { border-radius: 16px; padding: 16px 14px; border: 2px solid #e0e0e5;
-                       background: white; text-align: center; position: relative; }
-    .rpc.CORRECT     { border-color: #34c759; background: #f0fff4; }
-    .rpc.WRONG       { border-color: #ff3b30; background: #fff5f5; }
-    .rpc.PARTIAL     { border-color: #ffd60a; background: #fffbf0; }
-    .rpc-verdict     { position: absolute; top: 8px; right: 10px; font-size: 18px; }
-    .rpc-avatar      { font-size: 30px; margin-bottom: 6px; }
-    .rpc-name        { font-size: 13px; font-weight: 800; color: #1d1d1f; margin-bottom: 6px; }
-    .rpc-tags        { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
-    .rpc-tag         { font-size: 10px; background: #f0f0f5; padding: 3px 8px; border-radius: 20px;
-                       color: #6e6e73; font-weight: 700; }
-    .rpc-tag.yellow  { background: #fff3cd; color: #856404; }
-    .rpc-tag.red     { background: #f8d7da; color: #721c24; }
-    .rpc-pts         { font-size: 20px; font-weight: 900; }
-    .rpc-pts.pos     { color: #34c759; }
-    .rpc-pts.neg     { color: #ff3b30; }
-
-    /* ── Admin test panel ── */
-    .test-panel        { background: #fff8e1; border: 1.5px dashed #ffd54f; border-radius: 14px; padding: 16px; }
-    .test-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .test-panel-title  { font-size: 12px; font-weight: 800; color: #795548; }
-    .test-player-row   { display: flex; align-items: center; gap: 8px; padding: 8px 0;
-                         border-bottom: 1px solid #ffe082; flex-wrap: wrap; }
-    .test-player-row:last-child { border-bottom: none; }
-    .test-player-name  { flex: 1; min-width: 110px; font-size: 12px; font-weight: 700; color: #1d1d1f; }
-    .stat-input        { width: 50px; padding: 4px 6px; border: 1.5px solid #e0e0e5; border-radius: 8px;
-                         font-size: 12px; font-weight: 700; text-align: center; background: white; }
-    .stat-label        { font-size: 10px; color: #6e6e73; font-weight: 600; }
-    .stat-group        { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .win-toggle        { padding: 4px 10px; border-radius: 8px; border: 1.5px solid #e0e0e5;
-                         background: white; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .win-toggle.yes    { background: #34c759; border-color: #34c759; color: white; }
-    .resolve-btn       { background: #ff9500; color: white; border: none; padding: 10px 20px;
-                         border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;
-                         margin-top: 12px; width: 100%; transition: all .15s; }
+    /* Simulate panel */
+    .sim-panel       { background: #fffbf0; border: 2px dashed #ffd60a; border-radius: 16px; padding: 18px 20px; }
+    .sim-header      { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sim-title       { font-size: 12px; font-weight: 800; color: #b8860b; }
+    .sim-toggle      { background: none; border: none; font-size: 11px; font-weight: 700;
+                       color: #b8860b; cursor: pointer; }
+    .sim-row         { display: flex; align-items: center; gap: 10px; padding: 8px 0;
+                       border-bottom: 1px solid #ffe9a0; flex-wrap: wrap; }
+    .sim-row:last-of-type { border-bottom: none; }
+    .sim-name        { flex: 1; min-width: 100px; font-size: 12px; font-weight: 700; color: #1d1d1f; }
+    .stat-group      { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .stat-input      { width: 48px; padding: 5px 4px; border: 1.5px solid #e0e0e5; border-radius: 8px;
+                       font-size: 13px; font-weight: 800; text-align: center; background: white; }
+    .stat-label      { font-size: 9px; color: #aaa; font-weight: 700; }
+    .win-toggle      { padding: 6px 14px; border-radius: 20px; border: 2px solid #e0e0e5;
+                       background: white; font-size: 11px; font-weight: 800; cursor: pointer; transition: all .15s; }
+    .win-toggle.yes  { background: #34c759; border-color: #34c759; color: white; }
+    .resolve-btn     { width: 100%; margin-top: 14px; padding: 11px; border: none; border-radius: 12px;
+                       background: #ff9500; color: white; font-size: 13px; font-weight: 800; cursor: pointer; }
     .resolve-btn:disabled { opacity: .4; cursor: default; }
+
+    /* Results */
+    .res-hero        { border-radius: 24px; padding: 44px 28px 36px; text-align: center; position: relative; overflow: hidden; }
+    .res-hero.win    { background: linear-gradient(150deg,#1d7a3d 0%,#34c759 100%); color: white; }
+    .res-hero.loss   { background: linear-gradient(150deg,#9b1c1c 0%,#ff3b30 100%); color: white; }
+    .res-hero.draw   { background: linear-gradient(150deg,#7c5e00 0%,#ffd60a 100%); color: white; }
+    .res-hero-emoji  { font-size: 64px; display: block; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(0,0,0,.2)); }
+    .res-hero-msg    { font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+    .res-hero-week   { font-size: 13px; opacity: .8; margin-bottom: 16px; }
+    .res-hero-pts    { font-size: 60px; font-weight: 900; line-height: 1; letter-spacing: -.02em; }
+    .res-hero-pts span { font-size: 18px; font-weight: 700; opacity: .8; }
+    .res-hero-sub    { font-size: 13px; opacity: .75; margin-top: 8px; }
+
+    .res-list        { display: flex; flex-direction: column; gap: 0; background: white;
+                       border-radius: 20px; border: 1px solid #e8e8ed; overflow: hidden; }
+    .res-row         { display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+                       border-bottom: 1px solid #f2f2f7; transition: background .15s; }
+    .res-row:last-child { border-bottom: none; }
+    .res-row.CORRECT { background: #f6fff8; }
+    .res-row.WRONG   { background: #fff8f8; }
+    .res-row.PARTIAL { background: #fffcf0; }
+    .res-ava         { font-size: 22px; width: 34px; text-align: center; flex-shrink: 0; }
+    .res-info        { flex: 1; min-width: 0; }
+    .res-name        { font-size: 13px; font-weight: 800; color: #1d1d1f; }
+    .res-tags        { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+    .res-tag         { font-size: 10px; padding: 2px 8px; border-radius: 20px;
+                       background: #f0f0f5; color: #6e6e73; font-weight: 700; }
+    .res-tag.pred    { background: #e8f4fd; color: #0066cc; }
+    .res-tag.scored  { background: #e8fff0; color: #1a7a3a; }
+    .res-tag.card-y  { background: #fff9e6; color: #8a6500; }
+    .res-tag.card-r  { background: #fff0f0; color: #c0392b; }
+    .res-tag.captain { background: #fffaeb; color: #8a6500; }
+    .res-verdict     { flex-shrink: 0; font-size: 20px; }
+    .res-pts         { flex-shrink: 0; min-width: 60px; text-align: right;
+                       font-size: 16px; font-weight: 900; }
+    .res-pts.pos     { color: #34c759; }
+    .res-pts.neg     { color: #ff3b30; }
+    .res-pts.zero    { color: #aeaeb2; }
+
+    /* New prediction button */
+    .new-pred-btn    { display: block; width: 100%; margin-top: 18px; padding: 16px;
+                       background: linear-gradient(135deg, #007aff, #5ac8fa);
+                       color: white; font-size: 15px; font-weight: 700; border: none;
+                       border-radius: 16px; cursor: pointer; transition: opacity .15s; }
+    .new-pred-btn:hover { opacity: .9; }
+
+    /* History */
+    .hist-section    { margin-top: 20px; }
+    .hist-toggle     { display: flex; justify-content: space-between; align-items: center;
+                       width: 100%; padding: 14px 20px; background: white;
+                       border: 1px solid #e8e8ed; border-radius: 16px; cursor: pointer;
+                       font-size: 14px; font-weight: 700; color: #1c1c1e; }
+    .hist-toggle:hover { background: #f5f5f7; }
+    .hist-list       { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .hist-card       { background: white; border-radius: 16px; padding: 16px 20px;
+                       border: 1px solid #e8e8ed; }
+    .hist-card.hwin  { border-left: 4px solid #34c759; }
+    .hist-card.hloss { border-left: 4px solid #ff3b30; }
+    .hist-card.hdraw { border-left: 4px solid #ffd60a; }
+    .hist-week       { display: flex; justify-content: space-between; align-items: center;
+                       font-size: 13px; color: #636366; margin-bottom: 6px; }
+    .hist-status.hpend { color: #ff9500; font-weight: 700; }
+    .hist-status.hres  { color: #34c759; font-weight: 700; }
+    .hist-pts        { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
+    .hist-pts.pos    { color: #34c759; }
+    .hist-pts.neg    { color: #ff3b30; }
+    .hist-emoji      { font-size: 18px; }
+    .hist-players    { display: flex; flex-wrap: wrap; gap: 6px; }
+    .hist-chip       { display: flex; align-items: center; gap: 4px; padding: 4px 10px;
+                       border-radius: 20px; font-size: 11px; background: #f2f2f7; color: #1c1c1e; }
+    .hist-chip.hcorr { background: #f0fff4; color: #1d7a3d; }
+    .hist-chip.hwrong { background: #fff5f5; color: #9b1c1c; }
+    .hist-chip.hpart { background: #fffbeb; color: #8a6500; }
 
     /* ── Confirm / Toast ── */
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4);
@@ -881,186 +951,255 @@ function tennisSlots(): Slot[] {
 
   <!-- ════════════════ PREDICTION ════════════════ -->
   <ng-container *ngIf="viewMode==='prediction'">
-    <div class="pred-panel">
-      <div class="pred-header">
-        <h2>🎯 Weekly Prediction</h2>
-        <p>Pick your captain, predict which players will perform — and earn bonus pts if right!</p>
-      </div>
+    <div class="pred-wrap">
 
-      <!-- Points legend -->
-      <div class="points-legend">
-        <div class="legend-title">📊 How points work</div>
-        <div class="legend-row">⚽ Predict goal + player scores → <strong>+rating × 1.5 / 10 per goal</strong> (bonus)</div>
-        <div class="legend-row">❌ Predict goal + player doesn't score → <strong>−2 pts</strong> penalty</div>
-        <div class="legend-row">— No prediction + player scores → <strong>+rating / 10</strong> (normal, no bonus)</div>
-        <div class="legend-row" *ngIf="predSport==='BASKETBALL'">🏀 Predict big game + 30+ pts scored → <strong>×1.5 bonus</strong></div>
-        <div class="legend-row" *ngIf="predSport==='TENNIS'">🎾 Predict win + player wins → <strong>×1.5 bonus</strong></div>
-        <div class="legend-row">🟡 Yellow card → <strong>−3 pts</strong> &nbsp;|&nbsp; 🔴 Red card → <strong>−6 pts</strong> (automatic)</div>
-        <div class="legend-row">👑 Captain → <strong>×2</strong> on all earned points for that player</div>
-      </div>
-
-      <div class="pred-sport-nav">
-        <button *ngFor="let s of allSports" class="pred-sport-btn"
-                [class.active]="predSport===s.key" [disabled]="!savedTeams[s.key]"
+      <!-- Sport selector — one prediction per sport, independent -->
+      <div class="psb">
+        <button *ngFor="let s of allSports" class="psb-tab"
+                [class.active]="predSport===s.key"
+                [disabled]="!savedTeams[s.key]"
                 (click)="setPredSport(s.key)">
-          {{ s.label }}<span *ngIf="!savedTeams[s.key]" style="font-size:10px;color:#aeaeb2"> (no team)</span>
+          <span class="psb-tab-icon">{{ s.key==='FOOTBALL'?'⚽':s.key==='BASKETBALL'?'🏀':'🎾' }}</span>
+          <span class="psb-tab-name">{{ s.label }}</span>
+          <span class="psb-tab-status"
+                [class.none]="savedTeams[s.key] && !predStatusMap[s.key]"
+                [class.pending]="predStatusMap[s.key]==='PENDING'"
+                [class.resolved]="predStatusMap[s.key]==='RESOLVED'"
+                [class.noteam]="!savedTeams[s.key]">
+            {{ !savedTeams[s.key] ? 'No team' : predStatusMap[s.key]==='PENDING' ? '⏳ Pending' : predStatusMap[s.key]==='RESOLVED' ? '✅ Done' : '+ New' }}
+          </span>
         </button>
       </div>
 
-      <div class="no-team-warn" *ngIf="!savedTeams[predSport]">
-        ⚠️ No {{ predSport }} team.
-        <button style="margin-left:8px;background:none;border:none;color:#795548;font-weight:700;cursor:pointer"
-                (click)="goToBuild(predSport)">Build one →</button>
+      <!-- No team -->
+      <div *ngIf="!savedTeams[predSport]"
+           style="background:#fff8e1;border:1px solid #ffd54f;border-radius:16px;padding:18px 22px;font-size:13px;color:#795548;display:flex;align-items:center;justify-content:space-between">
+        <span>⚠️ You don't have a {{ predSport }} team yet</span>
+        <button style="background:#1d1d1f;color:white;border:none;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer"
+                (click)="goToBuild(predSport)">Build Team →</button>
       </div>
 
       <ng-container *ngIf="savedTeams[predSport] as t">
-        <div class="captain-section">
-          <div class="captain-label">👑 Choose your captain (points × 2)</div>
-          <div class="captain-list">
-            <button *ngFor="let p of t.starters" class="captain-btn"
-                    [class.selected]="captainId===p.id" (click)="captainId=p.id">
-              {{ avatarFor(p) }} {{ p.firstName }} {{ p.lastName }}
-            </button>
-          </div>
-        </div>
 
-        <div class="section-title">Your starters — toggle goal predictions</div>
-        <div *ngFor="let p of t.starters" class="player-row">
-          <span class="pr-av">{{ avatarFor(p) }}</span>
-          <div class="pr-inf">
-            <div class="pr-name">
-              {{ p.firstName }} {{ p.lastName }}
-              <span *ngIf="captainId===p.id" style="font-size:12px;margin-left:4px">👑</span>
+        <!-- ═══ SETUP ═══ -->
+        <ng-container *ngIf="!currentPrediction">
+
+          <div class="pf-card">
+            <div class="pf-section-title">👑 Step 1 — Pick your captain (points ×2)</div>
+            <div class="captain-grid">
+              <button *ngFor="let p of t.starters" class="cap-chip"
+                      [class.sel]="captainId===p.id" (click)="captainId=p.id">
+                <span style="font-size:18px">{{ avatarFor(p) }}</span>
+                <span style="flex:1;text-align:left">{{ p.firstName }} {{ p.lastName }}</span>
+                <span class="cap-chip-crown" *ngIf="captainId===p.id">👑</span>
+              </button>
             </div>
-            <div class="pr-meta">{{ p.position }} · {{ p.label }}</div>
           </div>
-          <button class="pred-toggle-btn"
-                  [class.active]="!!playerGoalPredictions[p.id]"
-                  (click)="playerGoalPredictions[p.id] = !playerGoalPredictions[p.id]">
-            <ng-container *ngIf="predSport==='FOOTBALL'">{{ playerGoalPredictions[p.id] ? '⚽ Will Score' : '— No Goal' }}</ng-container>
-            <ng-container *ngIf="predSport==='BASKETBALL'">{{ playerGoalPredictions[p.id] ? '🏀 Big Game' : '— Safe' }}</ng-container>
-            <ng-container *ngIf="predSport==='TENNIS'">{{ playerGoalPredictions[p.id] ? '🎾 Will Win' : '— Safe' }}</ng-container>
+
+          <div class="pf-card">
+            <div class="pf-section-title">🎯 Step 2 — Predict who performs</div>
+            <div *ngFor="let p of t.starters" class="pp-row">
+              <span class="pp-ava">{{ avatarFor(p) }}</span>
+              <div class="pp-info">
+                <div class="pp-name">{{ p.firstName }} {{ p.lastName }}<span *ngIf="captainId===p.id" style="font-size:11px;margin-left:4px">👑</span></div>
+                <div class="pp-pos">{{ p.position }}</div>
+              </div>
+              <button class="pp-tog" [class.on]="!!playerGoalPredictions[p.id]"
+                      (click)="playerGoalPredictions[p.id]=!playerGoalPredictions[p.id]">
+                <ng-container *ngIf="predSport==='FOOTBALL'">{{ playerGoalPredictions[p.id] ? '⚽ Will Score' : '— Skip' }}</ng-container>
+                <ng-container *ngIf="predSport==='BASKETBALL'">{{ playerGoalPredictions[p.id] ? '🏀 Big Game' : '— Skip' }}</ng-container>
+                <ng-container *ngIf="predSport==='TENNIS'">{{ playerGoalPredictions[p.id] ? '🎾 Will Win' : '— Skip' }}</ng-container>
+              </button>
+              <span class="pp-rating">{{ p.avgRating }}★</span>
+            </div>
+          </div>
+
+          <button class="pred-go" [class.loading]="predState==='loading'" [class.success]="predState==='success'"
+                  [disabled]="!captainId || predState==='loading'" (click)="submitPrediction()">
+            <span *ngIf="predState==='idle'">🚀 Lock in my prediction</span>
+            <span *ngIf="predState==='loading'">Submitting…</span>
+            <span *ngIf="predState==='success'">Locked in ✅</span>
           </button>
-          <span class="pr-pts">{{ p.fantasyPoints }} pts</span>
-        </div>
+          <div style="text-align:center;font-size:12px;color:#aeaeb2;margin-top:4px" *ngIf="!captainId">You must pick a captain to submit</div>
+        </ng-container>
 
-        <button class="submit-pred-btn"
-                [class.loading]="predState==='loading'" [class.success]="predState==='success'"
-                [disabled]="!captainId || predState==='loading'" (click)="submitPrediction()">
-          <span *ngIf="predState==='idle'">🚀 Submit Prediction</span>
-          <span *ngIf="predState==='loading'">Submitting…</span>
-          <span *ngIf="predState==='success'">Submitted ✅</span>
-        </button>
-
-        <div class="pred-result-card" *ngIf="currentPrediction">
-          <div class="pred-result-header">
-            <div>
-              <div class="pred-week">Week {{ currentPrediction.weekNumber }} / {{ currentPrediction.weekYear }}</div>
-              <div style="font-size:11px;color:#6e6e73;margin-top:2px">
-                {{ activePredictions.length }} player{{ activePredictions.length !== 1 ? 's' : '' }} predicted
+        <!-- ═══ PENDING ═══ -->
+        <ng-container *ngIf="currentPrediction && currentPrediction.status==='PENDING'">
+          <div class="pw-card">
+            <div class="pw-icon">⏳</div>
+            <div class="pw-title">Prediction locked in!</div>
+            <div class="pw-sub">Week {{ currentPrediction.weekNumber }} / {{ currentPrediction.weekYear }} · Results appear at the start of next week</div>
+            <div style="font-size:12px;color:#aeaeb2;">Your picks this week:</div>
+            <div class="pw-chips">
+              <div *ngFor="let pp of currentPrediction.playerPredictions" class="pw-chip" [class.no-pred]="!pp.predictGoal && !pp.isCaptain">
+                <span>{{ avatarForPosition(pp.playerPosition) }}</span>
+                <span>{{ pp.playerName }}</span>
+                <span *ngIf="pp.isCaptain">👑</span>
+                <span *ngIf="pp.predictGoal" style="color:#34c759;font-size:10px">
+                  {{ predSport==='BASKETBALL'?'🏀':predSport==='TENNIS'?'🎾':'⚽' }}
+                </span>
               </div>
             </div>
-            <span class="pred-status-badge" [class]="currentPrediction.status">{{ currentPrediction.status }}</span>
-            <span class="pred-total"
-                  [style.color]="currentPrediction.totalPointsEarned >= 0 ? '#007aff' : '#ff3b30'">
-              {{ currentPrediction.totalPointsEarned >= 0 ? '+' : '' }}{{ currentPrediction.totalPointsEarned | number:'1.1-1' }} pts
-            </span>
           </div>
 
-          <!-- Empty state -->
-          <div *ngIf="activePredictions.length === 0"
-               style="text-align:center;padding:20px 0;color:#aeaeb2;font-size:13px">
-            No predictions made for this week
+          <!-- Simulate panel -->
+          <div class="sim-panel">
+            <div class="sim-header">
+              <span class="sim-title">🧪 Simulate match results (test)</span>
+              <button class="sim-toggle" (click)="showTestPanel=!showTestPanel">{{ showTestPanel?'▲ Hide':'▼ Show' }}</button>
+            </div>
+            <ng-container *ngIf="showTestPanel">
+              <div *ngFor="let pp of currentPrediction.playerPredictions" class="sim-row">
+                <span style="font-size:16px">{{ avatarForPosition(pp.playerPosition) }}</span>
+                <div class="sim-name">{{ pp.playerName }}<span *ngIf="pp.isCaptain"> 👑</span><span *ngIf="pp.predictGoal" style="color:#34c759;font-size:10px"> ✓</span></div>
+                <ng-container *ngIf="predSport==='FOOTBALL'">
+                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="5" [(ngModel)]="testStats[pp.playerId].goals"><span class="stat-label">⚽ goals</span></div>
+                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].yellow"><span class="stat-label">🟡</span></div>
+                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].red"><span class="stat-label">🔴</span></div>
+                </ng-container>
+                <ng-container *ngIf="predSport==='BASKETBALL'">
+                  <div class="stat-group"><input class="stat-input" type="number" min="0" max="60" [(ngModel)]="testStats[pp.playerId].bpts"><span class="stat-label">🏀 pts</span></div>
+                </ng-container>
+                <ng-container *ngIf="predSport==='TENNIS'">
+                  <button class="win-toggle" [class.yes]="testStats[pp.playerId].win"
+                          (click)="testStats[pp.playerId].win=!testStats[pp.playerId].win">
+                    {{ testStats[pp.playerId].win ? '🎾 Win' : '🎾 Loss' }}
+                  </button>
+                </ng-container>
+              </div>
+              <button class="resolve-btn" [disabled]="resolveState==='loading'" (click)="saveAndResolve()">
+                <span *ngIf="resolveState!=='loading'">⚡ Resolve Now</span>
+                <span *ngIf="resolveState==='loading'">Resolving…</span>
+              </button>
+            </ng-container>
           </div>
+        </ng-container>
 
-          <!-- Only predicted players (+ captain always shown) -->
-          <ng-container *ngFor="let pp of currentPrediction.playerPredictions">
-            <div *ngIf="pp.predictGoal" class="pred-player-row">
-              <span style="font-size:16px;width:28px;text-align:center">{{ avatarForPosition(pp.playerPosition) }}</span>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                  {{ pp.playerName }}
-                  <span *ngIf="pp.isCaptain" style="font-size:11px"> 👑</span>
-                  <span *ngIf="pp.predictGoal" style="font-size:10px;color:#34c759;font-weight:700;margin-left:4px">
-                    {{ predSport === 'BASKETBALL' ? '🏀 Big Game' : predSport === 'TENNIS' ? '🎾 Win' : '⚽ Goal' }}
+          <!-- History in pending phase -->
+          <div class="hist-section" *ngIf="pastPredictions.length > 0">
+            <button class="hist-toggle" (click)="showHistory=!showHistory">
+              📜 Past Predictions ({{ pastPredictions.length }})
+              <span>{{ showHistory ? '▲' : '▼' }}</span>
+            </button>
+            <div *ngIf="showHistory" class="hist-list">
+              <div *ngFor="let h of pastPredictions" class="hist-card"
+                   [class.hwin]="h.totalPointsEarned > 0"
+                   [class.hloss]="h.totalPointsEarned < 0"
+                   [class.hdraw]="h.totalPointsEarned === 0">
+                <div class="hist-week">
+                  <span>Week {{ h.weekNumber }} / {{ h.weekYear }}</span>
+                  <span class="hist-status hres">✅ Resolved</span>
+                </div>
+                <div class="hist-pts" [class.pos]="h.totalPointsEarned > 0" [class.neg]="h.totalPointsEarned < 0">
+                  {{ h.totalPointsEarned > 0 ? '+' : '' }}{{ h.totalPointsEarned | number:'1.1-1' }} pts
+                  <span class="hist-emoji">{{ h.totalPointsEarned > 0 ? '🏆' : h.totalPointsEarned < 0 ? '😤' : '😐' }}</span>
+                </div>
+                <div class="hist-players">
+                  <span *ngFor="let pp of h.playerPredictions" class="hist-chip"
+                        [class.hcorr]="pp.result==='CORRECT'" [class.hwrong]="pp.result==='WRONG'" [class.hpart]="pp.result==='PARTIAL'">
+                    {{ avatarForPosition(pp.playerPosition) }} {{ pp.playerName }}
+                    <span>{{ pp.result==='CORRECT' ? '✅' : pp.result==='WRONG' ? '❌' : '⚠️' }}</span>
+                    <span *ngIf="pp.pointsEarned !== 0" style="font-weight:600">{{ pp.pointsEarned > 0 ? '+' : '' }}{{ pp.pointsEarned | number:'1.1-1' }}</span>
                   </span>
                 </div>
-                <div class="res-icons" *ngIf="currentPrediction.status === 'RESOLVED'">
-                  <span *ngIf="pp.goalsScored && pp.goalsScored > 0">⚽×{{ pp.goalsScored }}</span>
-                  <span *ngFor="let y of repeat(pp.yellowCards ?? 0)" class="card-y" title="Yellow card (-3pts)"></span>
-                  <span *ngFor="let r of repeat(pp.redCards ?? 0)" class="card-r" title="Red card (-6pts)"></span>
-                  <span *ngIf="pp.tennisWin === true" style="font-size:10px">🎾 Win</span>
-                  <span *ngIf="pp.tennisWin === false" style="font-size:10px">🎾 Loss</span>
-                  <span *ngIf="pp.basketballPoints != null" style="font-size:10px">🏀 {{ pp.basketballPoints }} pts</span>
-                </div>
               </div>
-              <span class="pred-result-badge" [class]="pp.result">{{ pp.result }}</span>
-              <span style="font-size:13px;font-weight:800;min-width:52px;text-align:right"
-                    [style.color]="pp.pointsEarned >= 0 ? '#007aff' : '#ff3b30'">
-                {{ pp.pointsEarned >= 0 ? '+' : '' }}{{ pp.pointsEarned | number:'1.1-1' }}
-              </span>
             </div>
-          </ng-container>
-        </div>
-        <!-- ── Test / Admin panel ── -->
-        <div class="test-panel" *ngIf="currentPrediction && currentPrediction.status === 'PENDING'">
-          <div class="test-panel-header">
-            <span class="test-panel-title">🧪 Simulate Match Results (test only)</span>
-            <button style="background:none;border:none;font-size:11px;color:#795548;cursor:pointer;font-weight:700"
-                    (click)="showTestPanel = !showTestPanel">
-              {{ showTestPanel ? '▲ Hide' : '▼ Show' }}
-            </button>
           </div>
 
-          <ng-container *ngIf="showTestPanel">
-            <div *ngFor="let pp of currentPrediction.playerPredictions" class="test-player-row">
-              <span style="font-size:15px">{{ avatarForPosition(pp.playerPosition) }}</span>
-              <div class="test-player-name">
-                {{ pp.playerName }}
-                <span *ngIf="pp.isCaptain" style="font-size:10px"> 👑</span>
-                <span *ngIf="pp.predictGoal" style="font-size:10px;color:#34c759"> ⚽predicted</span>
-              </div>
+        <!-- ═══ RESOLVED ═══ -->
+        <ng-container *ngIf="currentPrediction && currentPrediction.status==='RESOLVED'">
 
-              <!-- Football stats -->
-              <ng-container *ngIf="predSport === 'FOOTBALL'">
-                <div class="stat-group">
-                  <input class="stat-input" type="number" min="0" max="5" [(ngModel)]="testStats[pp.playerId].goals" placeholder="0">
-                  <span class="stat-label">⚽ Goals</span>
-                </div>
-                <div class="stat-group">
-                  <input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].yellow" placeholder="0">
-                  <span class="stat-label">🟡 Yellow</span>
-                </div>
-                <div class="stat-group">
-                  <input class="stat-input" type="number" min="0" max="1" [(ngModel)]="testStats[pp.playerId].red" placeholder="0">
-                  <span class="stat-label">🔴 Red</span>
-                </div>
-              </ng-container>
-
-              <!-- Basketball stats -->
-              <ng-container *ngIf="predSport === 'BASKETBALL'">
-                <div class="stat-group">
-                  <input class="stat-input" type="number" min="0" max="60" [(ngModel)]="testStats[pp.playerId].bpts" placeholder="0">
-                  <span class="stat-label">🏀 Pts</span>
-                </div>
-              </ng-container>
-
-              <!-- Tennis stats -->
-              <ng-container *ngIf="predSport === 'TENNIS'">
-                <button class="win-toggle" [class.yes]="testStats[pp.playerId].win"
-                        (click)="testStats[pp.playerId].win = !testStats[pp.playerId].win">
-                  {{ testStats[pp.playerId].win ? '🎾 Win' : '🎾 Loss' }}
-                </button>
-              </ng-container>
+          <div class="res-hero"
+               [class.win]="currentPrediction.totalPointsEarned > 0"
+               [class.loss]="currentPrediction.totalPointsEarned < 0"
+               [class.draw]="currentPrediction.totalPointsEarned === 0">
+            <span class="res-hero-emoji">
+              {{ currentPrediction.totalPointsEarned > 0 ? '🏆' : currentPrediction.totalPointsEarned < 0 ? '😤' : '😐' }}
+            </span>
+            <div class="res-hero-msg">
+              {{ currentPrediction.totalPointsEarned > 0 ? 'Congrats! Great week!' : currentPrediction.totalPointsEarned < 0 ? 'Hard luck this week' : 'Nothing gained, nothing lost' }}
             </div>
+            <div class="res-hero-week">Week {{ currentPrediction.weekNumber }} / {{ currentPrediction.weekYear }}</div>
+            <div class="res-hero-pts">
+              {{ currentPrediction.totalPointsEarned > 0 ? '+' : '' }}{{ currentPrediction.totalPointsEarned | number:'1.1-1' }}<span> pts</span>
+            </div>
+            <div class="res-hero-sub">
+              {{ currentPrediction.totalPointsEarned > 0 ? 'Your predictions paid off — keep it up!' : currentPrediction.totalPointsEarned < 0 ? 'Adjust your picks and come back stronger!' : 'No risk, no reward — try predicting next week!' }}
+            </div>
+          </div>
 
-            <button class="resolve-btn" [disabled]="resolveState === 'loading'" (click)="saveAndResolve()">
-              <span *ngIf="resolveState !== 'loading'">⚡ Save Stats & Resolve</span>
-              <span *ngIf="resolveState === 'loading'">Resolving…</span>
+          <!-- Player-by-player breakdown list -->
+          <div class="res-list">
+            <div *ngFor="let pp of currentPrediction.playerPredictions" class="res-row" [class]="pp.result">
+              <span class="res-ava">{{ avatarForPosition(pp.playerPosition) }}</span>
+              <div class="res-info">
+                <div class="res-name">
+                  {{ pp.playerName }}
+                  <span *ngIf="pp.isCaptain" style="font-size:11px"> 👑</span>
+                </div>
+                <div class="res-tags">
+                  <!-- Prediction badge -->
+                  <span *ngIf="pp.predictGoal" class="res-tag pred">
+                    {{ predSport==='BASKETBALL' ? '🏀 Big Game pred' : predSport==='TENNIS' ? '🎾 Win pred' : '⚽ Goal pred' }}
+                  </span>
+                  <!-- What happened -->
+                  <span *ngIf="pp.goalsScored && pp.goalsScored > 0" class="res-tag scored">⚽ ×{{ pp.goalsScored }} scored</span>
+                  <span *ngIf="pp.basketballPoints != null && pp.basketballPoints > 0" class="res-tag scored">🏀 {{ pp.basketballPoints }} pts</span>
+                  <span *ngIf="pp.tennisWin === true" class="res-tag scored">🎾 Won</span>
+                  <span *ngIf="pp.tennisWin === false" class="res-tag">🎾 Lost</span>
+                  <span *ngIf="pp.yellowCards && pp.yellowCards > 0" class="res-tag card-y">🟡 −{{ pp.yellowCards * 3 }}</span>
+                  <span *ngIf="pp.redCards && pp.redCards > 0" class="res-tag card-r">🔴 −{{ pp.redCards * 6 }}</span>
+                  <span *ngIf="pp.isCaptain" class="res-tag captain">👑 ×2</span>
+                </div>
+              </div>
+              <span class="res-verdict">
+                {{ pp.result==='CORRECT' ? '✅' : pp.result==='WRONG' ? '❌' : pp.result==='PARTIAL' ? '⚠️' : '' }}
+              </span>
+              <span class="res-pts" [class.pos]="pp.pointsEarned > 0" [class.neg]="pp.pointsEarned < 0" [class.zero]="pp.pointsEarned === 0">
+                {{ pp.pointsEarned > 0 ? '+' : '' }}{{ pp.pointsEarned | number:'1.1-1' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- New Prediction button -->
+          <button class="new-pred-btn" (click)="startNewPrediction()">
+            ➕ New Prediction for Next Week
+          </button>
+
+          <!-- History accordion -->
+          <div class="hist-section" *ngIf="pastPredictions.length > 0">
+            <button class="hist-toggle" (click)="showHistory=!showHistory">
+              📜 Past Predictions ({{ pastPredictions.length }})
+              <span>{{ showHistory ? '▲' : '▼' }}</span>
             </button>
-          </ng-container>
-        </div>
+            <div *ngIf="showHistory" class="hist-list">
+              <div *ngFor="let h of pastPredictions" class="hist-card"
+                   [class.hwin]="h.totalPointsEarned > 0"
+                   [class.hloss]="h.totalPointsEarned < 0"
+                   [class.hdraw]="h.totalPointsEarned === 0">
+                <div class="hist-week">
+                  <span>Week {{ h.weekNumber }} / {{ h.weekYear }}</span>
+                  <span class="hist-status" [class.hpend]="h.status==='PENDING'" [class.hres]="h.status==='RESOLVED'">
+                    {{ h.status==='PENDING' ? '⏳ Pending' : '✅ Resolved' }}
+                  </span>
+                </div>
+                <div class="hist-pts" [class.pos]="h.totalPointsEarned > 0" [class.neg]="h.totalPointsEarned < 0">
+                  {{ h.totalPointsEarned > 0 ? '+' : '' }}{{ h.totalPointsEarned | number:'1.1-1' }} pts
+                  <span class="hist-emoji">{{ h.totalPointsEarned > 0 ? '🏆' : h.totalPointsEarned < 0 ? '😤' : '😐' }}</span>
+                </div>
+                <div class="hist-players">
+                  <span *ngFor="let pp of h.playerPredictions" class="hist-chip"
+                        [class.hcorr]="pp.result==='CORRECT'" [class.hwrong]="pp.result==='WRONG'" [class.hpart]="pp.result==='PARTIAL'">
+                    {{ avatarForPosition(pp.playerPosition) }} {{ pp.playerName }}
+                    <span>{{ pp.result==='CORRECT' ? '✅' : pp.result==='WRONG' ? '❌' : pp.result==='PARTIAL' ? '⚠️' : '⏳' }}</span>
+                    <span *ngIf="pp.pointsEarned !== 0" style="font-weight:600">{{ pp.pointsEarned > 0 ? '+' : '' }}{{ pp.pointsEarned | number:'1.1-1' }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
+        </ng-container>
       </ng-container>
     </div>
   </ng-container>
@@ -1094,6 +1233,9 @@ export class FrontofficeFantasyComponent implements OnInit {
   captainId:      number | null = null;
   playerGoalPredictions: Record<number, boolean> = {};
   currentPrediction: PredictionResult | null = null;
+  predStatusMap: Record<string, string> = {};
+  predHistory: PredictionResult[] = [];
+  showHistory    = false;
   showTestPanel  = false;
   resolveState   = 'idle';
   testStats: Record<number, { goals: number; yellow: number; red: number; bpts: number; win: boolean }> = {};
@@ -1182,6 +1324,13 @@ export class FrontofficeFantasyComponent implements OnInit {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
+  /** History entries to display: only RESOLVED, excluding the currently shown prediction */
+  get pastPredictions(): PredictionResult[] {
+    return this.predHistory.filter(h =>
+      h.status === 'RESOLVED' && h.id !== this.currentPrediction?.id
+    );
+  }
+
   get activePredictions() {
     return this.currentPrediction?.playerPredictions.filter(pp => pp.predictGoal) ?? [];
   }
@@ -1302,6 +1451,7 @@ export class FrontofficeFantasyComponent implements OnInit {
           const first = this.allSports.find(s => teams.some((t: any) => t.sportType === s.key));
           if (first) { this.viewSport = first.key; this.viewMode = 'view'; }
         }
+        setTimeout(() => this.loadAllPredStatuses(), 600);
       },
       error: () => {}
     });
@@ -1357,8 +1507,10 @@ export class FrontofficeFantasyComponent implements OnInit {
     this.captainId              = null;
     this.playerGoalPredictions  = {};
     this.currentPrediction      = null;
+    this.predHistory            = [];
+    this.showHistory            = false;
     const dbId = this.savedTeams[sport]?.dbId;
-    if (dbId) this.loadCurrentPrediction(dbId);
+    if (dbId) this.loadCurrentPrediction(dbId, sport);
   }
 
   goToBuild(sport: Sport): void {
@@ -1455,11 +1607,51 @@ export class FrontofficeFantasyComponent implements OnInit {
   }
 
   // ── Prediction ────────────────────────────────────────────────────────────────
-  loadCurrentPrediction(teamId: number): void {
+  loadCurrentPrediction(teamId: number, sport?: string): void {
     this.http.get<PredictionResult>(`${this.BASE}/predictions/current/${teamId}`).subscribe({
-      next:  (p) => { this.currentPrediction = p; this.initTestStats(p); },
-      error: ()  => { this.currentPrediction = null; }
+      next: (p) => {
+        this.currentPrediction = p;
+        this.initTestStats(p);
+        if (sport) this.predStatusMap[sport] = p.status;
+        this.loadPredictionHistory(teamId);
+      },
+      error: () => {
+        // No current-week prediction — fall back to most recent from history
+        this.http.get<PredictionResult[]>(`${this.BASE}/predictions/history/${teamId}`).subscribe({
+          next: (list) => {
+            this.predHistory = list ?? [];
+            const latest = list?.[0] ?? null;
+            if (latest) {
+              this.currentPrediction = latest;
+              this.initTestStats(latest);
+              if (sport) this.predStatusMap[sport] = latest.status;
+            } else {
+              this.currentPrediction = null;
+            }
+          },
+          error: () => { this.currentPrediction = null; }
+        });
+      }
     });
+  }
+
+  loadPredictionHistory(teamId: number): void {
+    this.http.get<PredictionResult[]>(`${this.BASE}/predictions/history/${teamId}`).subscribe({
+      next: (list) => { this.predHistory = list; },
+      error: ()    => { this.predHistory = []; }
+    });
+  }
+
+  /** Load status badges for all sports that have a saved team */
+  private loadAllPredStatuses(): void {
+    for (const sport of ['FOOTBALL', 'BASKETBALL', 'TENNIS'] as Sport[]) {
+      const dbId = this.savedTeams[sport]?.dbId;
+      if (!dbId) continue;
+      this.http.get<PredictionResult>(`${this.BASE}/predictions/current/${dbId}`).subscribe({
+        next:  (p) => { this.predStatusMap[sport] = p.status; },
+        error: ()  => { }
+      });
+    }
   }
 
   private initTestStats(p: PredictionResult): void {
@@ -1485,9 +1677,20 @@ export class FrontofficeFantasyComponent implements OnInit {
       })),
     };
     this.http.post<PredictionResult>(`${this.BASE}/predictions/submit`, dto).subscribe({
-      next:  (res) => { this.currentPrediction = res; this.initTestStats(res); this.predState = 'success'; this.showToast('🎯 Prediction submitted!', 'success'); setTimeout(() => this.predState = 'idle', 2000); },
+      next:  (res) => { this.currentPrediction = res; this.initTestStats(res); this.predStatusMap[this.predSport] = res.status; this.predState = 'success'; this.showToast('🎯 Prediction submitted!', 'success'); setTimeout(() => this.predState = 'idle', 2000); },
       error: ()    => { this.predState = 'idle'; this.showToast('❌ Could not submit', 'error'); }
     });
+  }
+
+  startNewPrediction(): void {
+    this.currentPrediction             = null;
+    this.predStatusMap[this.predSport] = '';
+    this.captainId                     = null;
+    this.playerGoalPredictions         = {};
+    this.showHistory                   = false;
+    this.showTestPanel                 = false;
+    this.resolveState                  = 'idle';
+    this.predState                     = 'idle';
   }
 
   // ── Admin: save stats then resolve ───────────────────────────────────────────
@@ -1522,10 +1725,21 @@ export class FrontofficeFantasyComponent implements OnInit {
     Promise.all(requests)
       .then(() => lastValueFrom(this.http.post<PredictionResult>(`${this.BASE}/predictions/admin/resolve/${predId}`, {})))
       .then((resolved) => {
-        this.currentPrediction = resolved ?? null;
-        this.showTestPanel  = false;
-        this.resolveState   = 'idle';
-        this.showToast('✅ Resolved! Check your results.', 'success');
+        if (resolved) {
+          this.currentPrediction = resolved;
+          this.predStatusMap[this.predSport] = resolved.status;
+          // Auto-apply earned/lost points to user balance
+          const pts = resolved.totalPointsEarned ?? 0;
+          this.userPoints = Math.round((this.userPoints + pts) * 10) / 10;
+          if (pts > 0) this.showToast(`🏆 +${pts.toFixed(1)} pts added to your balance!`, 'success');
+          else if (pts < 0) this.showToast(`😤 ${pts.toFixed(1)} pts deducted from your balance`, 'error');
+          else this.showToast('😐 No points gained or lost this week', 'success');
+          // Reload history so new entry appears
+          const dbId = this.savedTeams[this.predSport]?.dbId;
+          if (dbId) this.loadPredictionHistory(dbId);
+        }
+        this.showTestPanel = false;
+        this.resolveState  = 'idle';
       })
       .catch(() => {
         this.resolveState = 'idle';

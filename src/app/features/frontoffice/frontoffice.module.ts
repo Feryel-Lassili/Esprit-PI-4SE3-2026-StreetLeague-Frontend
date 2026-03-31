@@ -5,7 +5,7 @@ import { FrontofficeComponent } from './frontoffice.component';
 import { authGuard } from '../../core/guards/auth.guard';
 import { ProfileComponent } from './profile/profile.component';
 import { FormsModule } from '@angular/forms';
-
+import { CommunityComponent } from './community.component';
   
 
 const routes: Routes = [
@@ -17,6 +17,7 @@ const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./home.component').then(m => m.FrontofficeHomeComponent) },
       { path: 'fantasy',   loadComponent: () => import('./fantasy.component').then(m => m.FrontofficeFantasyComponent) },
+      { path: 'community', component: CommunityComponent },
       { path: 'profile', component: ProfileComponent }
     ]
   }
