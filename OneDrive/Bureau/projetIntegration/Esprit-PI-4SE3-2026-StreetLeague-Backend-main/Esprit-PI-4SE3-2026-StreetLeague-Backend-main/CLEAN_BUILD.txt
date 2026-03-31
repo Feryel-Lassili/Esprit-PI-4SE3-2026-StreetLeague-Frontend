@@ -1,0 +1,17 @@
+# Clean and Rebuild Required
+
+The error shows AppUser.class still exists in target/classes even though we deleted the source file.
+
+## In IntelliJ IDEA:
+
+1. **Build** menu → **Clean Project**
+2. **Build** menu → **Rebuild Project**
+3. Run the application again
+
+OR use Maven:
+```bash
+mvn clean compile
+mvn spring-boot:run
+```
+
+This will remove all old compiled classes and rebuild from scratch.
