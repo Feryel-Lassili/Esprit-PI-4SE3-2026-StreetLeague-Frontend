@@ -1,0 +1,38 @@
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const token = authService.getToken();
+
+  const isAuthRequest = req.url.includes('/auth/login') ||
+                        req.url.includes('/auth/register');
+
+  const skipLogout = isAuthRequest ||
+                     req.url.includes('/cart') ||
+                     req.url.includes('/posts') ||
+                     req.url.includes('/likes') ||
+                     req.url.includes('/comments') ||
+                     req.url.includes('/comment-reactions')||
+                     req.url.includes('/user/me');
+
+ if (token) {
+  req = req.clone({
+    setHeaders: { Authorization: `Bearer ${token}` }
+  });
+}
+
+  return next(req).pipe(
+    catchError(error => {
+      if ((error.status === 401 || error.status === 403) && !skipLogout) {
+        authService.logout();
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
+  );
+};

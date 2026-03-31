@@ -1,0 +1,43 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>🎯 Événements</h2>
+    <button class="btn-add" (click)="openAdd()">+ Ajouter un événement</button>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <div class="modal-overlay" *ngIf="showForm">
+    <div class="modal">
+      <h3>{{ isEditing ? 'Modifier' : 'Nouvel' }} Événement</h3>
+      <div class="form-grid">
+        <label>Nom</label>
+        <input [(ngModel)]="current.name" placeholder="Nom de l'événement" />
+        <label>Description</label>
+        <input [(ngModel)]="current.description" placeholder="Description" />
+        <label>Date</label>
+        <input type="date" [(ngModel)]="current.date" />
+        <label>Lieu</label>
+        <input [(ngModel)]="current.location" placeholder="Lieu" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" (click)="save()">✔ Enregistrer</button>
+        <button class="btn-cancel" (click)="cancel()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card" *ngFor="let e of events">
+      <div class="card-header">{{ e.name }}</div>
+      <div class="card-body">
+        <p>📍 {{ e.location }}</p>
+        <p>📅 {{ e.date | date:'dd/MM/yyyy' }}</p>
+        <p>{{ e.description }}</p>
+      </div>
+      <div class="card-actions">
+        <button class="btn-edit" (click)="openEdit(e)">✏ Modifier</button>
+        <button class="btn-delete" (click)="delete(e.id!)">🗑 Supprimer</button>
+      </div>
+    </div>
+    <div class="empty" *ngIf="events.length === 0">Aucun événement.</div>
+  </div>
+</div>

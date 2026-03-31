@@ -1,0 +1,36 @@
+<div class="page-container">
+
+  <h2>🏋️ Trainings</h2>
+
+  <!-- COACH -->
+  <div *ngIf="auth.hasRole('COACH')" class="form">
+    <input [(ngModel)]="newTraining.title" placeholder="Title">
+    <input [(ngModel)]="newTraining.location" placeholder="Location">
+    <button class="btn btn-primary" (click)="createTraining()">Create</button>
+  </div>
+
+  <div class="grid">
+
+    <div *ngFor="let t of trainings" class="card">
+
+      <h3>{{t.title}}</h3>
+      <p>{{t.description}}</p>
+      <p>📍 {{t.location}}</p>
+
+      <div style="margin-top:10px; display:flex; gap:10px;">
+
+        <button *ngIf="auth.hasRole('PLAYER')" class="btn btn-primary" (click)="join(t.id)">
+          Join
+        </button>
+
+        <button *ngIf="auth.hasRole('PLAYER')" class="btn" (click)="leave(t.id)">
+          Leave
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

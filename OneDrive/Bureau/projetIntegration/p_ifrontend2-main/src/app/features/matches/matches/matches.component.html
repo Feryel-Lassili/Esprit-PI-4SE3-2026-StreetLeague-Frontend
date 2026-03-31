@@ -1,0 +1,33 @@
+<div class="page-container">
+
+  <h2>⚽ Matches</h2>
+
+  <div class="grid">
+
+    <div *ngFor="let m of matches" class="card">
+
+      <h3>{{m.title}}</h3>
+      <p>📍 {{m.location}}</p>
+      <p>📅 {{m.date}}</p>
+
+      <div style="margin-top:10px; display:flex; gap:10px;">
+
+        <button *ngIf="auth.hasRole('PLAYER')" class="btn btn-primary" (click)="joinMatch(m.id)">
+          Join
+        </button>
+
+        <button *ngIf="auth.hasRole('PLAYER')" class="btn" (click)="leaveMatch(m.id)">
+          Leave
+        </button>
+
+        <button *ngIf="auth.hasRole('ADMIN')" class="btn btn-danger" (click)="deleteMatch(m.id)">
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

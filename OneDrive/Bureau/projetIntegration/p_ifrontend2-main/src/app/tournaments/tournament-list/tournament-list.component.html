@@ -1,0 +1,44 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>🏆 Tournois</h2>
+    <button class="btn-add" (click)="openAdd()">+ Ajouter un tournoi</button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showForm">
+    <div class="modal">
+      <h3>{{ isEditing ? 'Modifier' : 'Nouveau' }} Tournoi</h3>
+      <div class="form-grid">
+        <label>Nom</label>
+        <input [(ngModel)]="current.name" placeholder="Nom du tournoi" />
+        <label>Date début</label>
+        <input type="date" [(ngModel)]="current.startDate" />
+        <label>Date fin</label>
+        <input type="date" [(ngModel)]="current.endDate" />
+        <label>Lieu</label>
+        <input [(ngModel)]="current.location" placeholder="Lieu" />
+        <label>Équipes max</label>
+        <input type="number" [(ngModel)]="current.maxTeams" min="2" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" (click)="save()">✔ Enregistrer</button>
+        <button class="btn-cancel" (click)="cancel()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card" *ngFor="let t of tournaments">
+      <div class="card-header">{{ t.name }}</div>
+      <div class="card-body">
+        <p>📅 {{ t.startDate | date:'dd/MM/yyyy' }} → {{ t.endDate | date:'dd/MM/yyyy' }}</p>
+        <p>📍 {{ t.location }}</p>
+        <p>👥 Max {{ t.maxTeams }} équipes</p>
+      </div>
+      <div class="card-actions">
+        <button class="btn-edit" (click)="openEdit(t)">✏ Modifier</button>
+        <button class="btn-delete" (click)="delete(t.id!)">🗑 Supprimer</button>
+      </div>
+    </div>
+    <div class="empty" *ngIf="tournaments.length === 0">Aucun tournoi.</div>
+  </div>
+</div>
