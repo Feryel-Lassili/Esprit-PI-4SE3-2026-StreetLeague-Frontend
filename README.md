@@ -1,27 +1,103 @@
-# Frontend2test
+# 🏆 StreetLeague Frontend - Esprit PI 2026
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.21.
+![Angular](https://img.shields.io/badge/Angular-18.2-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 
-## Development server
+Welcome to the *StreetLeague* frontend repository. This project is a comprehensive sports management platform developed for the Esprit PI (Projet Intégré) 2026. It provides a modern, high-performance interface for players, captains, and owners to manage teams, venues, and transactions.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+---
 
-## Code scaffolding
+## ✨ Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+StreetLeague is divided into several modules, each offering a rich set of functionalities:
 
-## Build
+### 👥 Teams Management
+- *Interactive Listing*: Explore all available teams with sport-specific icons and banners.
+- *Full CRUD*: Create and edit teams (including logo upload).
+- *Joining System*: Send and manage join requests or team invitations.
+- *Team Leadership*: Transfer captain rights to other members or manage team rosters.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### 🏟️ Venues & Reservations
+- *Venue Browser*: Discover sports facilities with detailed information.
+- *Booking*: Reserve venues for matches and training sessions (Owner/Member views).
 
-## Running unit tests
+### 💰 Wallet & Economy
+- *Transactions*: View history and manage digital currency balances.
+- *Integration*: Secure payment flows for league fees and merchandise.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### 🛒 Shop & Merchandise
+- *Merchandise*: Purchase gear, equipment, and personalized apparel.
+- *Sponsors*: Direct interaction and visibility for league partners.
 
-## Running end-to-end tests
+### 🚗 Carpooling
+- *Logistics*: Organize transportation for team members to venues.
+- *Coordination*: Create or join carpooling sessions for upcoming matches.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### 🏥 Health & Wellness
+- *Tracking*: Monitor player health status and injury reports.
 
-## Further help
+---
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18.x or higher)
+- [Angular CLI](https://angular.io/cli) (v18.x)
+
+### Installation
+1.  *Clone the repository*:
+    
+    git clone https://github.com/Feryel-Lassili/Esprit-PI-4SE3-2026-StreetLeague-Frontend.git
+    cd Esprit-PI-4SE3-2026-StreetLeague-Frontend
+    
+2.  *Install dependencies*:
+    
+    npm install
+    
+3.  *Start the development server*:
+    
+    npm start
+    
+    Access the application at http://localhost:4200/.
+
+---
+
+## 🛠️ Technology Stack
+
+- *Core*: Angular 18 (Standalone Components / RxJS)
+- *Styling*: Vanilla SCSS (Custom Premium Design System) + TailwindCSS
+- *Animations*: Angular Animations & Custom Keyframes
+- *Forms*: Reactive & Template-driven forms
+- *Icons*: Custom SVG & Sport Symbols
+
+---
+
+## 📁 Project Structure
+
+text
+src/
+├── app/
+│   ├── core/           # Services (Auth, Team, API interceptors)
+│   ├── features/       # Main application modules
+│   │   ├── auth/       # Registration & Login
+│   │   ├── backoffice/ # Admin dashboards
+│   │   ├── frontoffice/# User platform (Home, Teams, Wallet...)
+│   │   └── shared/     # Global reusable components
+│   └── assets/         # Static images, fonts, icons
+├── styles.scss         # Global styles & design tokens
+
+---
+
+## 🎨 UI/UX Design
+
+StreetLeague features a *Premium Modern Interface*:
+- *Dynamic Gradients*: Color-coded sports themes (Football: Green, Basketball: Orange, etc.).
+- *Micro-animations*: Subtle hover effects and smooth transitions (Glassmorphism).
+- *Responsive Web Design*: Optimized for Desktop and Mobile experiences.
+
+---
+
+## 📄 License
+This project is part of the Esprit University Academic curriculum. All rights reserved.
+ANGULAR: 18.2
