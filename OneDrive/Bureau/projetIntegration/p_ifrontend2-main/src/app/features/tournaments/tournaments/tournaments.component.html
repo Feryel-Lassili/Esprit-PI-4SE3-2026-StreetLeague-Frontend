@@ -1,0 +1,23 @@
+<div class="page-container">
+
+  <h2>🏆 Tournaments</h2>
+
+  <!-- ADMIN -->
+  <div *ngIf="auth.hasRole('ADMIN')" class="form">
+    <input [(ngModel)]="newTournament.name" placeholder="Name">
+    <input [(ngModel)]="newTournament.phase" placeholder="Phase">
+    <button class="btn btn-primary" (click)="create()">Create</button>
+  </div>
+
+  <div class="grid">
+
+    <div *ngFor="let t of tournaments" class="card">
+      <h3>{{t.name}}</h3>
+      <p>Phase: {{t.phase}}</p>
+      <p>Teams: {{t.numberOfTeams}}</p>
+      <p>Prize: {{t.prize}} DT</p>
+    </div>
+
+  </div>
+
+</div>

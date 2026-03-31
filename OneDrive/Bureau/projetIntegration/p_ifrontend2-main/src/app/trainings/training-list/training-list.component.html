@@ -1,0 +1,44 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>🏃 Entraînements</h2>
+    <button class="btn-add" (click)="openAdd()">+ Ajouter un entraînement</button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showForm">
+    <div class="modal">
+      <h3>{{ isEditing ? 'Modifier' : 'Nouvel' }} Entraînement</h3>
+      <div class="form-grid">
+        <label>Titre</label>
+        <input [(ngModel)]="current.title" placeholder="Titre de la séance" />
+        <label>Coach</label>
+        <input [(ngModel)]="current.coach" placeholder="Nom du coach" />
+        <label>Date</label>
+        <input type="date" [(ngModel)]="current.date" />
+        <label>Durée (min)</label>
+        <input type="number" [(ngModel)]="current.duration" min="15" />
+        <label>Lieu</label>
+        <input [(ngModel)]="current.location" placeholder="Terrain / salle" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" (click)="save()">✔ Enregistrer</button>
+        <button class="btn-cancel" (click)="cancel()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card" *ngFor="let t of trainings">
+      <div class="card-header">{{ t.title }}</div>
+      <div class="card-body">
+        <p>👨‍🏫 {{ t.coach }}</p>
+        <p>📅 {{ t.date | date:'dd/MM/yyyy' }}</p>
+        <p>⏱ {{ t.duration }} min — 📍 {{ t.location }}</p>
+      </div>
+      <div class="card-actions">
+        <button class="btn-edit" (click)="openEdit(t)">✏ Modifier</button>
+        <button class="btn-delete" (click)="delete(t.id!)">🗑 Supprimer</button>
+      </div>
+    </div>
+    <div class="empty" *ngIf="trainings.length === 0">Aucun entraînement.</div>
+  </div>
+</div>

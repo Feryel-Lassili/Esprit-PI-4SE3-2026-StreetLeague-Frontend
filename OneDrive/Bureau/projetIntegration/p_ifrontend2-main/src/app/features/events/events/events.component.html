@@ -1,0 +1,18 @@
+<h2>Events</h2>
+
+<!-- ADMIN -->
+<div *ngIf="auth.hasRole('ADMIN')" class="form">
+  <input [(ngModel)]="newEvent.title" placeholder="Title">
+  <input [(ngModel)]="newEvent.location" placeholder="Location">
+  <input [(ngModel)]="newEvent.description" placeholder="Description">
+
+  <button (click)="createEvent()">Create Event</button>
+</div>
+
+<hr>
+
+<div class="card" *ngFor="let e of events">
+  <h3>{{e.title}}</h3>
+  <p>{{e.location}}</p>
+  <small>{{e.description}}</small>
+</div>
