@@ -459,11 +459,17 @@ const REACTIONS = [
   `
 })
 export class CommunityComponent implements OnInit {
+readonly BASE      = 'http://localhost:8089/SpringSecurity';
+readonly reactions = REACTIONS;
 
-  readonly BASE            = 'http://localhost:8089/SpringSecurity';
-  readonly currentUserId   = 1;
-  readonly currentUsername = 'Me';
-  readonly reactions       = REACTIONS;
+private get currentUser() {
+  try {
+    const data = localStorage.getItem('user_data');
+    return data ? JSON.parse(data) : { id: 1, username: 'Me' };
+  } catch { return { id: 1, username: 'Me' }; }
+}
+get currentUserId(): number   { return this.currentUser.id ?? 1; }
+get currentUsername(): string { return this.currentUser.username ?? this.currentUser.email ?? 'Me'; }
 
   posts:         PostDto[] = [];
   loading        = true;
