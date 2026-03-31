@@ -163,7 +163,7 @@ export class WalletComponent implements OnInit {
         this.applyFilter();
         this.cdr.detectChanges();
       },
-      error: (err) => { console.error('getTransactions error:', err); }
+      error: () => {}
     });
   }
 
