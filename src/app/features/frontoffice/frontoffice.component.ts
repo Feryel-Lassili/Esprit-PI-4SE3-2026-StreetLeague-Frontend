@@ -112,6 +112,7 @@ export class FrontofficeComponent implements OnInit {
       items: [
         { path: '/teams',   label: 'Teams',     icon: '👥' },
         { path: '/venues',  label: 'Venues',    icon: '📍' },
+        { path: '/venues/create', label: 'Create Venue', icon: '🏟️' },
         { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
       ]
     },
