@@ -309,7 +309,7 @@ const REACTIONS = [
 
       <!-- Post header -->
       <div class="post-header">
-        <div class="post-avatar">{{ post.username[0]?.toUpperCase() }}</div>
+        <div class="post-avatar">{{ post.username[0].toUpperCase() }}</div>
         <div class="post-meta">
           <div class="post-author">{{ post.username }}</div>
           <div class="post-time">{{ formatTime(post.creationDate) }}</div>
@@ -385,7 +385,7 @@ const REACTIONS = [
 
         <!-- Comment list -->
         <div *ngFor="let comment of post.comments" class="comment-item">
-          <div class="comment-avatar">{{ comment.username[0]?.toUpperCase() }}</div>
+          <div class="comment-avatar">{{ comment.username[0].toUpperCase() }}</div>
           <div class="comment-bubble">
 
             <!-- Bubble -->
@@ -449,7 +449,7 @@ const REACTIONS = [
             <div class="replies-section"
                  *ngIf="comment.replies && comment.replies.length > 0">
               <div *ngFor="let reply of comment.replies" class="reply-item">
-                <div class="reply-avatar">{{ reply.username[0]?.toUpperCase() }}</div>
+                <div class="reply-avatar">{{ reply.username[0].toUpperCase() }}</div>
                 <div class="comment-bubble">
                   <div class="comment-box">
                     <div class="comment-author">{{ reply.username }}</div>
