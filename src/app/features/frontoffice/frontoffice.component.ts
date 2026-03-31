@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-frontoffice',
@@ -117,9 +118,18 @@ export class FrontofficeComponent implements OnInit {
     {
       section: 'Social',
       items: [
-        { path: '/community', label: 'Community', icon: '💬' },
-        { path: '/sponsors', label: 'Sponsors', icon: '💰' },
-        { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
+        { path: '/community',         label: 'Community',    icon: '💬' },
+        { path: '/sponsors',          label: 'Sponsors',     icon: '💰' },
+      ]
+    },
+    {
+      section: 'Carpooling',
+      items: [
+        { path: '/carpooling',          label: 'Browse Trips', icon: '🗺️' },
+        { path: '/carpooling/my-trips', label: 'My Trips',     icon: '🚗' },
+        { path: '/carpooling/my-joined',label: 'Joined Trips', icon: '🎒' },
+        { path: '/carpooling/create',   label: 'Create Trip',  icon: '➕' },
+        { path: '/cars',                label: 'My Cars',      icon: '🚘' },
       ]
     },
     {
@@ -147,11 +157,18 @@ export class FrontofficeComponent implements OnInit {
 
   getTitle(): string {
     const all = this.menu.flatMap(s => s.items);
-    return all.find(i => i.path === this.currentPath)?.label || 'Home';
+    const exact = all.find(i => i.path === this.currentPath);
+    if (exact) return exact.label;
+    // partial match for nested routes (e.g. /carpooling/details/5)
+    const partial = all.filter(i => i.path !== '/').find(i => this.currentPath.startsWith(i.path));
+    return partial?.label || 'Home';
   }
 
   constructor(private authService: AuthService, private router: Router) {
     this.currentPath = this.router.url || '/home';
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
+      this.currentPath = e.urlAfterRedirects || e.url;
+    });
   }
 
   ngOnInit() {
