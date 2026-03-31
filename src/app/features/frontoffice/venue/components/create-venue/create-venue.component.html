@@ -1,0 +1,98 @@
+<div class="page">
+  <div class="page-title">Create a Venue</div>
+  <div class="page-sub">Add your sports venue to StreetLeague</div>
+
+  <div class="success-box" *ngIf="success">✅ Venue created! Redirecting…</div>
+  <div class="error-box"   *ngIf="error">⚠️ {{ error }}</div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- Basic Info -->
+    <div class="card">
+      <div class="card-title">📋 Basic Information</div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">Venue Name *</label>
+          <input class="form-input" formControlName="name" placeholder="e.g. Arena Nord"
+            [class.invalid]="f['name'].touched && f['name'].invalid"/>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['required']">Name is required</span>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['minlength']">Name must be at least 3 characters</span>
+          <span class="form-error" *ngIf="f['name'].touched && f['name'].errors?.['maxlength']">Name cannot exceed 100 characters</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Sport Type *</label>
+          <select class="form-select" formControlName="sportType"
+            [class.invalid]="f['sportType'].touched && f['sportType'].invalid">
+            <option value="">— Choose sport —</option>
+            <option *ngFor="let s of sportTypes" [value]="s.value">{{ s.label }}</option>
+          </select>
+          <span class="form-error" *ngIf="f['sportType'].touched && f['sportType'].errors?.['required']">Sport type is required</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Price per Hour (TND) *</label>
+          <input class="form-input" type="number" formControlName="pricePerHour" placeholder="50" min="1"
+            [class.invalid]="f['pricePerHour'].touched && f['pricePerHour'].invalid"/>
+          <span class="form-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['required']">Price is required</span>
+          <span class="form-error" *ngIf="f['pricePerHour'].touched && f['pricePerHour'].errors?.['min']">Price must be greater than 0</span>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Capacity (players) *</label>
+          <input class="form-input" type="number" formControlName="capacity" placeholder="22" min="1"
+            [class.invalid]="f['capacity'].touched && f['capacity'].invalid"/>
+          <span class="form-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['required']">Capacity is required</span>
+          <span class="form-error" *ngIf="f['capacity'].touched && f['capacity'].errors?.['min']">Capacity must be at least 1</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address + Map -->
+    <div class="card">
+      <div class="card-title">📍 Location</div>
+      <div class="form-row full-width" style="margin-bottom:12px;">
+        <label class="form-label">Search Address</label>
+        <div class="map-search-row">
+          <input class="map-search-input" type="text" [(ngModel)]="mapSearch" [ngModelOptions]="{standalone:true}"
+            placeholder="Type a place and press Search…" (keydown.enter)="searchAddress($event)"/>
+          <button type="button" class="btn-search" (click)="searchAddress()">🔍 Search</button>
+        </div>
+        <div class="map-results" *ngIf="mapResults.length">
+          <div class="map-result-item" *ngFor="let r of mapResults" (click)="pickAddress(r)">
+            {{ r.display_name }}
+          </div>
+        </div>
+      </div>
+      <div class="form-row full-width" style="margin-bottom:12px;">
+        <label class="form-label">Address *</label>
+        <input class="form-input" formControlName="address" placeholder="Filled when you pick from map"
+          [class.invalid]="f['address'].touched && f['address'].invalid"/>
+        <span class="form-error" *ngIf="f['address'].touched && f['address'].errors?.['required']">Address is required — pick a location from the map</span>
+      </div>
+      <div class="map-container" id="create-venue-map"></div>
+    </div>
+
+    <!-- Photo -->
+    <div class="card">
+      <div class="card-title">📸 Photo</div>
+      <div *ngIf="!photoPreview" class="photo-upload-area" (click)="photoInput.click()">
+        <input #photoInput type="file" accept="image/*" (change)="onPhotoSelected($event)"/>
+        <div style="font-size:40px;margin-bottom:8px;">📷</div>
+        <div style="font-size:13px;font-weight:600;color:#1d1d1f;">Click to upload a photo</div>
+        <div style="font-size:12px;color:#6e6e73;margin-top:4px;">JPG, PNG — max 10 MB</div>
+      </div>
+      <div *ngIf="photoPreview" class="photo-preview-wrap">
+        <img [src]="photoPreview" class="photo-preview" alt="preview"/>
+        <button type="button" class="photo-remove" (click)="removePhoto()">✕</button>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a class="btn-back" routerLink="/venue/my-venues">← Back</a>
+      <button class="btn-submit" type="submit" [disabled]="loading">
+        <span class="spinner" *ngIf="loading"></span>
+        {{ loading ? 'Creating…' : '✓ Create Venue' }}
+      </button>
+    </div>
+
+  </form>
+</div>

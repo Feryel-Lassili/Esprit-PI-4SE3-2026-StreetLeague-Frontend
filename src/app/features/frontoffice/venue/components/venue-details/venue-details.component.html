@@ -1,0 +1,120 @@
+<div class="details-page">
+  <!-- Loading -->
+  <div *ngIf="loading" class="state-center">
+    <div class="spinner"></div>
+    <p>Loading venue details...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert-error">
+    <span>⚠️</span> {{ error }}
+    <a routerLink="/venue/my-venues" class="btn-back-err">← Back to venues</a>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="venue && !loading">
+    <div class="details-header">
+      <a routerLink="/venue/my-venues" class="back-link" id="back-from-details">← Back to My Venues</a>
+      <div class="header-actions">
+        <button class="btn-edit" (click)="editVenue()" id="edit-from-details">✏️ Edit Venue</button>
+      </div>
+    </div>
+
+    <div class="details-card">
+      <div class="details-card-top">
+        <div class="sport-pill">{{ venue.sportType }}</div>
+        <h1 class="venue-name">{{ venue.name }}</h1>
+        <p class="venue-address">📍 {{ venue.address }}</p>
+      </div>
+
+      <div class="details-stats">
+        <div class="stat-item">
+          <div class="stat-icon">💰</div>
+          <div class="stat-body">
+            <div class="stat-value">{{ venue.pricePerHour }} TND</div>
+            <div class="stat-label">per hour</div>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon">👥</div>
+          <div class="stat-body">
+            <div class="stat-value">{{ venue.capacity }}</div>
+            <div class="stat-label">max capacity</div>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon">⚽</div>
+          <div class="stat-body">
+            <div class="stat-value">{{ venue.sportType }}</div>
+            <div class="stat-label">sport type</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="details-info">
+        <h2 class="section-title">Venue Information</h2>
+        <div class="info-grid">
+          <div class="info-row">
+            <span class="info-label">ID</span>
+            <span class="info-value">#{{ venue.id }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Name</span>
+            <span class="info-value">{{ venue.name }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Address</span>
+            <span class="info-value">{{ venue.address }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Sport</span>
+            <span class="info-value">{{ venue.sportType }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Price / Hour</span>
+            <span class="info-value">{{ venue.pricePerHour }} TND</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Capacity</span>
+            <span class="info-value">{{ venue.capacity }} persons</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .details-page { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .state-center { display: flex; flex-direction: column; align-items: center; padding: 60px; color: #6e6e73; gap: 14px; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #e0e0e5; border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .alert-error { background: #fff2f2; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; display: flex; align-items: center; gap: 10px; }
+  .btn-back-err { margin-left: auto; color: #c62828; text-decoration: none; font-size: 13px; }
+  .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .back-link { font-size: 13px; color: #6e6e73; text-decoration: none; }
+  .back-link:hover { color: #000; }
+  .header-actions { display: flex; gap: 10px; }
+  .btn-edit { background: #000; color: #fff; border: none; padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .btn-edit:hover { opacity: 0.8; }
+  .details-card { background: #fff; border: 1px solid #e0e0e5; border-radius: 16px; overflow: hidden; }
+  .details-card-top { padding: 28px 28px 24px; border-bottom: 1px solid #f5f5f7; }
+  .sport-pill { display: inline-block; background: #e8f0fe; color: #185fa5; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .venue-name { font-size: 26px; font-weight: 700; color: #1d1d1f; margin: 0 0 8px; }
+  .venue-address { font-size: 15px; color: #6e6e73; margin: 0; }
+  .details-stats { display: flex; align-items: center; padding: 24px 28px; border-bottom: 1px solid #f5f5f7; }
+  .stat-item { display: flex; align-items: center; gap: 14px; flex: 1; }
+  .stat-icon { font-size: 24px; }
+  .stat-value { font-size: 20px; font-weight: 700; color: #1d1d1f; }
+  .stat-label { font-size: 12px; color: #6e6e73; margin-top: 2px; }
+  .stat-divider { width: 1px; height: 40px; background: #e0e0e5; margin: 0 24px; }
+  .details-info { padding: 24px 28px; }
+  .section-title { font-size: 15px; font-weight: 600; color: #1d1d1f; margin: 0 0 16px; }
+  .info-grid { display: flex; flex-direction: column; gap: 0; }
+  .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f7; }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 13px; color: #6e6e73; }
+  .info-value { font-size: 13px; font-weight: 500; color: #1d1d1f; }
+</style>

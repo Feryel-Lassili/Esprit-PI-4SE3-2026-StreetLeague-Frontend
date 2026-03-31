@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-frontoffice',
@@ -45,7 +46,7 @@ import { AuthService } from '../../core/services/auth.service';
       <aside class="sidebar" [class.collapsed]="!sidebarOpen">
 
         <div class="sidebar-header">
-          <div class="logo-box"><span>S</span></div>
+          <div class="logo-box"><img src="logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"></div>
           <span class="logo-text" *ngIf="sidebarOpen">StreetLeague</span>
           <button class="toggle-btn" (click)="sidebarOpen = !sidebarOpen">☰</button>
         </div>
@@ -93,9 +94,10 @@ import { AuthService } from '../../core/services/auth.service';
     </div>
   `
 })
-export class FrontofficeComponent {
+export class FrontofficeComponent implements OnInit {
   sidebarOpen = true;
   currentPath = '/home';
+  isPlayer = false;
 
   menu = [
     {
@@ -110,14 +112,25 @@ export class FrontofficeComponent {
       items: [
         { path: '/teams',   label: 'Teams',     icon: '👥' },
         { path: '/venues',  label: 'Venues',    icon: '📍' },
-        { path: 'fantasy',    label: 'Fantasy',   icon: '🎮' },
+        { path: '/venues/create', label: 'Create Venue', icon: '🏟️' },
+        { path: '/fantasy', label: 'Fantasy',   icon: '🎮' },
       ]
     },
     {
       section: 'Social',
       items: [
-       { path: 'community', label: 'Community', icon: '💬' },
-       { path: '/rideshare', label: 'Rideshare',  icon: '🚗' },
+        { path: '/community', label: 'Community', icon: '💬' },
+        { path: '/sponsors',  label: 'Sponsors',  icon: '💰' },
+      ]
+    },
+    {
+      section: 'Carpooling',
+      items: [
+        { path: '/carpooling',           label: 'Browse Trips', icon: '🗺️' },
+        { path: '/carpooling/my-trips',  label: 'My Trips',     icon: '🚗' },
+        { path: '/carpooling/my-joined', label: 'Joined Trips', icon: '🎒' },
+        { path: '/carpooling/create',    label: 'Create Trip',  icon: '➕' },
+        { path: '/cars',                 label: 'My Cars',      icon: '🚘' },
       ]
     },
     {
@@ -126,6 +139,7 @@ export class FrontofficeComponent {
         { path: '/shop',    label: 'Shop',      icon: '🛍️' },
         { path: '/wallet',  label: 'Wallet',    icon: '💳' },
         { path: '/profile', label: 'Profile',   icon: '👤' },
+        { path: '/health', label: 'Health', icon: '🏥' },
       ]
     }
   ];
@@ -144,11 +158,28 @@ export class FrontofficeComponent {
 
   getTitle(): string {
     const all = this.menu.flatMap(s => s.items);
-    return all.find(i => i.path === this.currentPath)?.label || 'Home';
+    const exact = all.find(i => i.path === this.currentPath);
+    if (exact) return exact.label;
+    // partial match for nested routes (e.g. /carpooling/details/5)
+    const partial = all.filter(i => i.path !== '/').find(i => this.currentPath.startsWith(i.path));
+    return partial?.label || 'Home';
   }
 
   constructor(private authService: AuthService, private router: Router) {
     this.currentPath = this.router.url || '/home';
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: any) => {
+      this.currentPath = e.urlAfterRedirects || e.url;
+    });
+  }
+
+  ngOnInit() {
+    this.isPlayer = this.authService.hasRole('PLAYER');
+    if (this.isPlayer) {
+      const moreSection = this.menu.find(s => s.section === 'More');
+      if (moreSection) {
+        moreSection.items.push({ path: '/my-merchandise', label: 'My Merch', icon: '🏅' });
+      }
+    }
   }
 
   logout() { this.authService.logout(); }

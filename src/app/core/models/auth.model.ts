@@ -38,6 +38,9 @@ export interface LoginResponse {
   token: string;
   email: string;
   role: string;
+  id: number;
+  username?: string;
+  profileId?: number;
 }
 
 export interface User {

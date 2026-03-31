@@ -1,0 +1,398 @@
+<div class="wrap">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="inner">
+
+    <!-- ═══ VUE LISTE ═══ -->
+    <ng-container *ngIf="!selectedTeam">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">ALL TEAMS</div>
+          <div class="page-subtitle">{{ allTeams.length }} teams available</div>
+        </div>
+        <div class="header-right">
+          <!-- Unified notification bell -->
+          <button class="btn-notif" (click)="openInvitationsModal()" *ngIf="currentUserId" title="Invitations & join requests">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+          </button>
+          <button class="btn-create" (click)="openCreateModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create team
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-card"><div class="stat-icon cyan">🏆</div><div><div class="stat-value" style="color:var(--accent)">{{ allTeams.length }}</div><div class="stat-label">Total teams</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">👥</div><div><div class="stat-value" style="color:var(--green)">{{ totalPlayers }}</div><div class="stat-label">Active players</div></div></div>
+      </div>
+
+      <!-- View filter (My Teams / Captain) -->
+      <div class="view-filter-bar" *ngIf="currentUserId">
+        <div class="view-pill" [class.active]="viewFilter==='ALL'"      (click)="setViewFilter('ALL')">🌍 All teams</div>
+        <div class="view-pill" [class.active]="viewFilter==='MY_TEAMS'" (click)="setViewFilter('MY_TEAMS')">👥 My teams</div>
+        <div class="view-pill captain-pill" [class.active]="viewFilter==='CAPTAIN'" (click)="setViewFilter('CAPTAIN')">👑 Captain</div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+          <input class="search-input" type="text" placeholder="Search for a team..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()"/>
+        </div>
+        <div class="filter-pill" [class.active]="currentFilter==='ALL'"        (click)="setFilter('ALL')">All</div>
+        <div class="filter-pill" [class.active]="currentFilter==='FOOTBALL'"   (click)="setFilter('FOOTBALL')">⚽ Football</div>
+        <div class="filter-pill" [class.active]="currentFilter==='BASKETBALL'" (click)="setFilter('BASKETBALL')">🏀 Basketball</div>
+        <div class="filter-pill" [class.active]="currentFilter==='TENNIS'"     (click)="setFilter('TENNIS')">🎾 Tennis</div>
+        <div class="filter-pill" [class.active]="currentFilter==='VOLLEYBALL'" (click)="setFilter('VOLLEYBALL')">🏐 Volleyball</div>
+        <div class="filter-pill" [class.active]="currentFilter==='HANDBALL'"   (click)="setFilter('HANDBALL')">🤾 Handball</div>
+      </div>
+
+      <div class="loading-wrap" *ngIf="loading"><div class="spinner"></div><span>Loading...</span></div>
+      <div class="error-box" *ngIf="error">⚠️ {{ error }}</div>
+
+      <div class="teams-grid" *ngIf="!loading && !error">
+        <div class="team-card" *ngFor="let team of filteredTeams" (click)="openDetail(team)">
+          <div class="card-banner" [style.background]="getBannerBg(team.type)">
+            <span class="banner-emoji">{{ getSportEmoji(team.type) }}</span>
+          </div>
+          <div class="card-body">
+            <div class="team-logo-wrap">
+              <img *ngIf="team.logo" [src]="team.logo" [alt]="team.name" (error)="$any($event.target).style.display='none'"/>
+              <span *ngIf="!team.logo">{{ getSportEmoji(team.type) }}</span>
+            </div>
+            <div class="team-name">
+              {{ team.name }}
+              <span class="captain-crown" *ngIf="isCaptain(team)" title="You are the captain">👑</span>
+            </div>
+            <div class="team-meta">
+              <span class="sport-badge" [style.background]="getBadgeBg(team.type)" [style.color]="getSportColor(team.type)">{{ team.type || 'N/A' }}</span>
+            </div>
+            <div class="card-stats">
+              <div class="cstat"><div class="cstat-val" [style.color]="getSportColor(team.type)">{{ team.players?.length || 0 }}</div><div class="cstat-label">Players</div></div>
+            </div>
+            <div class="players-row">
+              <div class="player-avatars">
+                <div class="player-avatar" *ngFor="let p of (team.players||[]) | slice:0:4; let i=index" [style.background]="avatarColors[i % avatarColors.length]">{{ getInitial(p, i) }}</div>
+                <div class="player-more" *ngIf="(team.players?.length||0) > 4">+{{ (team.players?.length||0) - 4 }}</div>
+                <span style="color:var(--muted);font-size:12px" *ngIf="!team.players?.length">No players</span>
+              </div>
+            </div>
+            <div class="card-hint">👁 Click to view details</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && !error && filteredTeams.length === 0">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No results</div>
+      </div>
+
+    </ng-container>
+
+    <!-- ═══ VUE DÉTAIL ═══ -->
+    <div class="detail-view" *ngIf="selectedTeam">
+
+      <button class="btn-back" (click)="closeDetail()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+        Back to teams
+      </button>
+
+      <div class="detail-hero">
+        <div class="detail-banner" [style.background]="getBannerBg(selectedTeam.type)">
+          <span class="detail-banner-emoji">{{ getSportEmoji(selectedTeam.type) }}</span>
+          <div class="detail-hero-content">
+            <div class="detail-logo">
+              <img *ngIf="selectedTeam.logo" [src]="selectedTeam.logo" [alt]="selectedTeam.name" (error)="$any($event.target).style.display='none'"/>
+              <span *ngIf="!selectedTeam.logo">{{ getSportEmoji(selectedTeam.type) }}</span>
+            </div>
+            <div class="detail-hero-info">
+              <div class="detail-team-name">
+                {{ selectedTeam.name }}
+                <span class="captain-crown" *ngIf="isCaptain(selectedTeam)">👑</span>
+              </div>
+              <div class="detail-badges">
+                <span class="detail-badge sport">{{ selectedTeam.type }}</span>
+                <span class="detail-badge captain" *ngIf="isCaptain(selectedTeam)">Captain</span>
+                <span class="detail-badge member" *ngIf="isMember(selectedTeam) && !isCaptain(selectedTeam)">Member</span>
+              </div>
+            </div>
+            <!-- Captain actions -->
+            <div class="detail-hero-actions" *ngIf="isCaptain(selectedTeam)">
+              <button class="btn-hero edit"    (click)="openEditModal(selectedTeam, $event)">✏️ Edit</button>
+              <button class="btn-hero requests" (click)="openRequestsModal(selectedTeam, $event)" style="position:relative">
+                📋 Requests
+                <span class="btn-hero-badge" *ngIf="getRequestsCountForTeam(selectedTeam.id) > 0">
+                  {{ getRequestsCountForTeam(selectedTeam.id) }}
+                </span>
+              </button>
+              <button class="btn-hero invite"  (click)="openInviteModal(selectedTeam, $event)">➕ Invite</button>
+              <button class="btn-hero transfer" (click)="openTransferModal(selectedTeam, $event)">👑 Transfer</button>
+              <button class="btn-hero del"     (click)="confirmDelete(selectedTeam, $event)">🗑</button>
+            </div>
+            <!-- Non-member actions -->
+            <div class="detail-hero-actions" *ngIf="!isMember(selectedTeam) && !isCaptain(selectedTeam) && currentUserId">
+              <button class="btn-hero join" (click)="requestJoin(selectedTeam)">📨 Request to join</button>
+            </div>
+            <!-- Member (non-captain) actions -->
+            <div class="detail-hero-actions" *ngIf="isMember(selectedTeam) && !isCaptain(selectedTeam) && currentUserId">
+              <button class="btn-hero del" (click)="leaveTeam(selectedTeam, $event)">🚪 Leave team</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-stats">
+        <div class="dstat"><div class="dstat-val" [style.color]="getSportColor(selectedTeam.type)">{{ selectedTeam.players?.length || 0 }}</div><div class="dstat-label">Players</div></div>
+      </div>
+
+      <div class="detail-section">
+        <div class="section-header">
+          <div class="section-title">👥 PLAYERS</div>
+          <span class="section-count">{{ selectedTeam.players?.length || 0 }}</span>
+        </div>
+        <div class="no-players" *ngIf="!selectedTeam.players?.length">
+          <div style="font-size:48px;margin-bottom:16px">🏟️</div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:8px">No players yet</div>
+        </div>
+        <div class="players-grid" *ngIf="selectedTeam.players?.length">
+          <div class="player-card" *ngFor="let p of selectedTeam.players; let i=index">
+            <div class="pcard-avatar" [style.background]="avatarColors[i % avatarColors.length]">
+              {{ getInitial(p, i) }}
+            </div>
+            <div class="pcard-info">
+              <div class="pcard-name">
+                {{ getPlayerName(p) }}
+                <span class="mini-crown" *ngIf="p.id === selectedTeam.captainId">👑</span>
+              </div>
+              <div class="pcard-email">{{ p.email || '' }}</div>
+            </div>
+            <!-- Captain can remove other players -->
+            <button class="btn-remove-player"
+              *ngIf="isCaptain(selectedTeam) && p.id !== selectedTeam.captainId"
+              (click)="removePlayer(selectedTeam, p, $event)"
+              title="Remove player">✕</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CREATE/EDIT ═══ -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">{{ editingTeam ? 'EDIT TEAM' : 'NEW TEAM' }}</div>
+    <div class="modal-error" *ngIf="modalError">⚠️ {{ modalError }}</div>
+
+    <div class="form-group">
+      <label class="form-label">Team logo</label>
+      <div class="logo-dropzone"
+        [class.drag-over]="isDragOver"
+        (dragover)="$event.preventDefault(); isDragOver=true"
+        (dragleave)="isDragOver=false"
+        (drop)="onLogoDrop($event)">
+        <input type="file" accept="image/*" (change)="onLogoFileChange($event)"/>
+        <div class="logo-preview" [class.empty]="!logoPreview">
+          <img *ngIf="logoPreview" [src]="logoPreview"/>
+          <span *ngIf="!logoPreview">{{ getSportEmoji(form.type) || '🏆' }}</span>
+        </div>
+        <div class="logo-drop-text">{{ logoPreview ? '✅ Image loaded — click to change' : 'Drag & drop or click to browse' }}</div>
+        <div class="logo-drop-hint">PNG, JPG, WEBP</div>
+      </div>
+      <button *ngIf="logoPreview" class="btn-remove-logo" type="button" (click)="logoPreview=''; form.logo=''">🗑 Remove logo</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Team name *</label>
+      <input class="form-input" type="text" placeholder="ex: Thunder Hawks" [(ngModel)]="form.name"
+        [class.form-input-err]="formTouched && !form.name.trim()"
+        (blur)="formTouched=true"/>
+      <span class="form-ferr" *ngIf="formTouched && !form.name.trim()">Team name is required</span>
+      <span class="form-ferr" *ngIf="formTouched && form.name.trim() && form.name.trim().length < 2">Name must be at least 2 characters</span>
+      <span class="form-fhint" *ngIf="form.name.trim().length >= 2">{{ form.name.trim().length }}/80</span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sport *</label>
+      <select class="form-select" [(ngModel)]="form.type"
+        [class.form-input-err]="formTouched && !form.type"
+        (blur)="formTouched=true">
+        <option value="">-- Choose a sport --</option>
+        <option value="FOOTBALL">⚽ Football</option>
+        <option value="BASKETBALL">🏀 Basketball</option>
+        <option value="TENNIS">🎾 Tennis</option>
+        <option value="VOLLEYBALL">🏐 Volleyball</option>
+        <option value="HANDBALL">🤾 Handball</option>
+      </select>
+      <span class="form-ferr" *ngIf="formTouched && !form.type">Please select a sport</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-submit" (click)="saveTeam()" [disabled]="modalLoading">
+        {{ modalLoading ? '⏳...' : (editingTeam ? 'Update' : 'Create team') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL DELETE ═══ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm">
+  <div class="delete-modal">
+    <div class="delete-icon">⚠️</div>
+    <div class="delete-title">DELETE?</div>
+    <p class="delete-msg">Do you want to delete<br/><strong>{{ teamToDelete?.name }}</strong> ?<br/>This action is irreversible.</p>
+    <div class="delete-actions">
+      <button class="btn-cancel" (click)="showDeleteConfirm=false">Cancel</button>
+      <button class="btn-delete" (click)="deleteTeam()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL PENDING REQUESTS (captain) ═══ -->
+<div class="modal-overlay" *ngIf="showRequestsModal" (click)="showRequestsModal=false">
+  <div class="modal wide-modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">📋 JOIN REQUESTS — {{ selectedTeam?.name }}</div>
+    <div class="loading-wrap" *ngIf="requestsLoading"><div class="spinner"></div></div>
+    <div *ngIf="!requestsLoading">
+      <div class="empty-state-sm" *ngIf="pendingRequests.length === 0">No pending requests</div>
+      <div class="request-list" *ngIf="pendingRequests.length > 0">
+        <div class="request-item" *ngFor="let req of pendingRequests">
+          <div class="req-avatar">{{ getInitial(req.player, 0) }}</div>
+          <div class="req-info">
+            <div class="req-name">{{ getPlayerName(req.player) }}</div>
+            <div class="req-email">{{ req.player.email }}</div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" (click)="acceptRequest(req)">✅ Accept</button>
+            <button class="btn-refuse" (click)="refuseRequest(req)">✕ Refuse</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showRequestsModal=false">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL INVITE PLAYER (captain) ═══ -->
+<div class="modal-overlay" *ngIf="showInviteModal" (click)="showInviteModal=false">
+  <div class="modal wide-modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">➕ INVITE A PLAYER — {{ selectedTeam?.name }}</div>
+    <div class="form-group">
+      <input class="form-input" type="text" placeholder="Search by name or email..." [(ngModel)]="inviteSearch"/>
+    </div>
+    <div class="loading-wrap" *ngIf="inviteLoading"><div class="spinner"></div></div>
+    <div *ngIf="!inviteLoading">
+      <div class="empty-state-sm" *ngIf="filteredInvitablePlayers.length === 0">No players available</div>
+      <div class="request-list" *ngIf="filteredInvitablePlayers.length > 0">
+        <div class="request-item" *ngFor="let p of filteredInvitablePlayers; let i=index">
+          <div class="req-avatar" [style.background]="avatarColors[i % avatarColors.length]">{{ getInitial(p, i) }}</div>
+          <div class="req-info">
+            <div class="req-name">{{ getPlayerName(p) }}</div>
+            <div class="req-email">{{ p.email }}</div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" (click)="invitePlayer(p)">📨 Invite</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showInviteModal=false">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL TRANSFER CAPTAIN ═══ -->
+<div class="modal-overlay" *ngIf="showTransferModal" (click)="showTransferModal=false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">👑 TRANSFER CAPTAIN</div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Choose a player from your team to become the new captain.</p>
+    <div class="form-group">
+      <label class="form-label">New captain</label>
+      <select class="form-select" [(ngModel)]="transferTargetId">
+        <option [ngValue]="null">-- Select a player --</option>
+        <ng-container *ngFor="let p of selectedTeam?.players">
+          <option *ngIf="p.id !== selectedTeam?.captainId" [ngValue]="p.id">{{ getPlayerName(p) }}</option>
+        </ng-container>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showTransferModal=false">Cancel</button>
+      <button class="btn-submit" (click)="confirmTransfer()" [disabled]="!transferTargetId">Confirm transfer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL NOTIFICATIONS (invitations + join requests) ═══ -->
+<div class="modal-overlay" *ngIf="showInvitationsModal" (click)="showInvitationsModal=false">
+  <div class="modal wide-modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">
+      🔔 NOTIFICATIONS
+      <span class="notif-badge-inline" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </div>
+
+    <div class="loading-wrap" *ngIf="notifLoading"><div class="spinner"></div></div>
+
+    <ng-container *ngIf="!notifLoading">
+
+      <!-- ── Section : Invitations reçues ── -->
+      <div class="notif-section-title">
+        ✉️ Invitations received
+        <span class="notif-section-count" *ngIf="invitationsCount > 0">{{ invitationsCount }}</span>
+      </div>
+      <div class="empty-state-sm" *ngIf="myInvitations.length === 0">No pending invitations</div>
+      <div class="request-list" *ngIf="myInvitations.length > 0">
+        <div class="request-item" *ngFor="let inv of myInvitations">
+          <div class="req-avatar" [style.background]="getBadgeBg(inv.team?.type)" style="font-size:20px">
+            {{ getSportEmoji(inv.team?.type) }}
+          </div>
+          <div class="req-info">
+            <div class="req-name">{{ inv.team?.name }}</div>
+            <div class="req-email">{{ inv.team?.type }}</div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" (click)="acceptInvitation(inv)">✅ Join</button>
+            <button class="btn-refuse" (click)="refuseInvitation(inv)">✕ Decline</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section : Demandes de rejoindre (capitaine) ── -->
+      <div class="notif-section-title" style="margin-top:20px" *ngIf="allCaptainRequests.length > 0 || captainRequestsCount === 0">
+        📋 Join requests (captain)
+        <span class="notif-section-count" *ngIf="captainRequestsCount > 0">{{ captainRequestsCount }}</span>
+      </div>
+      <div class="empty-state-sm" *ngIf="allCaptainRequests.length === 0">No pending join requests</div>
+      <div class="request-list" *ngIf="allCaptainRequests.length > 0">
+        <div class="request-item" *ngFor="let req of allCaptainRequests">
+          <div class="req-avatar">{{ getInitial(req.player, 0) }}</div>
+          <div class="req-info">
+            <div class="req-name">{{ getPlayerName(req.player) }}</div>
+            <div class="req-email">
+              wants to join <strong>{{ req.team?.name }}</strong>
+            </div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" (click)="acceptRequest(req)">✅ Accept</button>
+            <button class="btn-refuse" (click)="refuseRequest(req)">✕ Refuse</button>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showInvitationsModal=false">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" *ngIf="toastVisible" [style.borderColor]="toastColor" [style.color]="toastColor">
+  {{ toastMessage }}
+</div>

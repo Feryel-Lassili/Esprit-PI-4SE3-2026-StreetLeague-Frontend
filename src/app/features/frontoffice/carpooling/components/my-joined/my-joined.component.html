@@ -1,0 +1,43 @@
+<div class="cp-page">
+  <div class="cp-header"><div><h1 class="cp-title">Joined Trips</h1><p class="cp-sub">Trips you joined as passenger</p></div></div>
+  <div *ngIf="loading" class="cp-center"><div class="cp-spinner"></div><p>Loading…</p></div>
+  <div *ngIf="error && !loading" class="cp-error">⚠️ {{ error }}</div>
+  <div *ngIf="!loading && !error && trips.length === 0" class="cp-empty"><div class="cp-empty-icon">🎒</div><h2>No Joined Trips</h2><p>Browse available trips and join one!</p></div>
+  <div *ngIf="!loading && !error && trips.length > 0" class="cp-grid">
+    <div class="cp-card" *ngFor="let t of trips">
+      <div class="cp-card-banner cp-banner-purple"><span class="cp-card-emoji">🎒</span><span class="cp-card-pill">Passenger</span></div>
+      <div class="cp-card-body">
+        <h3 class="cp-card-title">{{ t.departureLocation }} → {{ t.arrivalLocation }}</h3>
+        <p class="cp-card-sub">📅 {{ t.date }} · 🕐 {{ t.departureTime }}</p>
+        <p class="cp-card-sub">🚘 {{ t.carModel }} · {{ t.plateNumber }}</p>
+        <div class="cp-owner-strip"><div class="cp-owner-avatar">{{ t.driverUsername[0].toUpperCase() }}</div><div class="cp-owner-info"><span class="cp-owner-name">{{ t.driverUsername }}</span><span class="cp-owner-email">{{ t.driverEmail }}</span></div></div>
+      </div>
+      <div class="cp-card-footer">
+        <button class="cp-btn cp-btn-view" (click)="details(t.id)">👁 Details</button>
+        <button class="cp-btn cp-btn-leave" (click)="leaveTrip(t.id)">🚪 Leave</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .cp-page{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .cp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .cp-title{font-size:22px;font-weight:700;color:#1d1d1f;margin:0 0 4px}.cp-sub{font-size:14px;color:#6e6e73;margin:0}
+  .cp-center{display:flex;flex-direction:column;align-items:center;padding:80px 20px;color:#6e6e73;gap:14px}
+  .cp-spinner{width:32px;height:32px;border:3px solid #e0e0e5;border-top-color:#000;border-radius:50%;animation:cps .8s linear infinite}@keyframes cps{to{transform:rotate(360deg)}}
+  .cp-error{background:#fff2f2;border:1px solid #ffcdd2;color:#c62828;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .cp-empty{display:flex;flex-direction:column;align-items:center;padding:80px 20px;text-align:center;color:#6e6e73}.cp-empty-icon{font-size:56px;margin-bottom:14px}.cp-empty h2{font-size:20px;font-weight:600;color:#1d1d1f;margin:0 0 8px}
+  .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+  .cp-card{background:#fff;border:1px solid #e0e0e5;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}.cp-card:hover{box-shadow:0 10px 30px rgba(0,0,0,.09);transform:translateY(-3px)}
+  .cp-card-banner{padding:20px;display:flex;justify-content:space-between;align-items:center}
+  .cp-banner-purple{background:linear-gradient(135deg,#4a148c,#6a1b9a,#7b1fa2)}
+  .cp-card-emoji{font-size:36px}.cp-card-pill{background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px}
+  .cp-card-body{padding:16px 20px;flex:1}.cp-card-title{font-size:17px;font-weight:700;color:#1d1d1f;margin:0 0 6px}.cp-card-sub{font-size:13px;color:#6e6e73;margin:0 0 4px}
+  .cp-owner-strip{display:flex;align-items:center;gap:10px;background:#e8f0fe;border-radius:10px;padding:10px 12px;margin-top:10px}
+  .cp-owner-avatar{width:32px;height:32px;border-radius:50%;background:#185fa5;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cp-owner-info{display:flex;flex-direction:column;overflow:hidden}.cp-owner-name{font-size:13px;font-weight:700;color:#1a3a6e}.cp-owner-email{font-size:11px;color:#5a7ab5}
+  .cp-card-footer{padding:12px 20px;border-top:1px solid #f0f0f5;display:flex;gap:8px}
+  .cp-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:background .15s}
+  .cp-btn-view{background:#e8f0fe;color:#185fa5;border:1px solid #bbdefb}.cp-btn-view:hover{background:#bbdefb}
+  .cp-btn-leave{background:#fffde7;color:#f57f17;border:1px solid #fff9c4}.cp-btn-leave:hover{background:#fff9c4}
+</style>
