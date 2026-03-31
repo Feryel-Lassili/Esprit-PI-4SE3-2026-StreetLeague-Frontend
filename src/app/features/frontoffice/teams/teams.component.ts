@@ -92,7 +92,7 @@ export class FrontofficeTeamsComponent implements OnInit {
   get notificationCount(): number { return this.invitationsCount + this.captainRequestsCount; }
 
   getRequestsCountForTeam(teamId: number): number {
-    return this.allCaptainRequests.filter(r => r.team?.id === teamId).length;
+    return this.allCaptainRequests.filter(r => r.team.id === teamId).length;
   }
 
   // ── Toast ──────────────────────────────────────────────────────────────────

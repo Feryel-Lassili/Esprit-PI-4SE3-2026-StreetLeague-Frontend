@@ -348,12 +348,12 @@
       <div class="empty-state-sm" *ngIf="myInvitations.length === 0">No pending invitations</div>
       <div class="request-list" *ngIf="myInvitations.length > 0">
         <div class="request-item" *ngFor="let inv of myInvitations">
-          <div class="req-avatar" [style.background]="getBadgeBg(inv.team?.type)" style="font-size:20px">
-            {{ getSportEmoji(inv.team?.type) }}
+          <div class="req-avatar" [style.background]="getBadgeBg(inv.team.type)" style="font-size:20px">
+            {{ getSportEmoji(inv.team.type) }}
           </div>
           <div class="req-info">
-            <div class="req-name">{{ inv.team?.name }}</div>
-            <div class="req-email">{{ inv.team?.type }}</div>
+            <div class="req-name">{{ inv.team.name }}</div>
+            <div class="req-email">{{ inv.team.type }}</div>
           </div>
           <div class="req-actions">
             <button class="btn-accept" (click)="acceptInvitation(inv)">✅ Join</button>
@@ -374,7 +374,7 @@
           <div class="req-info">
             <div class="req-name">{{ getPlayerName(req.player) }}</div>
             <div class="req-email">
-              wants to join <strong>{{ req.team?.name }}</strong>
+              wants to join <strong>{{ req.team.name }}</strong>
             </div>
           </div>
           <div class="req-actions">

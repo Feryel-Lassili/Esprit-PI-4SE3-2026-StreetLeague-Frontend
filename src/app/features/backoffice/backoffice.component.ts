@@ -8,6 +8,8 @@ import { BackofficeShopComponent } from './shop-management.component';
 import { BackofficeOrdersComponent } from './orders-management.component';
 import { BackofficeSponsorComponent } from './sponsor-management.component';
 import { MerchandiseAdminComponent } from './merchandise-admin.component';
+import { BackofficeTeamsComponent } from './teams-management.component';
+import { BackofficeReservationsComponent } from './reservations-management.component';
 import { environment } from '../../../environments/environment';
 
 interface WalletAdmin {
@@ -23,7 +25,7 @@ interface WalletAdmin {
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent],
+    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent, BackofficeTeamsComponent, BackofficeReservationsComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -351,6 +353,12 @@ interface WalletAdmin {
               </div>
             </div>
           </div>
+
+          <!-- TEAMS -->
+          <bo-teams *ngIf="currentScreen === 'teams'"></bo-teams>
+
+          <!-- RESERVATIONS -->
+          <bo-reservations *ngIf="currentScreen === 'reservations'"></bo-reservations>
 
           <!-- MERCHANDISE ADMIN -->
           <bo-merchandise-admin *ngIf="currentScreen === 'merchandise'"></bo-merchandise-admin>
@@ -705,6 +713,8 @@ export class BackofficeComponent implements OnInit {
       section: 'Management',
       items: [
         { id: 'users', label: 'Users & Teams', icon: '👥' },
+        { id: 'teams', label: 'Teams', icon: '⚽' },
+        { id: 'reservations', label: 'Reservations', icon: '📅' },
         { id: 'venues', label: 'Venues', icon: '📍' },
         { id: 'orders', label: 'Orders', icon: '📦' },
         { id: 'merchandise', label: 'Player Merch', icon: '🏅' },
