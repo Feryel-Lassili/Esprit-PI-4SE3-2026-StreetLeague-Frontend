@@ -10,6 +10,11 @@ import { BackofficeSponsorComponent } from './sponsor-management.component';
 import { MerchandiseAdminComponent } from './merchandise-admin.component';
 import { BackofficeTeamsComponent } from './teams-management.component';
 import { BackofficeReservationsComponent } from './reservations-management.component';
+import { BackofficeVenuesComponent } from './venues-management.component';
+import { BackofficeCarsComponent } from './cars-management.component';
+import { BackofficeCarpoolingComponent } from './carpooling-admin.component';
+import { BackofficeFantasyComponent } from './fantasy-admin.component';
+import { BackofficeCommunityComponent } from './community-admin.component';
 import { environment } from '../../../environments/environment';
 
 interface WalletAdmin {
@@ -25,7 +30,7 @@ interface WalletAdmin {
 @Component({
   selector: 'app-backoffice',
   standalone: true,
-    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent, BackofficeTeamsComponent, BackofficeReservationsComponent],
+    imports: [CommonModule, FormsModule, BackofficeShopComponent, BackofficeOrdersComponent, BackofficeSponsorComponent, MerchandiseAdminComponent, BackofficeTeamsComponent, BackofficeReservationsComponent, BackofficeVenuesComponent, BackofficeCarsComponent, BackofficeCarpoolingComponent, BackofficeFantasyComponent, BackofficeCommunityComponent],
   styles: [`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .layout { display: flex; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f7; }
@@ -201,9 +206,13 @@ interface WalletAdmin {
             <div class="nav-section" *ngIf="sidebarOpen">{{ section.section }}</div>
             <button class="nav-item" *ngFor="let item of section.items"
               [class.active]="currentScreen === item.id"
-              (click)="currentScreen = item.id">
+              (click)="currentScreen = item.id; item.id === 'community' ? loadModerationCounts() : null">
               <span class="nav-icon">{{ item.icon }}</span>
               <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
+              <span *ngIf="item.id === 'community' && flaggedCount > 0"
+                    style="margin-left:auto;background:#c62828;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center">
+                {{ flaggedCount }}
+              </span>
             </button>
           </div>
         </nav>
@@ -232,7 +241,7 @@ interface WalletAdmin {
       <main class="main">
         <div class="topbar">
           <span class="page-title">{{ getTitle() }}</span>
-          <span class="badge-danger" *ngIf="currentScreen === 'community'">7 reports</span>
+          <span class="badge-danger" *ngIf="currentScreen === 'community' && flaggedCount > 0">{{ flaggedCount }} flagged</span>
         </div>
 
         <div class="content">
@@ -287,25 +296,13 @@ interface WalletAdmin {
           </div>
 
           <!-- VENUES -->
-          <div *ngIf="currentScreen === 'venues'">
-            <div class="grid-3">
-              <div class="card" *ngFor="let v of venues">
-                <div style="font-size:15px; font-weight:600; margin-bottom:4px;">{{ v.name }}</div>
-                <div style="font-size:12px; color:#6e6e73; margin-bottom:12px;">📍 {{ v.location }}</div>
-                <div style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;">
-                  <span class="pill pill-blue" *ngFor="let s of v.sports">{{ s }}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                  <span style="font-size:13px; font-weight:600;">{{ v.pricePerHour }} TND/hr</span>
-                  <span class="pill pill-green">{{ v.status }}</span>
-                </div>
-                <div style="display:flex; gap:8px;">
-                  <button class="action-btn" style="flex:1;">Edit</button>
-                  <button class="action-btn" style="flex:1;">View</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <bo-venues *ngIf="currentScreen === 'venues'"></bo-venues>
+
+          <!-- CARS -->
+          <bo-cars *ngIf="currentScreen === 'cars'"></bo-cars>
+
+          <!-- CARPOOLING -->
+          <bo-carpooling *ngIf="currentScreen === 'carpooling'"></bo-carpooling>
 
           <!-- USERS -->
           <div *ngIf="currentScreen === 'users'">
@@ -334,25 +331,7 @@ interface WalletAdmin {
           </div>
 
           <!-- COMMUNITY -->
-          <div *ngIf="currentScreen === 'community'">
-            <div class="card">
-              <div class="card-title">AI-flagged reports</div>
-              <div class="activity-item" *ngFor="let r of communityReports">
-                <div class="activity-left">
-                  <div class="activity-avatar" style="background:#fff2f2; color:#c62828;">⚠</div>
-                  <div>
-                    <div class="activity-name">{{ r.user }} — {{ r.type }}</div>
-                    <div class="activity-action">"{{ r.content }}"</div>
-                  </div>
-                </div>
-                <div style="display:flex; gap:6px; align-items:center;">
-                  <span class="pill pill-red" style="font-size:10px;">{{ r.severity }}</span>
-                  <button class="action-btn">Review</button>
-                  <button class="action-btn">Dismiss</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <bo-community *ngIf="currentScreen === 'community'"></bo-community>
 
           <!-- TEAMS -->
           <bo-teams *ngIf="currentScreen === 'teams'"></bo-teams>
@@ -408,29 +387,7 @@ interface WalletAdmin {
           </div>
 
           <!-- FANTASY -->
-          <div *ngIf="currentScreen === 'fantasy'">
-            <div class="grid-4" style="margin-bottom:24px;">
-              <div class="card" *ngFor="let s of fantasyStats">
-                <div class="stat-label">{{ s.label }}</div>
-                <div class="stat-value">{{ s.value }}</div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-title">Active leagues</div>
-              <table class="table">
-                <thead><tr><th>League</th><th>Players</th><th>Prize</th><th>Status</th><th>Actions</th></tr></thead>
-                <tbody>
-                  <tr *ngFor="let l of fantasyLeagues">
-                    <td style="font-weight:500;">{{ l.name }}</td>
-                    <td>{{ l.players }}</td>
-                    <td>{{ l.prize }} TND</td>
-                    <td><span class="pill" [class.pill-green]="l.status==='Active'" [class.pill-yellow]="l.status==='Upcoming'">{{ l.status }}</span></td>
-                    <td><button class="action-btn">Manage</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <bo-fantasy *ngIf="currentScreen === 'fantasy'"></bo-fantasy>
 
           <!-- SPONSORS -->
           <div *ngIf="currentScreen === 'sponsorships'">
@@ -680,6 +637,9 @@ export class BackofficeComponent implements OnInit {
   userRole: 'admin' | 'venue-allocator' = 'admin';
   currentScreen = 'dashboard';
 
+  // ── Moderation badge ──────────────────────────────────────
+  flaggedCount = 0;
+
   // ── Wallet admin state ────────────────────────────────────
   wallets: WalletAdmin[] = [];
   walletLoading  = false;
@@ -716,6 +676,8 @@ export class BackofficeComponent implements OnInit {
         { id: 'teams', label: 'Teams', icon: '⚽' },
         { id: 'reservations', label: 'Reservations', icon: '📅' },
         { id: 'venues', label: 'Venues', icon: '📍' },
+        { id: 'cars', label: 'Cars', icon: '🚗' },
+        { id: 'carpooling', label: 'Carpooling', icon: '🚌' },
         { id: 'orders', label: 'Orders', icon: '📦' },
         { id: 'merchandise', label: 'Player Merch', icon: '🏅' },
         { id: 'health', label: 'Health', icon: '🏥' },
@@ -753,6 +715,17 @@ export class BackofficeComponent implements OnInit {
         this.userRole = 'venue-allocator';
         this.currentScreen = 'allocator';
       }
+    });
+    this.loadModerationCounts();
+  }
+
+  loadModerationCounts() {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` });
+    this.http.get<{ flaggedPosts: number; flaggedComments: number }>(
+      `${environment.baseUrl}/admin/moderation/counts`, { headers }
+    ).subscribe({
+      next: c => { this.flaggedCount = (c.flaggedPosts || 0) + (c.flaggedComments || 0); },
+      error: () => {}
     });
   }
 
@@ -903,20 +876,10 @@ export class BackofficeComponent implements OnInit {
     { user: 'Mike Chen',      action: 'Purchased equipment', time: '32 min ago' },
     { user: 'Emma Wilson',    action: 'Joined tournament', time: '1 hour ago'  }
   ];
-  venues = [
-    { name: 'Arena Sports Complex', location: 'Downtown, Tunis',  sports: ['Football','Basketball'], pricePerHour: 50, status: 'Active' },
-    { name: 'City Stadium',         location: 'North District',   sports: ['Football'],               pricePerHour: 40, status: 'Active' },
-    { name: 'Green Park',           location: 'South Tunis',      sports: ['Tennis','Volleyball'],    pricePerHour: 30, status: 'Active' }
-  ];
   users = [
     { name: 'Alex Johnson',   email: 'alex@mail.com',   role: 'PLAYER',  status: 'Active',  joined: '2025-01-10' },
     { name: 'Sarah Mitchell', email: 'sarah@mail.com',  role: 'COACH',   status: 'Active',  joined: '2025-02-05' },
     { name: 'Mike Chen',      email: 'mike@mail.com',   role: 'REFEREE', status: 'Pending', joined: '2025-03-01' }
-  ];
-  communityReports = [
-    { user: 'user123',   type: 'Hate speech',  content: 'Reported comment content…', severity: 'High'   },
-    { user: 'player99',  type: 'Spam',         content: 'Repeated spam message…',    severity: 'Medium' },
-    { user: 'coach77',   type: 'Harassment',   content: 'Offensive message…',        severity: 'High'   }
   ];
   products = [
     { name: 'Football Jersey', category: 'Apparel',     price: 45,  stock: 23 },
@@ -930,15 +893,6 @@ export class BackofficeComponent implements OnInit {
   pendingCerts = [
     { name: 'Karim Dridi', cert: 'FIFA Referee License'  },
     { name: 'Nour Belhaj', cert: 'UEFA Coaching Badge'   }
-  ];
-  fantasyStats = [
-    { label: 'Active leagues', value: '24' }, { label: 'Total players', value: '1,840' },
-    { label: 'Prize pool',     value: '12,500 TND' }, { label: 'Matches today', value: '8' }
-  ];
-  fantasyLeagues = [
-    { name: 'Spring Championship', players: 120, prize: 2000, status: 'Active'   },
-    { name: 'Summer Cup',          players: 64,  prize: 1000, status: 'Upcoming' },
-    { name: 'Pro League',          players: 200, prize: 5000, status: 'Active'   }
   ];
   sponsors = [
     { company: 'SportsPro TN', budget: 50000, status: 'Active',   contact: 'contact@sportspro.tn' },

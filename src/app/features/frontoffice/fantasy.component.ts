@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import { VirtualTeamService, SportType } from '../../core/services/virtual-team.service';
 import { AuthService } from '../../core/services/auth.service';
+import { WalletService } from '../../core/services/wallet.service';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 interface Player {
@@ -40,7 +41,7 @@ interface PredictionResult {
 }
 
 type Sport    = 'FOOTBALL' | 'BASKETBALL' | 'TENNIS';
-type ViewMode = 'shop' | 'inventory' | 'build' | 'view' | 'prediction';
+type ViewMode = 'shop' | 'inventory' | 'build' | 'view' | 'prediction' | 'history';
 
 // ─── Slot factories ─────────────────────────────────────────────────────────────
 function footballSlots(): Slot[] {
@@ -239,7 +240,7 @@ function tennisSlots(): Slot[] {
     .pitch-title { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px; }
     .pitch-hint  { font-size: 11px; font-weight: 400; color: #aeaeb2; margin-left: 6px; }
     .pitch { position: relative; width: 100%; border-radius: 12px; overflow: hidden; }
-    .football-pitch   { padding-bottom: 130%; }
+    .football-pitch   { padding-bottom: 95%; }
     .basketball-pitch { padding-bottom: 78%; }
     .tennis-pitch     { padding-bottom: 80%; }
     .pitch-lines { position: absolute; inset: 0; }
@@ -558,6 +559,99 @@ function tennisSlots(): Slot[] {
 
     .loading-bank { text-align: center; padding: 30px; color: #aeaeb2; font-size: 13px; }
     .empty        { text-align: center; padding: 30px 16px; color: #aeaeb2; font-size: 13px; }
+
+    /* ── History view ── */
+    .hv-page { }
+    .hv-header { margin-bottom: 24px; }
+    .hv-header h1 { font-size: 26px; font-weight: 900; color: #1d1d1f; letter-spacing: -.02em; }
+    .hv-header p  { font-size: 14px; color: #6e6e73; margin-top: 4px; }
+    .hv-sport-block { margin-bottom: 32px; }
+    .hv-sport-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800;
+                      color: #1d1d1f; margin-bottom: 14px; padding-bottom: 8px;
+                      border-bottom: 2px solid #e0e0e5; flex-wrap: wrap; }
+    .hv-sport-sub   { font-size: 11px; font-weight: 500; color: #aeaeb2; background: #f5f5f7;
+                      padding: 2px 8px; border-radius: 20px; }
+    .hv-empty  { background: white; border: 1px solid #e0e0e5; border-radius: 14px;
+                 padding: 28px; text-align: center; color: #aeaeb2; font-size: 13px; }
+    .hv-card   { background: white; border: 1.5px solid #e0e0e5; border-radius: 16px;
+                 margin-bottom: 12px; overflow: hidden; transition: box-shadow .15s; }
+    .hv-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+    .hv-card-head  { display: flex; align-items: center; justify-content: space-between;
+                     padding: 14px 18px; gap: 12px; flex-wrap: wrap; }
+    .hv-week       { font-size: 13px; font-weight: 700; color: #1d1d1f; }
+    .hv-date       { font-size: 11px; color: #aeaeb2; margin-top: 2px; }
+    .hv-pts        { font-size: 20px; font-weight: 900; }
+    .hv-pts.pos    { color: #34c759; }
+    .hv-pts.neg    { color: #ff3b30; }
+    .hv-pts.zero   { color: #aeaeb2; }
+    .hv-status     { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+    .hv-status.pend   { background: #fffde7; color: #f57f17; }
+    .hv-status.res    { background: #f1f8e9; color: #2e7d32; }
+    .hv-players    { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px 14px; }
+    .hv-chip       { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+                     display: flex; align-items: center; gap: 4px; }
+    .hv-chip.CORRECT { background: #f1f8e9; color: #2e7d32; }
+    .hv-chip.WRONG   { background: #fff2f2; color: #c62828; }
+    .hv-chip.PARTIAL { background: #fff8e1; color: #f57f17; }
+    .hv-chip.PENDING { background: #f5f5f7; color: #6e6e73; }
+    .hv-loading { text-align: center; padding: 48px; color: #aeaeb2; font-size: 14px; }
+    .hv-no-teams { background: white; border: 1px solid #e0e0e5; border-radius: 16px;
+                   padding: 48px; text-align: center; }
+    .hv-no-teams p { color: #6e6e73; font-size: 14px; margin-bottom: 16px; }
+    .hv-tabs      { display:flex; gap:8px; margin-bottom:24px; }
+    .hv-tab       { display:flex; align-items:center; gap:6px; padding:9px 20px; border-radius:12px;
+                    border:1.5px solid #e0e0e5; background:white; font-size:13px; font-weight:600;
+                    color:#6e6e73; cursor:pointer; transition:all .15s; }
+    .hv-tab:hover { background:#f5f5f7; color:#1d1d1f; }
+    .hv-tab.hv-tab-active { background:#1d1d1f; color:white; border-color:#1d1d1f; }
+    .hv-tab-badge { background:rgba(255,255,255,.25); color:inherit; font-size:10px; font-weight:700;
+                    padding:1px 6px; border-radius:20px; }
+    .hv-tab-active .hv-tab-badge { background:rgba(255,255,255,.2); }
+    .hv-tab:not(.hv-tab-active) .hv-tab-badge { background:#f0f0f5; color:#1d1d1f; }
+
+    /* ── Wallet top-up ── */
+    .nav-wallet { display: flex; align-items: center; gap: 6px;
+                  background: linear-gradient(135deg,#0a84ff,#0070d4); color: white;
+                  padding: 7px 14px; border-radius: 10px; margin-left: 8px; }
+    .nav-wallet-icon { font-size: 14px; }
+    .nav-wallet-val  { font-size: 15px; font-weight: 800; }
+    .nav-wallet-lbl  { font-size: 10px; color: rgba(255,255,255,.65); font-weight: 600; }
+    .topup-btn { background: white; color: #0a84ff; border: none; border-radius: 8px;
+                 padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer;
+                 margin-left: 6px; transition: opacity .15s; }
+    .topup-btn:hover { opacity: .85; }
+
+    .topup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000;
+                     display: flex; align-items: center; justify-content: center; }
+    .topup-box { background: white; border-radius: 20px; padding: 32px 28px; width: 360px;
+                 box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+    .topup-box h3 { font-size: 20px; font-weight: 800; color: #1d1d1f; margin-bottom: 4px; }
+    .topup-box p  { font-size: 13px; color: #6e6e73; margin-bottom: 20px; }
+    .topup-current { background: #f0f7ff; border-radius: 12px; padding: 12px 16px;
+                     display: flex; justify-content: space-between; align-items: center;
+                     margin-bottom: 20px; }
+    .topup-current-lbl { font-size: 12px; color: #6e6e73; font-weight: 600; }
+    .topup-current-val { font-size: 20px; font-weight: 900; color: #0a84ff; }
+    .topup-label { font-size: 12px; font-weight: 700; color: #1d1d1f; margin-bottom: 6px; }
+    .topup-presets { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .topup-preset  { padding: 7px 16px; border-radius: 20px; border: 1.5px solid #e0e0e5;
+                     background: white; font-size: 13px; font-weight: 700; color: #1d1d1f;
+                     cursor: pointer; transition: all .15s; }
+    .topup-preset:hover,
+    .topup-preset.sel { background: #1d1d1f; color: white; border-color: #1d1d1f; }
+    .topup-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e5;
+                   border-radius: 12px; font-size: 16px; font-weight: 700; outline: none;
+                   margin-bottom: 8px; }
+    .topup-input:focus { border-color: #0a84ff; }
+    .topup-error { color: #ff3b30; font-size: 12px; margin-bottom: 12px; min-height: 16px; }
+    .topup-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .topup-cancel  { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid #e0e0e5;
+                     background: white; font-size: 14px; font-weight: 600; cursor: pointer; color: #6e6e73; }
+    .topup-confirm { flex: 2; padding: 12px; border-radius: 12px; border: none;
+                     background: #0a84ff; color: white; font-size: 14px; font-weight: 700;
+                     cursor: pointer; transition: opacity .15s; }
+    .topup-confirm:disabled { opacity: .5; cursor: not-allowed; }
+    .topup-confirm:not(:disabled):hover { opacity: .88; }
   `],
   template: `
 <div class="page">
@@ -569,7 +663,7 @@ function tennisSlots(): Slot[] {
       <div style="font-size:13px;color:#6e6e73;margin-bottom:4px">{{ buyCandidate!.position }} · {{ buyCandidate!.level }}</div>
       <div class="buy-confirm-price">{{ buyCandidate!.fantasyPoints }} <span>pts</span></div>
       <div class="buy-confirm-after">
-        After purchase: <strong>{{ userPoints - buyCandidate!.fantasyPoints }} pts</strong> remaining
+        After purchase: <strong>{{ walletBalance - buyCandidate!.fantasyPoints }} pts</strong> remaining
       </div>
       <div class="buy-actions">
         <button class="buy-cancel"  (click)="buyCandidate=null">Cancel</button>
@@ -586,6 +680,32 @@ function tennisSlots(): Slot[] {
       <div class="sell-actions">
         <button class="sell-cancel"  (click)="sellCandidate=null">Keep</button>
         <button class="sell-confirm" (click)="confirmSell()">Sell</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Top-up wallet modal ── -->
+  <div class="topup-overlay" *ngIf="showTopUp">
+    <div class="topup-box">
+      <h3>💳 Top Up Wallet</h3>
+      <p>Add points to your wallet to spend in the Fantasy shop.</p>
+      <div class="topup-current">
+        <span class="topup-current-lbl">Current balance</span>
+        <span class="topup-current-val">{{ walletBalance }} pts</span>
+      </div>
+      <div class="topup-label">Quick amounts</div>
+      <div class="topup-presets">
+        <button class="topup-preset" *ngFor="let a of [100,250,500,1000]"
+          [class.sel]="topUpAmount===a" (click)="topUpAmount=a">+{{ a }}</button>
+      </div>
+      <div class="topup-label">Or enter custom amount</div>
+      <input class="topup-input" type="number" min="1" [(ngModel)]="topUpAmount" placeholder="e.g. 200" />
+      <div class="topup-error">{{ topUpError }}</div>
+      <div class="topup-actions">
+        <button class="topup-cancel" (click)="showTopUp=false; topUpError=''">Cancel</button>
+        <button class="topup-confirm" [disabled]="topUpLoading" (click)="confirmTopUp()">
+          {{ topUpLoading ? 'Processing…' : '+ Add ' + (topUpAmount || 0) + ' pts' }}
+        </button>
       </div>
     </div>
   </div>
@@ -625,12 +745,17 @@ function tennisSlots(): Slot[] {
       <span class="nav-badge" *ngIf="predStatusMap[predSport]==='PENDING'">⏳</span>
       <span class="nav-badge green" *ngIf="newResultBanner">!</span>
     </button>
-    <div class="nav-pts">
-      <span class="nav-pts-icon">💰</span>
+    <button class="nav-btn" [class.active]="viewMode==='history'" (click)="openHistory()">
+      📜 My History
+      <span class="nav-badge green" *ngIf="allHistory.length > 0">{{ totalHistoryCount }}</span>
+    </button>
+    <div class="nav-wallet">
+      <span class="nav-wallet-icon">💳</span>
       <div>
-        <div class="nav-pts-val">{{ userPoints }}</div>
-        <div class="nav-pts-lbl">pts left</div>
+        <div class="nav-wallet-val">{{ walletBalance }}</div>
+        <div class="nav-wallet-lbl">wallet</div>
       </div>
+      <button class="topup-btn" (click)="showTopUp=true">+ Top Up</button>
     </div>
   </div>
 
@@ -638,7 +763,7 @@ function tennisSlots(): Slot[] {
   <ng-container *ngIf="viewMode==='shop'">
     <div class="shop-header">
       <h1>Player Market 🛒</h1>
-      <p>Buy players with your points. You have <strong>{{ userPoints }} pts</strong> remaining.</p>
+      <p>Buy players with your points. You have <strong>{{ walletBalance }} pts</strong> remaining.</p>
     </div>
 
     <div class="shop-sport-tabs">
@@ -673,11 +798,11 @@ function tennisSlots(): Slot[] {
           <div class="shop-price">{{ p.fantasyPoints }} <span>pts</span></div>
           <button class="buy-btn"
                   [class.owned]="isOwned(p)"
-                  [class.can]="!isOwned(p) && userPoints >= p.fantasyPoints"
-                  [class.broke]="!isOwned(p) && userPoints < p.fantasyPoints"
+                  [class.can]="!isOwned(p) && walletBalance >= p.fantasyPoints"
+                  [class.broke]="!isOwned(p) && walletBalance < p.fantasyPoints"
                   [disabled]="isOwned(p)"
                   (click)="openBuyModal(p)">
-            {{ isOwned(p) ? '✓ Owned' : userPoints < p.fantasyPoints ? "💸 Can't afford" : '+ Buy' }}
+            {{ isOwned(p) ? '✓ Owned' : walletBalance < p.fantasyPoints ? "💸 Can't afford" : '+ Buy' }}
           </button>
         </div>
       </div>
@@ -924,7 +1049,7 @@ function tennisSlots(): Slot[] {
         </div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-lbl">Total pts cost</div><div class="stat-val">{{ t.spent }}</div></div>
-          <div class="stat-card"><div class="stat-lbl">Budget left</div><div class="stat-val" [style.color]="userPoints<0?'#ff3b30':'#34c759'">{{ userPoints }}</div></div>
+          <div class="stat-card"><div class="stat-lbl">Budget left</div><div class="stat-val" [style.color]="walletBalance<0?'#ff3b30':'#34c759'">{{ walletBalance }}</div></div>
           <div class="stat-card"><div class="stat-lbl">Players</div><div class="stat-val">{{ t.players.length }}</div></div>
         </div>
         <div class="section-title">Starters</div>
@@ -1208,6 +1333,99 @@ function tennisSlots(): Slot[] {
     </div>
   </ng-container>
 
+  <!-- ════════════════ HISTORY ════════════════ -->
+  <ng-container *ngIf="viewMode==='history'">
+    <div class="hv-page">
+      <div class="hv-header">
+        <h1>📜 My Prediction History</h1>
+        <p>All your past predictions across every sport</p>
+      </div>
+
+      <!-- Sport tabs -->
+      <div class="hv-tabs">
+        <button class="hv-tab" [class.hv-tab-active]="historyTab==='FOOTBALL'"   (click)="historyTab='FOOTBALL'">
+          ⚽ Football
+          <span class="hv-tab-badge" *ngIf="historyBlocksFor('FOOTBALL').length">{{ historyPredCount('FOOTBALL') }}</span>
+        </button>
+        <button class="hv-tab" [class.hv-tab-active]="historyTab==='BASKETBALL'" (click)="historyTab='BASKETBALL'">
+          🏀 Basketball
+          <span class="hv-tab-badge" *ngIf="historyBlocksFor('BASKETBALL').length">{{ historyPredCount('BASKETBALL') }}</span>
+        </button>
+        <button class="hv-tab" [class.hv-tab-active]="historyTab==='TENNIS'"     (click)="historyTab='TENNIS'">
+          🎾 Tennis
+          <span class="hv-tab-badge" *ngIf="historyBlocksFor('TENNIS').length">{{ historyPredCount('TENNIS') }}</span>
+        </button>
+      </div>
+
+      <div *ngIf="historyLoading" class="hv-loading">Loading your history…</div>
+
+      <div *ngIf="!historyLoading && historyBlocksFor(historyTab).length === 0" class="hv-no-teams">
+        <p>No {{ historyTab | titlecase }} predictions yet.</p>
+        <button class="buy-btn can" (click)="viewMode='prediction'">Go to Prediction</button>
+      </div>
+
+      <div *ngFor="let block of historyBlocksFor(historyTab)" class="hv-sport-block">
+
+        <!-- Team header -->
+        <div class="hv-sport-title">
+          <span>{{ block.sport === 'FOOTBALL' ? '⚽' : block.sport === 'BASKETBALL' ? '🏀' : '🎾' }}</span>
+          <strong>{{ block.teamName }}</strong>
+          <span class="hv-sport-sub">{{ block.sport | titlecase }}</span>
+          <span style="font-size:12px;font-weight:500;color:#aeaeb2;margin-left:auto">
+            {{ block.predictions.length }} prediction{{ block.predictions.length !== 1 ? 's' : '' }}
+            · total: <strong [style.color]="teamTotal(block) > 0 ? '#34c759' : teamTotal(block) < 0 ? '#ff3b30' : '#aeaeb2'">
+              {{ teamTotal(block) > 0 ? '+' : '' }}{{ teamTotal(block) | number:'1.1-1' }} pts
+            </strong>
+          </span>
+        </div>
+
+        <div *ngIf="block.predictions.length === 0" class="hv-empty">No predictions yet for this team.</div>
+
+        <div *ngFor="let h of block.predictions; let i = index" class="hv-card">
+          <div class="hv-card-head">
+            <div>
+              <div class="hv-week">Week {{ h.weekNumber }} / {{ h.weekYear }}</div>
+              <div class="hv-date">{{ h.playerPredictions ? h.playerPredictions.length : 0 }} players · #{{ block.predictions.length - i }}</div>
+            </div>
+            <span class="hv-status" [class.pend]="h.status==='PENDING'" [class.res]="h.status==='RESOLVED'">
+              {{ h.status === 'PENDING' ? '⏳ Pending' : '✅ Resolved' }}
+            </span>
+            <div class="hv-pts"
+                 [class.pos]="h.totalPointsEarned > 0"
+                 [class.neg]="h.totalPointsEarned < 0"
+                 [class.zero]="h.totalPointsEarned === 0">
+              {{ h.status === 'PENDING' ? '—' : (h.totalPointsEarned > 0 ? '+' : '') + (h.totalPointsEarned | number:'1.1-1') + ' pts' }}
+            </div>
+          </div>
+
+          <!-- Captain & goal predictions summary -->
+          <div style="padding: 0 18px 8px; display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:#6e6e73">
+            <span *ngIf="getCaptain(h)">
+              👑 Captain: <strong style="color:#f57f17">{{ getCaptain(h)!.playerName }}</strong>
+            </span>
+            <span *ngIf="getGoalPredictors(h).length > 0">
+              ⚽ Goals predicted:
+              <strong style="color:#2e7d32">{{ getGoalPredictorNames(h) }}</strong>
+            </span>
+            <span *ngIf="getGoalPredictors(h).length === 0" style="color:#aeaeb2">No goal predictions</span>
+          </div>
+
+          <div class="hv-players">
+            <span *ngFor="let pp of h.playerPredictions" class="hv-chip" [class]="h.status==='PENDING' ? 'PENDING' : pp.result">
+              {{ avatarForPosition(pp.playerPosition) }}
+              {{ pp.playerName }}
+              <span *ngIf="pp.isCaptain">👑</span>
+              <span *ngIf="pp.predictGoal">⚽</span>
+              <span *ngIf="h.status==='RESOLVED' && pp.pointsEarned !== 0" style="font-size:10px;opacity:.8">
+                ({{ pp.pointsEarned > 0 ? '+' : '' }}{{ pp.pointsEarned | number:'1.1-1' }})
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
   <!-- Toast -->
   <div *ngIf="toastMsg" class="toast" [class.success]="toastType==='success'" [class.error]="toastType==='error'">
     {{ toastMsg }}
@@ -1248,8 +1466,7 @@ export class FrontofficeFantasyComponent implements OnInit {
   newResultBanner = false;
 
   // ── Budget: starts at 200, increases with prediction earnings (persisted via VirtualTeam.earnedPoints) ──
-  userPoints = 200;
-  private baseUserPoints = 200; // never changes — the starting grant
+  userPoints = 0;
 
   private get currentUserId(): number { return (this.authService.getCurrentUser() as any)?.id ?? 0; }
   private readonly BASE = 'http://localhost:8089/SpringSecurity';
@@ -1299,11 +1516,110 @@ export class FrontofficeFantasyComponent implements OnInit {
     TENNIS:     ['P1'],
   };
 
-  constructor(private http: HttpClient, private teamService: VirtualTeamService, private authService: AuthService) {}
+  // ── All-sports prediction history ────────────────────────────────────────────
+  allHistory: { sport: Sport; teamId: number; teamName: string; predictions: PredictionResult[] }[] = [];
+  historyLoading = false;
+  historyTab: Sport = 'FOOTBALL';
+
+  get totalHistoryCount(): number {
+    return this.allHistory.reduce((s, b) => s + b.predictions.length, 0);
+  }
+
+  historyBlocksFor(sport: string) {
+    return this.allHistory.filter(b => b.sport === sport);
+  }
+
+  historyPredCount(sport: string): number {
+    return this.historyBlocksFor(sport).reduce((s, b) => s + b.predictions.length, 0);
+  }
+
+  teamTotal(block: { predictions: PredictionResult[] }): number {
+    return block.predictions.reduce((s, p) => s + (p.status === 'RESOLVED' ? (p.totalPointsEarned ?? 0) : 0), 0);
+  }
+
+  getCaptain(h: PredictionResult) {
+    return h.playerPredictions?.find(pp => pp.isCaptain) ?? null;
+  }
+
+  getGoalPredictors(h: PredictionResult) {
+    return h.playerPredictions?.filter(pp => pp.predictGoal) ?? [];
+  }
+
+  getGoalPredictorNames(h: PredictionResult): string {
+    return this.getGoalPredictors(h).map(pp => pp.playerName).join(', ');
+  }
+
+  openHistory(): void {
+    this.viewMode = 'history';
+    this.historyLoading = true;
+    this.allHistory = [];
+    const sportOrder: Sport[] = ['FOOTBALL', 'BASKETBALL', 'TENNIS'];
+
+    this.teamService.getTeamsByUser(this.currentUserId).subscribe({
+      next: teams => {
+        if (!teams.length) { this.historyLoading = false; return; }
+        let remaining = teams.length;
+        for (const team of teams) {
+          const sport      = team.sportType as Sport;
+          const teamName   = team.name || `Team #${team.id}`;
+          this.http.get<PredictionResult[]>(`${this.BASE}/predictions/history/${team.id}`).subscribe({
+            next: list => {
+              // Always push the team block (even if empty — shows "no predictions yet")
+              this.allHistory.push({ sport, teamId: team.id, teamName, predictions: list });
+              this.allHistory.sort((a, b) => {
+                const sd = sportOrder.indexOf(a.sport) - sportOrder.indexOf(b.sport);
+                return sd !== 0 ? sd : a.teamId - b.teamId;
+              });
+              if (--remaining === 0) this.historyLoading = false;
+            },
+            error: () => { if (--remaining === 0) this.historyLoading = false; }
+          });
+        }
+      },
+      error: () => { this.historyLoading = false; }
+    });
+  }
+
+  // ── Wallet top-up ────────────────────────────────────────────────────────────
+  walletBalance = 0;
+  showTopUp     = false;
+  topUpAmount: number | null = null;
+  topUpLoading  = false;
+  topUpError    = '';
+
+  constructor(private http: HttpClient, private teamService: VirtualTeamService, private authService: AuthService, private walletService: WalletService) {}
 
   ngOnInit(): void {
     this.loadAllSportPlayers();
     this.loadAllMyTeams();
+    this.loadWalletBalance();
+  }
+
+  loadWalletBalance(): void {
+    this.walletService.getMyWallet().subscribe({
+      next: w => this.walletBalance = w.points ?? 0,
+      error: () => {}
+    });
+  }
+
+  confirmTopUp(): void {
+    const amount = Number(this.topUpAmount);
+    if (!amount || amount <= 0) { this.topUpError = 'Enter a valid amount.'; return; }
+    this.topUpLoading = true;
+    this.topUpError   = '';
+    this.walletService.deposit(amount).subscribe({
+      next: (w: any) => {
+        this.walletBalance = w.newBalance ?? w.points ?? (this.walletBalance + amount);
+        this.topUpLoading  = false;
+        this.showTopUp     = false;
+        this.topUpAmount   = null;
+        this.showToast(`✅ +${amount} pts added to your wallet!`, 'success');
+      },
+      error: () => {
+        this.topUpLoading = false;
+        this.topUpError   = 'Top-up failed. Please try again.';
+      }
+    });
   }
 
   // ── Computed ─────────────────────────────────────────────────────────────────
@@ -1331,11 +1647,9 @@ export class FrontofficeFantasyComponent implements OnInit {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
-  /** History entries to display: only RESOLVED, excluding the currently shown prediction */
+  /** History entries to display: all predictions excluding the currently shown one */
   get pastPredictions(): PredictionResult[] {
-    return this.predHistory.filter(h =>
-      h.status === 'RESOLVED' && h.id !== this.currentPrediction?.id
-    );
+    return this.predHistory.filter(h => h.id !== this.currentPrediction?.id);
   }
 
   get activePredictions() {
@@ -1400,15 +1714,15 @@ export class FrontofficeFantasyComponent implements OnInit {
   // ── Shop: open buy modal ─────────────────────────────────────────────────────
   openBuyModal(p: Player): void {
     if (this.isOwned(p)) return;
-    if (this.userPoints < p.fantasyPoints) { this.showToast('Not enough points!', 'error'); return; }
+    if (this.walletBalance < p.fantasyPoints) { this.showToast('Not enough points!', 'error'); return; }
     this.buyCandidate = p;
   }
 
   confirmBuy(): void {
     if (!this.buyCandidate) return;
     const p = this.buyCandidate;
-    if (this.userPoints < p.fantasyPoints) { this.showToast('Not enough points!', 'error'); this.buyCandidate = null; return; }
-    this.userPoints -= p.fantasyPoints;
+    if (this.walletBalance < p.fantasyPoints) { this.showToast('Not enough points!', 'error'); this.buyCandidate = null; return; }
+    this.walletBalance -= p.fantasyPoints;
     this.ownedPlayers = [...this.ownedPlayers, p];
     this.buyCandidate = null;
     this.showToast(`✅ ${p.firstName} ${p.lastName} added to your squad!`, 'success');
@@ -1432,7 +1746,7 @@ export class FrontofficeFantasyComponent implements OnInit {
       }
     });
     this.ownedPlayers = this.ownedPlayers.filter(o => o.id !== p.id);
-    this.userPoints  += p.fantasyPoints;
+    this.walletBalance += p.fantasyPoints;
     this.sellCandidate = null;
     this.showToast(`💰 Sold ${p.firstName} ${p.lastName} — +${p.fantasyPoints} pts back`, 'success');
   }
@@ -1442,8 +1756,7 @@ export class FrontofficeFantasyComponent implements OnInit {
     this.teamService.getTeamsByUser(this.currentUserId).subscribe({
       next: (teams) => {
         // Sum all earned prediction points across teams and add to base budget
-        const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
-        this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
+        this.loadWalletBalance();
 
         const sports = [...new Set(teams.map((t: any) => t.sportType as Sport))];
         sports.forEach((sport: Sport) => {
@@ -1656,7 +1969,7 @@ export class FrontofficeFantasyComponent implements OnInit {
       const dbId = this.savedTeams[sport]?.dbId;
       if (!dbId) continue;
       this.http.get<PredictionResult>(`${this.BASE}/predictions/current/${dbId}`).subscribe({
-        next:  (p) => { this.predStatusMap[sport] = p.status; },
+        next:  (p) => { if (p) this.predStatusMap[sport] = p.status; },
         error: ()  => { }
       });
     }
@@ -1723,12 +2036,7 @@ export class FrontofficeFantasyComponent implements OnInit {
             : '😐 Results are in. No points gained or lost',
             pts >= 0 ? 'success' : 'error'
           );
-          this.teamService.getTeamsByUser(this.currentUserId).subscribe({
-            next: (teams) => {
-              const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
-              this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
-            }
-          });
+          this.loadWalletBalance();
           this.loadPredictionHistory(dbId);
         }
       },
@@ -1773,12 +2081,7 @@ export class FrontofficeFantasyComponent implements OnInit {
           this.predStatusMap[this.predSport] = resolved.status;
           // Reload earned pts from server (authoritative)
           const pts = resolved.totalPointsEarned ?? 0;
-          this.teamService.getTeamsByUser(this.currentUserId).subscribe({
-            next: (teams) => {
-              const totalEarned = teams.reduce((sum: number, t: any) => sum + (t.earnedPoints ?? 0), 0);
-              this.userPoints = this.baseUserPoints + Math.round(totalEarned * 10) / 10;
-            }
-          });
+          this.loadWalletBalance();
           if (pts > 0) this.showToast(`🏆 +${pts.toFixed(1)} pts added to your budget!`, 'success');
           else if (pts < 0) this.showToast(`😤 ${pts.toFixed(1)} pts deducted from your budget`, 'error');
           else this.showToast('😐 No points gained or lost this week', 'success');

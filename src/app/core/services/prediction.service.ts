@@ -84,6 +84,10 @@ export class PredictionService {
     return this.http.post<void>(`${this.base}/admin/stats`, dto);
   }
 
+  getAllPredictions(): Observable<PredictionResponse[]> {
+    return this.http.get<PredictionResponse[]>(`${this.base}/admin/all`);
+  }
+
   resolvePrediction(predictionId: number): Observable<PredictionResponse> {
     return this.http.post<PredictionResponse>(`${this.base}/admin/resolve/${predictionId}`, {});
   }

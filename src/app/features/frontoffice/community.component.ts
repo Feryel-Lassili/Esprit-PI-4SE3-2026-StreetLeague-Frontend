@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +10,8 @@ interface PostDto {
   creationDate: string;
   userId: number;
   username: string;
+  flagged?: boolean;
+  flagReason?: string;
   likes?: LikeDto[];
   comments?: CommentDto[];
   showComments?: boolean;
@@ -49,6 +51,15 @@ interface CommentReactionDto {
   commentId: number;
   userId: number;
   username: string;
+}
+
+interface NotificationDto {
+  id: number;
+  message: string;
+  type: string;
+  read: boolean;
+  createdAt: string;
+  postId?: number;
 }
 
 const REACTIONS = [
@@ -207,6 +218,38 @@ const REACTIONS = [
     .toast.success { background: #1d1d1f; color: white; }
     .toast.error   { background: #ff3b30; color: white; }
 
+    .notif-wrap { position: relative; display: inline-block; }
+    .notif-bell { background: none; border: 1.5px solid #e0e0e5; border-radius: 50%;
+                  width: 40px; height: 40px; font-size: 18px; cursor: pointer;
+                  display: flex; align-items: center; justify-content: center;
+                  transition: background .15s; }
+    .notif-bell:hover { background: #f5f5f7; }
+    .notif-badge { position: absolute; top: -4px; right: -4px; background: #ff3b30;
+                   color: white; border-radius: 50%; width: 18px; height: 18px;
+                   font-size: 10px; font-weight: 700; display: flex;
+                   align-items: center; justify-content: center; pointer-events: none; }
+    .notif-dropdown { position: absolute; right: 0; top: 48px; width: 320px;
+                      background: white; border: 1px solid #e0e0e5; border-radius: 16px;
+                      box-shadow: 0 8px 32px rgba(0,0,0,.15); z-index: 500;
+                      overflow: hidden; }
+    .notif-header { display: flex; align-items: center; justify-content: space-between;
+                    padding: 14px 16px; border-bottom: 1px solid #f0f0f5; }
+    .notif-header h4 { font-size: 14px; font-weight: 700; color: #1d1d1f; }
+    .notif-mark-read { background: none; border: none; font-size: 11px; color: #185fa5;
+                       cursor: pointer; font-weight: 600; }
+    .notif-list { max-height: 320px; overflow-y: auto; }
+    .notif-item { padding: 12px 16px; border-bottom: 1px solid #f5f5f7;
+                  display: flex; gap: 10px; align-items: flex-start; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: #f0f7ff; }
+    .notif-item.clickable { cursor: pointer; }
+    .notif-item.clickable:hover { background: #e8f0fe; }
+    .notif-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .notif-body { flex: 1; }
+    .notif-msg { font-size: 13px; color: #1d1d1f; line-height: 1.45; }
+    .notif-time { font-size: 11px; color: #aeaeb2; margin-top: 4px; }
+    .notif-empty { padding: 28px 16px; text-align: center; font-size: 13px; color: #aeaeb2; }
+
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4);
                        display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .confirm-box     { background: white; border-radius: 16px; padding: 28px 32px;
@@ -236,9 +279,35 @@ const REACTIONS = [
   </div>
 
   <!-- Header -->
-  <div class="page-header">
-    <h1>Community 💬</h1>
-    <p>Share what's on your mind with the StreetLeague community</p>
+  <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <h1>Community 💬</h1>
+      <p>Share what's on your mind with the StreetLeague community</p>
+    </div>
+    <!-- Notification Bell -->
+    <div class="notif-wrap">
+      <button class="notif-bell" (click)="toggleNotifications()">🔔</button>
+      <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      <div class="notif-dropdown" *ngIf="showNotifications">
+        <div class="notif-header">
+          <h4>Notifications</h4>
+          <button class="notif-mark-read" (click)="markAllRead()" *ngIf="unreadCount > 0">Mark all read</button>
+        </div>
+        <div class="notif-list">
+          <div *ngIf="notifications.length === 0" class="notif-empty">No notifications yet</div>
+          <div *ngFor="let n of notifications" class="notif-item"
+               [class.unread]="!n.read"
+               [class.clickable]="!!n.postId"
+               (click)="openNotification(n)">
+            <div class="notif-icon">{{ notifIcon(n.type) }}</div>
+            <div class="notif-body">
+              <div class="notif-msg">{{ n.message }}</div>
+              <div class="notif-time">{{ formatTime(n.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Compose -->
@@ -267,7 +336,7 @@ const REACTIONS = [
 
   <!-- Feed -->
   <div class="feed" *ngIf="!loading">
-    <div *ngFor="let post of posts" class="post-card">
+    <div *ngFor="let post of posts" class="post-card" [id]="'post-' + post.id">
 
       <!-- Post header -->
       <div class="post-header">
@@ -458,7 +527,8 @@ const REACTIONS = [
 </div>
   `
 })
-export class CommunityComponent implements OnInit {
+export class CommunityComponent implements OnInit, OnDestroy {
+  private notifPollInterval: any;
 readonly BASE      = 'http://localhost:8089/SpringSecurity';
 readonly reactions = REACTIONS;
 
@@ -480,13 +550,25 @@ get currentUsername(): string { return this.currentUser.username ?? this.current
   confirmTarget: number | null   = null;
   confirmType:   'post' | 'comment' = 'post';
 
+  notifications:     NotificationDto[] = [];
+  unreadCount        = 0;
+  showNotifications  = false;
+
   private hideTimers = new Map<any, any>();
 
   get userInitial(): string { return this.currentUsername[0].toUpperCase(); }
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit(): void { this.loadPosts(); }
+  ngOnInit(): void {
+    this.loadPosts();
+    this.loadNotifications();
+    this.notifPollInterval = setInterval(() => this.loadNotifications(), 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.notifPollInterval);
+  }
 
   loadPosts(): void {
     this.loading = true;
@@ -560,7 +642,11 @@ get currentUsername(): string { return this.currentUser.username ?? this.current
         });
         this.newPostContent = '';
         this.posting = false;
-        this.showToast('Post shared! 🎉', 'success');
+        if (post.flagged) {
+          this.showToast('Your post contains inappropriate content and has been sent for review.', 'error');
+        } else {
+          this.showToast('Post shared! 🎉', 'success');
+        }
       },
       error: () => { this.posting = false; this.showToast('Failed to post', 'error'); }
     });
@@ -689,6 +775,9 @@ get currentUsername(): string { return this.currentUser.username ?? this.current
           reactions: [], showReactions: false, userReaction: null
         });
         post.newComment = '';
+        if ((comment as any).flagged) {
+          this.showToast('Your comment contains inappropriate content and has been sent for review.', 'error');
+        }
       },
       error: () => this.showToast('Could not post comment', 'error')
     });
@@ -770,6 +859,59 @@ get currentUsername(): string { return this.currentUser.username ?? this.current
     if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return date.toLocaleDateString();
+  }
+
+  notifIcon(type: string): string {
+    if (type === 'POST_LIKED')       return '❤️';
+    if (type === 'POST_COMMENTED')   return '💬';
+    if (type === 'COMMENT_LIKED')    return '❤️';
+    if (type === 'COMMENT_REPLIED')  return '↩️';
+    if (type === 'POST_REJECTED')    return '🚫';
+    if (type === 'COMMENT_REJECTED') return '🚫';
+    return '🔔';
+  }
+
+  openNotification(n: NotificationDto): void {
+    n.read = true;
+    this.unreadCount = Math.max(0, this.unreadCount - 1);
+    this.showNotifications = false;
+
+    if (n.postId) {
+      // Mark as read on backend
+      this.http.put(`${this.BASE}/notifications/user/${this.currentUserId}/read`, null).subscribe();
+      // Scroll to the post card
+      setTimeout(() => {
+        const el = document.getElementById(`post-${n.postId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.style.outline = '2px solid #185fa5';
+          el.style.borderRadius = '20px';
+          setTimeout(() => { el.style.outline = ''; }, 2000);
+        }
+      }, 100);
+    }
+  }
+
+  loadNotifications(): void {
+    this.http.get<NotificationDto[]>(`${this.BASE}/notifications/user/${this.currentUserId}`).subscribe({
+      next: (notifs) => {
+        this.notifications = notifs;
+        this.unreadCount   = notifs.filter(n => !n.read).length;
+      }
+    });
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  markAllRead(): void {
+    this.http.put(`${this.BASE}/notifications/user/${this.currentUserId}/read`, null).subscribe({
+      next: () => {
+        this.notifications.forEach(n => n.read = true);
+        this.unreadCount = 0;
+      }
+    });
   }
 
   private showToast(msg: string, type: 'success' | 'error'): void {
